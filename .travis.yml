@@ -5,4 +5,4 @@ notifications:
   email: false
 before_script:
 - mvn clean
-script: mvn install
+script: mvn install -Dmaven.javadoc.skip=true -B -V
