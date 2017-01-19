@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.github.ozlerhakan.poiji</groupId>
+    <artifactId>poiji</artifactId>
+    <version>1.0</version>
+    <packaging>jar</packaging>
+
+    <name>poiji</name>
+    <description>
+        Poiji allows you to map excel sheets to Java objects by means of Apache POI
+    </description>
+    <url>http://github.com/ozlerhakan/poiji</url>
+
+    <prerequisites>
+        <maven>3.0</maven>
+    </prerequisites>
+
+    <licenses>
+        <license>
+            <name>The MIT License (MIT)</name>
+            <url>http://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Hakan Ozler</name>
+            <email>ozler.hakan@gmail.com</email>
+            <organization>Istanbul JUG</organization>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/ozlerhakan/poiji.git</connection>
+        <developerConnection>scm:git:ssh://github.com:ozlerhakan/poiji.git</developerConnection>
+        <url>http://github.com/ozlerhakan/poiji/tree/master</url>
+    </scm>
+
+    <inceptionYear>2017</inceptionYear>
+
+    <issueManagement>
+        <system>github.com</system>
+        <url>https://github.com/ozlerhakan/poiji/issues</url>
+    </issueManagement>
+
+    <properties>
+        <apache.poi.version>3.15</apache.poi.version>
+        <junit.version>4.12</junit.version>
+        <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+        <jdk.source>1.8</jdk.source>
+        <jdk.target>1.8</jdk.target>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${apache.poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <source>${jdk.source}</source>
+                    <target>${jdk.target}</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

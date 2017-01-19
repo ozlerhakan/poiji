@@ -1,0 +1,99 @@
+= Poiji
+:version: v1.0
+
+Poiji is a teeny Java framework that provides one way mapping from Excel sheets to Java classes. In a way it lets us convert each row of the specified excel data into Java objects. Poiji uses https://poi.apache.org/[Apache Poi] (the Java API for Microsoft Documents) under the hood to fulfill the mapping process.
+
+== How it works
+
+In your Java projects, first create your object model:
+
+[source,java]
+----
+public class Employee {
+
+    @Index(column = 0, cell = 0) <1>
+    private long employeeId;     <2>
+
+    @Index(column = 1, cell = 1)
+    private String name;
+
+    @Index(column = 2, cell = 2)
+    private String surname;
+
+    @Index(column = 3, cell = 3)
+    private int age;
+
+    @Index(column = 4, cell = 4)
+    private boolean single;
+
+    @Index(column = 5, cell = 5)
+    private String birthday;
+
+    //no need getters/setters to map excel cells to fields
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "employeeId=" + employeeId +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", age=" + age +
+                ", single=" + single +
+                ", birthday='" + birthday + '\'' +
+                '}';
+    }
+}
+----
+<1> a field must be annotated with `@Index` along with its properties in order to get the value from the right coordinate in the target excel data.
+<2> an annotated field can be either protected, private or public modifier. The field may be either of `boolean`, `byte`, `short`, `int`, `long`, `char`, `float`, `double` or `String`.
+
+.This is the excel file (`employees.xlsx`) we want to map to a list of employee instance.
+|===
+|ID | NAME |SURNAME |AGE |SINGLE |BIRTHDAY
+
+|123923
+|Joe
+|Doe
+|30
+|TRUE
+|4/9/1987
+
+|123123
+|Sophie
+|Derue
+|20
+|FALSE
+|5/3/1997
+
+|135923
+|Paul
+|Raul
+|30
+|FALSE
+|4/9/1986
+|===
+
+The snippet below shows how to obtain the excel data using `Poiji`.
+
+[source,java]
+----
+List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class);
+employees.size();
+// 3
+Employee firstEmploye = employees.get(0);
+// Employee{employeeId=123923, name='Joe', surname='Doe', age=30, single=true, birthday='4/9/1987'}
+----
+
+By default, Poiji ignores the first row of the excel data. You can override this behaviour by setting a `PoijiOptions`.
+
+[source,java]
+----
+PoijiOptions options = PoijiOptionsBuilder.settings(2).build();
+List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class, options);
+Employee firstEmploye = employees.get(0);
+// Employee{employeeId=123123, name='Sophie', surname='Derue', age=20, single=false, birthday='5/3/1997'}
+----
+
+== License
+
+MIT
