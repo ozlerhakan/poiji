@@ -1,6 +1,8 @@
 = Poiji
 :version: v1.0
 
+image:https://travis-ci.org/ozlerhakan/poiji.svg?branch=master["Build Status", link="https://travis-ci.org/ozlerhakan/poiji"] image:https://img.shields.io/badge/license-MIT-blue.svg[]
+
 Poiji is a teeny Java framework that provides one way mapping from Excel sheets to Java classes. In a way it lets us convert each row of the specified excel data into Java objects. Poiji uses https://poi.apache.org/[Apache Poi] (the Java API for Microsoft Documents) under the hood to fulfill the mapping process.
 
 == How it works

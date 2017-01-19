@@ -1,0 +1,8 @@
+language: java
+jdk:
+- oraclejdk8
+notifications:
+  email: false
+before_script:
+- mvn clean
+script: mvn install
