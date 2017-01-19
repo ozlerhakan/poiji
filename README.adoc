@@ -7,7 +7,36 @@ Poiji is a teeny Java framework that provides one way mapping from Excel sheets 
 
 == How it works
 
-In your Java projects, first create your object model:
+In your Java 8 Maven project, first add the following dependency into your pom:
+
+[source,xml]
+----
+<dependency>
+  <groupId>com.github.ozlerhakan</groupId>
+  <artifactId>poiji</artifactId>
+  <version>1.0</version>
+</dependency>
+----
+
+In order to access the latest release, you need to add OSSR Repository URL as well:
+
+[source,xml]
+----
+<repositories>
+    <repository>
+        <id>oss-sonatype</id>
+        <name>oss-sonatype</name>
+        <url>https://oss.sonatype.org/content/repositories/releases/</url>
+        <snapshots>
+            <enabled>false</enabled>
+        </snapshots>
+    </repository>
+</repositories>
+----
+
+You can find the latest development version including javadoc and source files on https://oss.sonatype.org/content/groups/public/com/github/ozlerhakan/poiji/[Sonatypes OSS repository].
+
+So far so good, now create your object model:
 
 [source,java]
 ----
@@ -46,10 +75,11 @@ public class Employee {
     }
 }
 ----
-<1> a field must be annotated with `@Index` along with its properties in order to get the value from the right coordinate in the target excel data.
+<1> a field must be annotated with `@Index` along with its properties in order to get the value from the right coordinate in the target excel sheet.
 <2> an annotated field can be either protected, private or public modifier. The field may be either of `boolean`, `byte`, `short`, `int`, `long`, `char`, `float`, `double` or `String`.
 
-.This is the excel file (`employees.xlsx`) we want to map to a list of employee instance.
+This is the excel file (`employees.xlsx`) we want to map to a list of `Employee` instance:
+
 |===
 |ID | NAME |SURNAME |AGE |SINGLE |BIRTHDAY
 
@@ -82,7 +112,7 @@ The snippet below shows how to obtain the excel data using `Poiji`.
 List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class);
 employees.size();
 // 3
-Employee firstEmploye = employees.get(0);
+Employee firstEmployee = employees.get(0);
 // Employee{employeeId=123923, name='Joe', surname='Doe', age=30, single=true, birthday='4/9/1987'}
 ----
 
@@ -92,7 +122,7 @@ By default, Poiji ignores the first row of the excel data. You can override this
 ----
 PoijiOptions options = PoijiOptionsBuilder.settings(2).build();
 List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class, options);
-Employee firstEmploye = employees.get(0);
+Employee firstEmployee = employees.get(0);
 // Employee{employeeId=123123, name='Sophie', surname='Derue', age=20, single=false, birthday='5/3/1997'}
 ----
 
