@@ -18,22 +18,6 @@ In your Java 8 Maven project, first add the following dependency into your pom:
 </dependency>
 ----
 
-In order to access the latest release, you need to add OSSR Repository URL as well:
-
-[source,xml]
-----
-<repositories>
-    <repository>
-        <id>oss-sonatype</id>
-        <name>oss-sonatype</name>
-        <url>https://oss.sonatype.org/content/repositories/releases/</url>
-        <snapshots>
-            <enabled>false</enabled>
-        </snapshots>
-    </repository>
-</repositories>
-----
-
 You can find the latest development version including javadoc and source files on https://oss.sonatype.org/content/groups/public/com/github/ozlerhakan/poiji/[Sonatypes OSS repository].
 
 So far so good, now create your object model:
