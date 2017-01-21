@@ -78,13 +78,13 @@ This is the excel file (`employees.xlsx`) we want to map to a list of `Employee`
 |Sophie
 |Derue
 |20
-|FALSE
+|TRUE
 |5/3/1997
 
 |135923
 |Paul
 |Raul
-|30
+|31
 |FALSE
 |4/9/1986
 |===
@@ -107,7 +107,7 @@ By default, Poiji ignores the first row of the excel data. You can override this
 PoijiOptions options = PoijiOptionsBuilder.settings(2).build();
 List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class, options);
 Employee firstEmployee = employees.get(0);
-// Employee{employeeId=123123, name='Sophie', surname='Derue', age=20, single=false, birthday='5/3/1997'}
+// Employee{employeeId=123123, name='Sophie', surname='Derue', age=20, single=true, birthday='5/3/1997'}
 ----
 
 == License
