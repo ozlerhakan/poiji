@@ -1,5 +1,6 @@
 package com.poiji.deserialize;
 
+import com.poiji.deserialize.model.Employee;
 import com.poiji.internal.Poiji;
 import com.poiji.internal.PoijiOptions;
 import org.junit.Test;

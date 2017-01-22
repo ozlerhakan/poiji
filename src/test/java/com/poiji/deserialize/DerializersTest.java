@@ -1,5 +1,6 @@
 package com.poiji.deserialize;
 
+import com.poiji.deserialize.model.Employee;
 import com.poiji.internal.Poiji;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,7 +55,6 @@ public class DerializersTest {
 
 
             Employee actualEmployee1 = actualEmployees.get(0);
-            System.out.println(actualEmployee1);
             Employee actualEmployee2 = actualEmployees.get(1);
             Employee actualEmployee3 = actualEmployees.get(2);
 

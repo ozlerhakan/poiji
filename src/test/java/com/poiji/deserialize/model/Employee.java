@@ -1,4 +1,4 @@
-package com.poiji.deserialize;
+package com.poiji.deserialize.model;
 
 import com.poiji.internal.annotation.Index;
 
