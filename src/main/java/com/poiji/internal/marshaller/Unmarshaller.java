@@ -70,22 +70,24 @@ public final class Unmarshaller implements Deserializer {
             Annotation[] annotations = field.getDeclaredAnnotations();
             if (annotations.length != 0) {
                 Index index = (Index) annotations[0];
+                Class<?> fieldType = field.getType();
                 Cell cell = currentRow.getCell(index.cell());
+                Object o;
 
                 if (cell != null && index.column() == cell.getColumnIndex()) {
 
                     if (!field.isAccessible())
                         field.setAccessible(true);
-                    Class<?> fieldType = field.getType();
 
                     String value = df.formatCellValue(cell);
-                    Object o = castValue(fieldType, value);
-
-                    try {
-                        field.set(instance, o);
-                    } catch (IllegalAccessException e) {
-                        throw new IllegalCastException("Unexpected cast type {" + value + "} of field" + field.getName());
-                    }
+                    o = castValue(fieldType, value);
+                } else {
+                    o = castValue(fieldType, "");
+                }
+                try {
+                    field.set(instance, o);
+                } catch (IllegalAccessException e) {
+                    throw new IllegalCastException("Unexpected cast type {" + o + "} of field" + field.getName());
                 }
             }
         }
