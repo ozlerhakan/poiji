@@ -20,7 +20,9 @@ In your Java 8 Maven project, first add the following dependency into your pom:
 
 You can find the latest development version including javadoc and source files on https://oss.sonatype.org/content/groups/public/com/github/ozlerhakan/poiji/[Sonatypes OSS repository].
 
-So far so good, now create your object model:
+=== Example 1
+
+Create your object model:
 
 [source,java]
 ----
@@ -108,6 +110,55 @@ PoijiOptions options = PoijiOptionsBuilder.settings(2).build();
 List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class, options);
 Employee firstEmployee = employees.get(0);
 // Employee{employeeId=123123, name='Sophie', surname='Derue', age=20, single=true, birthday='5/3/1997'}
+----
+
+== Example 2
+
+Your object model may be derived from a super class:
+
+[source,java]
+----
+public abstract class Vehicle {
+
+    @Index(column = 0, cell = 0)
+    protected String name;
+
+    @Index(column = 1, cell = 1)
+    protected int year;
+}
+
+public class Car extends Vehicle {
+
+    @Index(column = 2, cell = 2)
+    private int nOfSeats;
+}
+----
+
+and you want to map the table (`car.xlsx`) below to Car objects:
+
+|===
+|NAME |YEAR |SEATS
+
+|Honda Civic
+|2017
+|4
+
+|Chevrolet Corvette
+|2017
+|2
+|===
+
+Using Poiji, you can map the annotated field(s) of super class(es) of the target class like so:
+
+[source,java]
+----
+List<Car> cars = Poiji.fromExcel(new File("cars.xls"), Car.class);
+cars.size();
+// 2
+Car car = cars.get(0);
+// Honda Civic
+// 2017
+// 4
 ----
 
 == License
