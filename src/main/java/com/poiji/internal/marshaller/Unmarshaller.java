@@ -95,7 +95,7 @@ public final class Unmarshaller implements Deserializer {
     }
 
     private <T> T setFieldValue(Row currentRow, Class<? super T> subclass, T instance) {
-        return subclass.getSuperclass() == null
+        return subclass == null
                 ? instance
                 : tailSetFieldValue(currentRow, subclass, setFieldValue(currentRow, subclass.getSuperclass(), instance));
     }
