@@ -74,11 +74,10 @@ public final class Unmarshaller implements Deserializer {
                 Cell cell = currentRow.getCell(index.cell());
                 Object o;
 
+                if (!field.isAccessible())
+                    field.setAccessible(true);
+
                 if (cell != null && index.column() == cell.getColumnIndex()) {
-
-                    if (!field.isAccessible())
-                        field.setAccessible(true);
-
                     String value = df.formatCellValue(cell);
                     o = castValue(fieldType, value);
                 } else {
