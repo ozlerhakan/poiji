@@ -41,7 +41,7 @@ public class DerializersEmptyCellTest {
     public static Iterable<Object[]> queries() throws Exception {
         return Arrays.asList(new Object[][]{
                 {"src/test/resources/employeeswithemptycells.xlsx", unmarshalling(), null},
-                {"src/test/resources/cars.xlsx", unmarshalling(), FileNotFoundException.class},
+                {"src/test/resources/fruits.xlsx", unmarshalling(), FileNotFoundException.class},
         });
     }
 
