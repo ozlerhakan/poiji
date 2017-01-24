@@ -2,7 +2,6 @@ package com.poiji.internal;
 
 import com.poiji.internal.PoijiOptions.PoijiOptionsBuilder;
 import com.poiji.internal.marshaller.Deserializer;
-import com.poiji.internal.marshaller.Unmarshaller;
 import com.poiji.util.Files;
 
 import java.io.File;
@@ -34,7 +33,7 @@ public final class Poiji {
     private static Deserializer deserializer(File file) throws FileNotFoundException {
         final PoijiStream poiParser = new PoijiStream(fileInputStream(file));
         final PoiWorkbook workbook = PoiWorkbook.workbook(Files.getExtension(file.getName()), poiParser);
-        return Unmarshaller.instance(workbook);
+        return Deserializer.instance(workbook);
     }
 
     private static <T> List<T> deserialize(final Class<T> type, final Deserializer unmarshaller) {

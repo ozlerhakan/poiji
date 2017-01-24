@@ -27,7 +27,7 @@ public final class Unmarshaller implements Deserializer {
     private final PoiWorkbook poiWorkbook;
     private final DataFormatter df = new DataFormatter();
 
-    private Unmarshaller(final PoiWorkbook poiWorkbook) {
+    Unmarshaller(final PoiWorkbook poiWorkbook) {
         this.poiWorkbook = poiWorkbook;
     }
 
@@ -137,9 +137,5 @@ public final class Unmarshaller implements Deserializer {
 
     private boolean skip(final Row currentRow, int skip) {
         return currentRow.getRowNum() + 1 <= skip;
-    }
-
-    public static Deserializer instance(PoiWorkbook workbook) {
-        return new Unmarshaller(workbook);
     }
 }

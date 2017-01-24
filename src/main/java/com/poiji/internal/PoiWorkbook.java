@@ -1,6 +1,7 @@
 package com.poiji.internal;
 
 import com.poiji.exception.InvalidExcelFileExtension;
+import com.poiji.exception.PoijiException;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -12,37 +13,41 @@ import java.io.IOException;
  */
 public abstract class PoiWorkbook {
 
-    protected final PoijiStream poiParser;
+    private final PoijiStream stream;
 
-    private PoiWorkbook(PoijiStream poiParser) {
-        this.poiParser = poiParser;
+    private PoiWorkbook(PoijiStream stream) {
+        this.stream = stream;
     }
 
     public abstract Workbook workbook();
 
-    static PoiWorkbook workbook(String fileExtension, PoijiStream poiParser) {
+    public static PoiWorkbook workbook(String fileExtension, PoijiStream stream) {
         switch (fileExtension) {
             case ".xls":
-                return new PoiWorkbookHSSH(poiParser);
+                return new PoiWorkbookHSSH(stream);
             case ".xlsx":
-                return new PoiWorkbookXSSH(poiParser);
+                return new PoiWorkbookXSSH(stream);
             default:
                 throw new InvalidExcelFileExtension("Invalid file extension (" + fileExtension + "), excepted .xls or .xlsx");
         }
     }
 
+    protected PoijiStream stream() {
+        return stream;
+    }
+
     private static class PoiWorkbookXSSH extends PoiWorkbook {
 
-        private PoiWorkbookXSSH(PoijiStream poiParser) {
-            super(poiParser);
+        private PoiWorkbookXSSH(PoijiStream stream) {
+            super(stream);
         }
 
         @Override
         public Workbook workbook() {
             try {
-                return new XSSFWorkbook(poiParser.getFis());
+                return new XSSFWorkbook(stream().get());
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new PoijiException("Problem occurred while creating XSSFWorkbook", e);
             }
         }
 
@@ -50,18 +55,16 @@ public abstract class PoiWorkbook {
 
     private static class PoiWorkbookHSSH extends PoiWorkbook {
 
-        private PoiWorkbookHSSH(PoijiStream poiParser) {
-            super(poiParser);
+        private PoiWorkbookHSSH(PoijiStream stream) {
+            super(stream);
         }
 
         @Override
         public Workbook workbook() {
             try {
-                return new HSSFWorkbook(poiParser.getFis());
+                return new HSSFWorkbook(stream().get());
             } catch (IOException e) {
-                throw new RuntimeException("Problem occurred while creting ");
-            } catch (NullPointerException e) {
-                throw new RuntimeException("Problem occurred while cre");
+                throw new PoijiException("Problem occurred while creating HSSFWorkbook", e);
             }
         }
 

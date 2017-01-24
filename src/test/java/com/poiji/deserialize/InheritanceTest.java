@@ -1,7 +1,6 @@
 package com.poiji.deserialize;
 
 import com.poiji.deserialize.model.Car;
-import com.poiji.deserialize.model.Employee;
 import com.poiji.deserialize.model.Vehicle;
 import com.poiji.internal.Poiji;
 import org.junit.Test;

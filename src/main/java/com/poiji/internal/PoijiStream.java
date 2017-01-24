@@ -7,13 +7,17 @@ import java.io.InputStream;
  */
 class PoijiStream<T extends InputStream> {
 
-    private final T fis;
+    private final T t;
 
-    PoijiStream(T fis) {
-        this.fis = fis;
+    PoijiStream(T t) {
+        this.t = t;
     }
 
-    T getFis() {
-        return fis;
+    /**
+     * the T derived from {@link InputStream}
+     * @return T
+     */
+    public T get() {
+        return t;
     }
 }
