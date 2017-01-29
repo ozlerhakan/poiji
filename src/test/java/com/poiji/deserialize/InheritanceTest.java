@@ -2,6 +2,7 @@ package com.poiji.deserialize;
 
 import com.poiji.deserialize.model.Car;
 import com.poiji.deserialize.model.Vehicle;
+import com.poiji.exception.InvalidExcelFileExtension;
 import com.poiji.internal.Poiji;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +41,8 @@ public class InheritanceTest {
     public static Iterable<Object[]> queries() throws Exception {
         return Arrays.asList(new Object[][]{
                 {"src/test/resources/cars.xlsx", unmarshalling(), null},
+                {"src/test/resources/cars.xls", unmarshalling(), null},
+                {"src/test/resources/cars.xl", unmarshalling(), InvalidExcelFileExtension.class},
         });
     }
 
@@ -70,7 +73,7 @@ public class InheritanceTest {
             assertThat(actualCar2.getName(), is(expectedCar2.getName()));
             assertThat(actualCar2.getYear(), is(expectedCar2.getYear()));
 
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             if (expectedException == null) {
                 fail(e.getMessage());
             } else {
