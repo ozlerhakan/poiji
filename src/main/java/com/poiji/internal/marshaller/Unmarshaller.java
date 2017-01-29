@@ -4,14 +4,13 @@ import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.PoijiInstantiationException;
 import com.poiji.internal.PoiWorkbook;
 import com.poiji.internal.PoijiOptions;
-import com.poiji.internal.annotation.Index;
+import com.poiji.internal.annotation.ExcelCell;
 import com.poiji.util.Casting;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +21,7 @@ import java.util.Objects;
  * <br>
  * Created by hakan on 16/01/2017.
  */
-public final class Unmarshaller implements Deserializer {
+final class Unmarshaller implements Deserializer {
 
     private final PoiWorkbook poiWorkbook;
     private final DataFormatter df = new DataFormatter();
@@ -33,12 +32,13 @@ public final class Unmarshaller implements Deserializer {
 
     public <T> List<T> deserialize(Class<T> type, PoijiOptions options) {
         Sheet sheet = poiWorkbook.workbook().getSheetAt(0);
-        int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - options.skip();
+        int skip = options.skip();
+        int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
         List<T> list = new ArrayList<>(maxPhysicalNumberOfRows);
 
         for (Row currentRow : sheet) {
 
-            if (skip(currentRow, options.skip()))
+            if (skip(currentRow, skip))
                 continue;
 
             if (maxPhysicalNumberOfRows > list.size()) {
@@ -56,7 +56,6 @@ public final class Unmarshaller implements Deserializer {
         try {
             instance = type.newInstance();
         } catch (IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
             throw new PoijiInstantiationException("Cannot create a new instance of " + type.getName());
         }
 
@@ -67,17 +66,16 @@ public final class Unmarshaller implements Deserializer {
     private <T> T tailSetFieldValue(Row currentRow, Class<? super T> type, T instance) {
         for (Field field : type.getDeclaredFields()) {
 
-            Annotation[] annotations = field.getDeclaredAnnotations();
-            if (annotations.length != 0) {
-                Index index = (Index) annotations[0];
+            ExcelCell index = field.getAnnotation(ExcelCell.class);
+            if (index != null) {
                 Class<?> fieldType = field.getType();
-                Cell cell = currentRow.getCell(index.cell());
+                Cell cell = currentRow.getCell(index.value());
                 Object o;
 
                 if (!field.isAccessible())
                     field.setAccessible(true);
 
-                if (cell != null && index.column() == cell.getColumnIndex()) {
+                if (cell != null) {
                     String value = df.formatCellValue(cell);
                     o = castValue(fieldType, value);
                 } else {

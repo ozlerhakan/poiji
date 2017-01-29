@@ -1,28 +1,28 @@
 package com.poiji.deserialize.model;
 
-import com.poiji.internal.annotation.Index;
+import com.poiji.internal.annotation.ExcelCell;
 
 /**
  * Created by hakan on 17/01/2017.
  */
 public class Employee {
 
-    @Index(column = 0, cell = 0)
+    @ExcelCell(0)
     private long employeeId;
 
-    @Index(column = 1, cell = 1)
+    @ExcelCell(1)
     private String name;
 
-    @Index(column = 2, cell = 2)
+    @ExcelCell(2)
     private String surname;
 
-    @Index(column = 3, cell = 3)
+    @ExcelCell(3)
     private int age;
 
-    @Index(column = 4, cell = 4)
+    @ExcelCell(4)
     private boolean single;
 
-    @Index(column = 5, cell = 5)
+    @ExcelCell(5)
     private String birthday;
 
     /*
