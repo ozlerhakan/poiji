@@ -5,4 +5,6 @@ notifications:
   email: false
 before_script:
 - mvn clean
+after_success:
+- mvn clean cobertura:cobertura coveralls:report
 script: mvn install -Dmaven.javadoc.skip=true -B -V
