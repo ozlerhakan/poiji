@@ -1,6 +1,7 @@
 package com.poiji.deserialize;
 
 import com.poiji.deserialize.model.Employee;
+import com.poiji.exception.PoijiException;
 import com.poiji.internal.Poiji;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +41,7 @@ public class DerializersTest {
         return Arrays.asList(new Object[][]{
                 {"src/test/resources/employees.xlsx", unmarshalling(), null},
                 {"src/test/resources/fruits.xlsx", unmarshalling(), FileNotFoundException.class},
+                {"src/test/resources/cloud.xls", unmarshalling(), PoijiException.class},
         });
     }
 
@@ -66,7 +68,7 @@ public class DerializersTest {
             assertThat(actualEmployee2.toString(), is(expectedEmployee2.toString()));
             assertThat(actualEmployee3.toString(), is(expectedEmployee3.toString()));
 
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             if (expectedException == null) {
                 fail(e.getMessage());
             } else {
