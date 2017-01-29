@@ -5,9 +5,6 @@ package com.poiji.exception;
  */
 public class PoijiException extends RuntimeException {
 
-    public PoijiException() {
-    }
-
     public PoijiException(String message) {
         super(message);
     }
@@ -16,11 +13,4 @@ public class PoijiException extends RuntimeException {
         super(message, cause);
     }
 
-    public PoijiException(Throwable cause) {
-        super(cause);
-    }
-
-    public PoijiException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
 }
