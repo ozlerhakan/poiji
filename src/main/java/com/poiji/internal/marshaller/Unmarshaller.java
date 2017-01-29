@@ -98,39 +98,35 @@ final class Unmarshaller implements Deserializer {
     }
 
     private Object castValue(Class<?> fieldType, String value) {
-        try {
-            Object o;
-            if (fieldType.getName().equals("int")) {
-                o = Casting.integerValue(Objects.equals(value, "") ? "0" : value);
+        Object o;
+        if (fieldType.getName().equals("int")) {
+            o = Casting.integerValue(Objects.equals(value, "") ? "0" : value);
 
-            } else if (fieldType.getName().equals("long")) {
-                o = Casting.longValue(Objects.equals(value, "") ? "0" : value);
+        } else if (fieldType.getName().equals("long")) {
+            o = Casting.longValue(Objects.equals(value, "") ? "0" : value);
 
-            } else if (fieldType.getName().equals("double")) {
-                o = Casting.doubleValue(Objects.equals(value, "") ? "0" : value);
+        } else if (fieldType.getName().equals("double")) {
+            o = Casting.doubleValue(Objects.equals(value, "") ? "0" : value);
 
-            } else if (fieldType.getName().equals("float")) {
-                o = Casting.floatValue(Objects.equals(value, "") ? "0" : value);
+        } else if (fieldType.getName().equals("float")) {
+            o = Casting.floatValue(Objects.equals(value, "") ? "0" : value);
 
-            } else if (fieldType.getName().equals("boolean")) {
-                o = Boolean.valueOf(value);
+        } else if (fieldType.getName().equals("boolean")) {
+            o = Boolean.valueOf(value);
 
-            } else if (fieldType.getName().equals("byte")) {
-                o = Casting.byteValue(Objects.equals(value, "") ? "0" : value);
+        } else if (fieldType.getName().equals("byte")) {
+            o = Casting.byteValue(Objects.equals(value, "") ? "0" : value);
 
-            } else if (fieldType.getName().equals("short")) {
-                o = Casting.shortValue(Objects.equals(value, "") ? "0" : value);
+        } else if (fieldType.getName().equals("short")) {
+            o = Casting.shortValue(Objects.equals(value, "") ? "0" : value);
 
-            } else if (fieldType.getName().equals("char")) {
-                value = Objects.equals(value, "") ? " " : value;
-                o = value.charAt(0);
+        } else if (fieldType.getName().equals("char")) {
+            value = Objects.equals(value, "") ? " " : value;
+            o = value.charAt(0);
 
-            } else
-                o = value;
-            return o;
-        } catch (Exception e) {
-            throw new IllegalCastException("Unexpected cast value {" + value + "} of type " + fieldType.getName());
-        }
+        } else
+            o = value;
+        return o;
     }
 
     private boolean skip(final Row currentRow, int skip) {
