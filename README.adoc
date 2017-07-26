@@ -15,7 +15,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 <dependency>
   <groupId>com.github.ozlerhakan</groupId>
   <artifactId>poiji</artifactId>
-  <version>1.1</version>
+  <version>1.2</version>
 </dependency>
 ----
 
@@ -23,11 +23,11 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    compile 'com.github.ozlerhakan:poiji:1.1'
+    compile 'com.github.ozlerhakan:poiji:1.2'
 }
 ----
 
-You can find the latest development version including javadoc and source files on https://oss.sonatype.org/content/groups/public/com/github/ozlerhakan/poiji/[Sonatypes OSS repository].
+You can find the latest and earlier development versions including javadoc and source files on https://oss.sonatype.org/content/groups/public/com/github/ozlerhakan/poiji/[Sonatypes OSS repository].
 
 === Example 1
 

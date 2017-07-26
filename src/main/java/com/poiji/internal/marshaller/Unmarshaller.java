@@ -41,6 +41,9 @@ final class Unmarshaller implements Deserializer {
             if (skip(currentRow, skip))
                 continue;
 
+            if (isRowEmpty(currentRow))
+                continue;
+
             if (maxPhysicalNumberOfRows > list.size()) {
                 T t = deserialize0(currentRow, type);
                 list.add(t);
@@ -51,7 +54,6 @@ final class Unmarshaller implements Deserializer {
     }
 
     private <T> T deserialize0(Row currentRow, Class<T> type) {
-
         T instance;
         try {
             instance = type.newInstance();
@@ -131,5 +133,14 @@ final class Unmarshaller implements Deserializer {
 
     private boolean skip(final Row currentRow, int skip) {
         return currentRow.getRowNum() + 1 <= skip;
+    }
+
+    private boolean isRowEmpty(Row row) {
+        for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
+            Cell cell = row.getCell(c, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+            if (cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK)
+                return false;
+        }
+        return true;
     }
 }
