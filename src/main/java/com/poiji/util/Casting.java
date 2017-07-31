@@ -3,7 +3,10 @@ package com.poiji.util;
 /**
  * Created by hakan on 22/01/2017.
  */
-public class Casting {
+public final class Casting {
+
+    private Casting() {
+    }
 
     public static Integer integerValue(String value) {
         try {

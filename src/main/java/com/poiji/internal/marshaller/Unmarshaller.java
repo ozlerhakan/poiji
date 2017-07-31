@@ -21,7 +21,7 @@ import java.util.Objects;
  * <br>
  * Created by hakan on 16/01/2017.
  */
-final class Unmarshaller implements Deserializer {
+final class Unmarshaller extends Deserializer {
 
     private final PoiWorkbook poiWorkbook;
     private final DataFormatter df = new DataFormatter();

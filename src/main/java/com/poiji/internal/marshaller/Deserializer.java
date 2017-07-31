@@ -8,11 +8,11 @@ import java.util.List;
 /**
  * Created by hakan on 17/01/2017.
  */
-public interface Deserializer {
+public abstract class Deserializer {
 
-    <T> List<T> deserialize(Class<T> type, PoijiOptions options);
+    public abstract <T> List<T> deserialize(Class<T> type, PoijiOptions options);
 
-    static Deserializer instance(PoiWorkbook workbook) {
+    public static Deserializer instance(PoiWorkbook workbook) {
         return new Unmarshaller(workbook);
     }
 }
