@@ -9,8 +9,4 @@ public class InvalidExcelFileExtension extends PoijiException {
         super(message);
     }
 
-    public InvalidExcelFileExtension(String message, Throwable cause) {
-        super(message, cause);
-    }
-
 }
