@@ -1,5 +1,7 @@
 package com.poiji.util;
 
+import com.poiji.internal.PoijiOptions;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -53,9 +55,9 @@ public final class Casting {
         }
     }
 
-    public static Date dateValue(String value) {
+    public static Date dateValue(String value, PoijiOptions options) {
         try {
-            final SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
+            final SimpleDateFormat sdf = new SimpleDateFormat(options.datePattern());
             return sdf.parse(value);
         } catch (ParseException e) {
             Calendar calendar = Calendar.getInstance();

@@ -25,13 +25,15 @@ import java.util.Objects;
 final class Unmarshaller extends Deserializer {
 
     private final PoiWorkbook poiWorkbook;
+    private PoijiOptions options;
     private final DataFormatter df = new DataFormatter();
 
-    Unmarshaller(final PoiWorkbook poiWorkbook) {
+    Unmarshaller(final PoiWorkbook poiWorkbook, PoijiOptions options) {
+        this.options = options;
         this.poiWorkbook = poiWorkbook;
     }
 
-    public <T> List<T> deserialize(Class<T> type, PoijiOptions options) {
+    public <T> List<T> deserialize(Class<T> type) {
         Sheet sheet = poiWorkbook.workbook().getSheetAt(0);
         int skip = options.skip();
         int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
@@ -117,7 +119,8 @@ final class Unmarshaller extends Deserializer {
         } else if (fieldType.getName().equals("boolean")) {
             o = Boolean.valueOf(value);
         } else if (fieldType.getName().equals("java.util.Date")) {
-            o = Casting.dateValue(value);
+
+            o = Casting.dateValue(value, options);
         } else
             o = value;
         return o;

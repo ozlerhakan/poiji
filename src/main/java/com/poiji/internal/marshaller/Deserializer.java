@@ -10,9 +10,9 @@ import java.util.List;
  */
 public abstract class Deserializer {
 
-    public abstract <T> List<T> deserialize(Class<T> type, PoijiOptions options);
+    public abstract <T> List<T> deserialize(Class<T> type);
 
-    public static Deserializer instance(PoiWorkbook workbook) {
-        return new Unmarshaller(workbook);
+    public static Deserializer instance(PoiWorkbook workbook, PoijiOptions options) {
+        return new Unmarshaller(workbook, options);
     }
 }

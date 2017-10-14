@@ -6,8 +6,9 @@ package com.poiji.internal;
 public final class PoijiOptions {
 
     private int skip;
+    private String datePattern;
 
-    private PoijiOptions(){
+    private PoijiOptions() {
         super();
     }
 
@@ -16,8 +17,18 @@ public final class PoijiOptions {
         return this;
     }
 
+    private PoijiOptions setDatePattern(String datePattern) {
+        this.datePattern = datePattern;
+        return this;
+    }
+
+    public String datePattern() {
+        return datePattern;
+    }
+
     /**
      * the number of skipped rows
+     *
      * @return n rows skipped
      */
     public int skip() {
@@ -27,27 +38,40 @@ public final class PoijiOptions {
     public static class PoijiOptionsBuilder {
 
         private int skip = 1;
+        private String datePattern = "dd/M/yyyy";
 
-        private PoijiOptionsBuilder(){}
+        private PoijiOptionsBuilder() {
+        }
 
-        private PoijiOptionsBuilder(int skip){
+        private PoijiOptionsBuilder(int skip) {
             this.skip = skip;
         }
 
-        public PoijiOptions build(){
-            return new PoijiOptions().setSkip(skip);
+        public PoijiOptions build() {
+            return new PoijiOptions().setSkip(skip).setDatePattern(datePattern);
         }
 
-        public static PoijiOptionsBuilder settings(){
+        public static PoijiOptionsBuilder settings() {
             return new PoijiOptionsBuilder();
+        }
+
+        public PoijiOptionsBuilder setDatePattern(String datePattern) {
+            this.datePattern = datePattern;
+            return this;
+        }
+
+        public PoijiOptionsBuilder setSkip(int skip) {
+            this.skip = skip;
+            return this;
         }
 
         /**
          * Skip the n rows of the excel data. Default is 1
+         *
          * @param skip ignored row number
          * @return builder itself
          */
-        public static PoijiOptionsBuilder settings(int skip){
+        public static PoijiOptionsBuilder settings(int skip) {
             return new PoijiOptionsBuilder(skip);
         }
 
