@@ -8,22 +8,22 @@ import com.poiji.internal.annotation.ExcelCell;
 public class Employee {
 
     @ExcelCell(0)
-    private long employeeId;
+    protected long employeeId;
 
     @ExcelCell(1)
-    private String name;
+    protected String name;
 
     @ExcelCell(2)
-    private String surname;
+    protected String surname;
 
     @ExcelCell(3)
-    private int age;
+    protected int age;
 
     @ExcelCell(4)
-    private boolean single;
+    protected boolean single;
 
     @ExcelCell(5)
-    private String birthday;
+    protected String birthday;
 
     /*
         We normally don't need getters and setters to map excel cells to fields

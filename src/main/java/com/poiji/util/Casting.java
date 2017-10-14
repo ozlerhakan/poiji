@@ -1,5 +1,10 @@
 package com.poiji.util;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * Created by hakan on 22/01/2017.
  */
@@ -48,11 +53,13 @@ public final class Casting {
         }
     }
 
-    public static Byte byteValue(String value) {
+    public static Date dateValue(String value) {
         try {
-            return new Byte(value);
-        } catch (NumberFormatException nfe) {
-            return 0;
+            final SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
+            return sdf.parse(value);
+        } catch (ParseException e) {
+            Calendar calendar = Calendar.getInstance();
+            return calendar.getTime();
         }
     }
 }

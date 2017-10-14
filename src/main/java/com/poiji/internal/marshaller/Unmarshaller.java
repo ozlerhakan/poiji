@@ -7,6 +7,7 @@ import com.poiji.internal.PoijiOptions;
 import com.poiji.internal.annotation.ExcelCell;
 import com.poiji.util.Casting;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -115,17 +116,8 @@ final class Unmarshaller extends Deserializer {
 
         } else if (fieldType.getName().equals("boolean")) {
             o = Boolean.valueOf(value);
-
-        } else if (fieldType.getName().equals("byte")) {
-            o = Casting.byteValue(Objects.equals(value, "") ? "0" : value);
-
-        } else if (fieldType.getName().equals("short")) {
-            o = Casting.shortValue(Objects.equals(value, "") ? "0" : value);
-
-        } else if (fieldType.getName().equals("char")) {
-            value = Objects.equals(value, "") ? " " : value;
-            o = value.charAt(0);
-
+        } else if (fieldType.getName().equals("java.util.Date")) {
+            o = Casting.dateValue(value);
         } else
             o = value;
         return o;
@@ -138,7 +130,7 @@ final class Unmarshaller extends Deserializer {
     private boolean isRowEmpty(Row row) {
         for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
             Cell cell = row.getCell(c, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-            if (cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK)
+            if (cell != null && cell.getCellTypeEnum() != CellType.BLANK)
                 return false;
         }
         return true;
