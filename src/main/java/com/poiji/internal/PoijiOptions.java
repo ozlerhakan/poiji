@@ -1,5 +1,7 @@
 package com.poiji.internal;
 
+import static com.poiji.util.PoijiConstants.DEFAULT_DATE_PATTERN;
+
 /**
  * Created by hakan on 17/01/2017.
  */
@@ -38,7 +40,7 @@ public final class PoijiOptions {
     public static class PoijiOptionsBuilder {
 
         private int skip = 1;
-        private String datePattern = "dd/M/yyyy";
+        private String datePattern = DEFAULT_DATE_PATTERN;
 
         private PoijiOptionsBuilder() {
         }

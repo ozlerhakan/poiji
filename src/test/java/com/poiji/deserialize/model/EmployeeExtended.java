@@ -40,7 +40,7 @@ public class EmployeeExtended extends Employee {
                 ", age=" + age +
                 ", single=" + single +
                 ", birthday='" + birthday + '\'' +
-                "rate=" + rate +
+                ", rate=" + rate +
                 ", date=" + date +
                 '}';
 

@@ -21,7 +21,7 @@ public abstract class PoiWorkbook {
 
     public abstract Workbook workbook();
 
-    public static PoiWorkbook workbook(String fileExtension, PoijiStream stream) {
+    static PoiWorkbook workbook(String fileExtension, PoijiStream stream) {
         switch (fileExtension) {
             case ".xls":
                 return new PoiWorkbookHSSH(stream);
@@ -32,7 +32,7 @@ public abstract class PoiWorkbook {
         }
     }
 
-    protected PoijiStream stream() {
+    PoijiStream stream() {
         return stream;
     }
 
