@@ -42,6 +42,7 @@ public class DerializersTest {
                 {"src/test/resources/employees.xlsx", unmarshalling(), null},
                 {"src/test/resources/fruits.xlsx", unmarshalling(), FileNotFoundException.class},
                 {"src/test/resources/cloud.xls", unmarshalling(), PoijiException.class},
+                {"src/test/resources/cloud", unmarshalling(), PoijiException.class},
         });
     }
 
