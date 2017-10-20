@@ -8,18 +8,15 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static com.poiji.internal.PoijiOptions.PoijiOptionsBuilder;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 /**
  * Created by hakan on 17/01/2017.
@@ -41,14 +38,12 @@ public class DerializersEmptyCellTest {
     public static Iterable<Object[]> queries() throws Exception {
         return Arrays.asList(new Object[][]{
                 {"src/test/resources/employeeswithemptycells.xlsx", unmarshalling(), null},
-                {"src/test/resources/fruits.xlsx", unmarshalling(), FileNotFoundException.class},
         });
     }
 
     @Test
     public void shouldMapEmptyCellsAndSkipTwoRows() {
 
-        try {
             PoijiOptions options = PoijiOptionsBuilder.settings(2).build();
             List<Employee> actualEmployees = Poiji.fromExcel(new File(path), Employee.class, options);
 
@@ -65,13 +60,6 @@ public class DerializersEmptyCellTest {
             assertThat(actualEmployee1.toString(), is(expectedEmployee1.toString()));
             assertThat(actualEmployee2.toString(), is(expectedEmployee2.toString()));
 
-        } catch (FileNotFoundException e) {
-            if (expectedException == null) {
-                fail(e.getMessage());
-            } else {
-                assertThat(e, instanceOf(expectedException));
-            }
-        }
     }
 
     private static List<Employee> unmarshalling() {

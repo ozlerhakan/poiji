@@ -1,16 +1,17 @@
 package com.poiji.internal.marshaller;
 
+import com.poiji.annotation.ExcelCell;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.PoijiInstantiationException;
 import com.poiji.internal.PoiWorkbook;
 import com.poiji.internal.PoijiOptions;
-import com.poiji.internal.annotation.ExcelCell;
 import com.poiji.util.Casting;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -34,7 +35,9 @@ final class Unmarshaller extends Deserializer {
     }
 
     public <T> List<T> deserialize(Class<T> type) {
-        Sheet sheet = poiWorkbook.workbook().getSheetAt(0);
+        Workbook workbook = poiWorkbook.workbook();
+        Sheet sheet = workbook.getSheetAt(0);
+
         int skip = options.skip();
         int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
         List<T> list = new ArrayList<>(maxPhysicalNumberOfRows);
@@ -65,7 +68,6 @@ final class Unmarshaller extends Deserializer {
         }
 
         return setFieldValue(currentRow, type, instance);
-
     }
 
     private <T> T tailSetFieldValue(Row currentRow, Class<? super T> type, T instance) {

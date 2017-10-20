@@ -8,7 +8,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,7 +39,6 @@ public class DerializersTest {
     public static Iterable<Object[]> queries() throws Exception {
         return Arrays.asList(new Object[][]{
                 {"src/test/resources/employees.xlsx", unmarshalling(), null},
-                {"src/test/resources/fruits.xlsx", unmarshalling(), FileNotFoundException.class},
                 {"src/test/resources/cloud.xls", unmarshalling(), PoijiException.class},
                 {"src/test/resources/cloud", unmarshalling(), PoijiException.class},
         });

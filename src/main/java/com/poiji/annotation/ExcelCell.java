@@ -1,4 +1,4 @@
-package com.poiji.internal.annotation;
+package com.poiji.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

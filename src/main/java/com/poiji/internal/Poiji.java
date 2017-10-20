@@ -5,8 +5,6 @@ import com.poiji.internal.marshaller.Deserializer;
 import com.poiji.util.Files;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
@@ -19,29 +17,25 @@ public final class Poiji {
     private Poiji() {
     }
 
-    public static <T> List<T> fromExcel(File file, Class<T> clazz) throws FileNotFoundException {
-        final Deserializer unmarshaller = deserializer(file,  PoijiOptionsBuilder.settings().build());
+    public static <T> List<T> fromExcel(File file, Class<T> clazz) {
+        final Deserializer unmarshaller = deserializer(file, PoijiOptionsBuilder.settings().build());
         return deserialize(clazz, unmarshaller);
     }
 
-    public static <T> List<T> fromExcel(File file, Class<T> clazz, PoijiOptions options) throws FileNotFoundException {
+    public static <T> List<T> fromExcel(File file, Class<T> clazz, PoijiOptions options) {
         final Deserializer unmarshaller = deserializer(file, options);
         return deserialize(clazz, unmarshaller);
     }
 
     @SuppressWarnings("unchecked")
-    private static Deserializer deserializer(File file, PoijiOptions options) throws FileNotFoundException {
-        final PoijiStream poiParser = new PoijiStream(fileInputStream(file));
+    private static Deserializer deserializer(File file, PoijiOptions options) {
+        final PoijiStream poiParser = new PoijiStream(file);
         final PoiWorkbook workbook = PoiWorkbook.workbook(Files.getExtension(file.getName()), poiParser);
         return Deserializer.instance(workbook, options);
     }
 
     private static <T> List<T> deserialize(final Class<T> type, final Deserializer unmarshaller) {
         return unmarshaller.deserialize(type);
-    }
-
-    private static FileInputStream fileInputStream(File file) throws FileNotFoundException {
-        return new FileInputStream(file);
     }
 
 }

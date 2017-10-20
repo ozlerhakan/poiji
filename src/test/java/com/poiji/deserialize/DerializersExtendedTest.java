@@ -9,7 +9,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,7 +42,6 @@ public class DerializersExtendedTest {
     public static Iterable<Object[]> queries() throws Exception {
         return Arrays.asList(new Object[][]{
                 {"src/test/resources/employees_extended.xls", unmarshalling(), null},
-                {"src/test/resources/fruits.xlsx", unmarshalling(), FileNotFoundException.class},
                 {"src/test/resources/cloud.xls", unmarshalling(), PoijiException.class},
         });
     }

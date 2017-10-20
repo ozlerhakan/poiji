@@ -1,6 +1,6 @@
 package com.poiji.deserialize.model;
 
-import com.poiji.internal.annotation.ExcelCell;
+import com.poiji.annotation.ExcelCell;
 
 /**
  * Created by hakan on 17/01/2017.
