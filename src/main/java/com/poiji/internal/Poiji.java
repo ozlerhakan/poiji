@@ -1,6 +1,7 @@
 package com.poiji.internal;
 
-import com.poiji.internal.PoijiOptions.PoijiOptionsBuilder;
+import com.poiji.option.PoijiOptions;
+import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
 import com.poiji.internal.marshaller.Deserializer;
 import com.poiji.util.Files;
 
@@ -30,7 +31,7 @@ public final class Poiji {
     @SuppressWarnings("unchecked")
     private static Deserializer deserializer(File file, PoijiOptions options) {
         final PoijiStream poiParser = new PoijiStream(file);
-        final PoiWorkbook workbook = PoiWorkbook.workbook(Files.getExtension(file.getName()), poiParser);
+        final PoijiWorkbook workbook = PoijiWorkbook.workbook(Files.getExtension(file.getName()), poiParser);
         return Deserializer.instance(workbook, options);
     }
 

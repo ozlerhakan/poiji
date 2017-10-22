@@ -1,7 +1,7 @@
 package com.poiji.internal.marshaller;
 
-import com.poiji.internal.PoiWorkbook;
-import com.poiji.internal.PoijiOptions;
+import com.poiji.internal.PoijiWorkbook;
+import com.poiji.option.PoijiOptions;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ public abstract class Deserializer {
 
     public abstract <T> List<T> deserialize(Class<T> type);
 
-    public static Deserializer instance(PoiWorkbook workbook, PoijiOptions options) {
+    public static Deserializer instance(PoijiWorkbook workbook, PoijiOptions options) {
         return new Unmarshaller(workbook, options);
     }
 }

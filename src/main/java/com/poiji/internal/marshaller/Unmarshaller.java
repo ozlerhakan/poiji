@@ -3,8 +3,8 @@ package com.poiji.internal.marshaller;
 import com.poiji.annotation.ExcelCell;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.PoijiInstantiationException;
-import com.poiji.internal.PoiWorkbook;
-import com.poiji.internal.PoijiOptions;
+import com.poiji.internal.PoijiWorkbook;
+import com.poiji.option.PoijiOptions;
 import com.poiji.util.Casting;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -16,7 +16,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * This is the main class that converts the excel sheet fromExcel Java object
@@ -25,18 +24,19 @@ import java.util.Objects;
  */
 final class Unmarshaller extends Deserializer {
 
-    private final PoiWorkbook poiWorkbook;
-    private PoijiOptions options;
-    private final DataFormatter df = new DataFormatter();
+    private final DataFormatter dataFormatter;
+    private final PoijiOptions options;
+    private final PoijiWorkbook poijiWorkbook;
 
-    Unmarshaller(final PoiWorkbook poiWorkbook, PoijiOptions options) {
+    Unmarshaller(final PoijiWorkbook poijiWorkbook, PoijiOptions options) {
+        this.poijiWorkbook = poijiWorkbook;
         this.options = options;
-        this.poiWorkbook = poiWorkbook;
+        dataFormatter = new DataFormatter();
     }
 
     public <T> List<T> deserialize(Class<T> type) {
-        Workbook workbook = poiWorkbook.workbook();
-        Sheet sheet = workbook.getSheetAt(0);
+        Workbook workbook = poijiWorkbook.workbook();
+        Sheet sheet = workbook.getSheetAt(options.sheetIndex());
 
         int skip = options.skip();
         int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
@@ -83,10 +83,10 @@ final class Unmarshaller extends Deserializer {
                     field.setAccessible(true);
 
                 if (cell != null) {
-                    String value = df.formatCellValue(cell);
-                    o = castValue(fieldType, value);
+                    String value = dataFormatter.formatCellValue(cell);
+                    o = Casting.castValue(fieldType, value, options);
                 } else {
-                    o = castValue(fieldType, "");
+                    o = Casting.castValue(fieldType, "", options);
                 }
                 try {
                     field.set(instance, o);
@@ -102,30 +102,6 @@ final class Unmarshaller extends Deserializer {
         return subclass == null
                 ? instance
                 : tailSetFieldValue(currentRow, subclass, setFieldValue(currentRow, subclass.getSuperclass(), instance));
-    }
-
-    private Object castValue(Class<?> fieldType, String value) {
-        Object o;
-        if (fieldType.getName().equals("int")) {
-            o = Casting.integerValue(Objects.equals(value, "") ? "0" : value);
-
-        } else if (fieldType.getName().equals("long")) {
-            o = Casting.longValue(Objects.equals(value, "") ? "0" : value);
-
-        } else if (fieldType.getName().equals("double")) {
-            o = Casting.doubleValue(Objects.equals(value, "") ? "0" : value);
-
-        } else if (fieldType.getName().equals("float")) {
-            o = Casting.floatValue(Objects.equals(value, "") ? "0" : value);
-
-        } else if (fieldType.getName().equals("boolean")) {
-            o = Boolean.valueOf(value);
-        } else if (fieldType.getName().equals("java.util.Date")) {
-
-            o = Casting.dateValue(value, options);
-        } else
-            o = value;
-        return o;
     }
 
     private boolean skip(final Row currentRow, int skip) {

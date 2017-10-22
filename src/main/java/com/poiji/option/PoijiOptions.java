@@ -1,4 +1,4 @@
-package com.poiji.internal;
+package com.poiji.option;
 
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_PATTERN;
 
@@ -9,6 +9,7 @@ public final class PoijiOptions {
 
     private int skip;
     private String datePattern;
+    private int sheetIndex;
 
     private PoijiOptions() {
         super();
@@ -22,6 +23,15 @@ public final class PoijiOptions {
     private PoijiOptions setDatePattern(String datePattern) {
         this.datePattern = datePattern;
         return this;
+    }
+
+    public PoijiOptions setSheetIndex(int sheetIndex) {
+        this.sheetIndex = sheetIndex;
+        return this;
+    }
+
+    public int sheetIndex() {
+        return sheetIndex;
     }
 
     public String datePattern() {
@@ -41,6 +51,7 @@ public final class PoijiOptions {
 
         private int skip = 1;
         private String datePattern = DEFAULT_DATE_PATTERN;
+        private int sheetNumber;
 
         private PoijiOptionsBuilder() {
         }
@@ -50,7 +61,10 @@ public final class PoijiOptions {
         }
 
         public PoijiOptions build() {
-            return new PoijiOptions().setSkip(skip).setDatePattern(datePattern);
+            return new PoijiOptions()
+                    .setSkip(skip)
+                    .setDatePattern(datePattern)
+                    .setSheetIndex(sheetNumber);
         }
 
         public static PoijiOptionsBuilder settings() {
@@ -64,6 +78,11 @@ public final class PoijiOptions {
 
         public PoijiOptionsBuilder setSkip(int skip) {
             this.skip = skip;
+            return this;
+        }
+
+        public PoijiOptionsBuilder setSheetNumber() {
+            this.sheetNumber = sheetNumber;
             return this;
         }
 

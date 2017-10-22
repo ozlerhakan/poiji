@@ -1,11 +1,12 @@
 package com.poiji.util;
 
-import com.poiji.internal.PoijiOptions;
+import com.poiji.option.PoijiOptions;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Created by hakan on 22/01/2017.
@@ -63,5 +64,29 @@ public final class Casting {
             Calendar calendar = Calendar.getInstance();
             return calendar.getTime();
         }
+    }
+
+    public static Object castValue(Class<?> fieldType, String value, PoijiOptions options) {
+        Object o;
+        if (fieldType.getName().equals("int")) {
+            o = Casting.integerValue(Objects.equals(value, "") ? "0" : value);
+
+        } else if (fieldType.getName().equals("long")) {
+            o = Casting.longValue(Objects.equals(value, "") ? "0" : value);
+
+        } else if (fieldType.getName().equals("double")) {
+            o = Casting.doubleValue(Objects.equals(value, "") ? "0" : value);
+
+        } else if (fieldType.getName().equals("float")) {
+            o = Casting.floatValue(Objects.equals(value, "") ? "0" : value);
+
+        } else if (fieldType.getName().equals("boolean")) {
+            o = Boolean.valueOf(value);
+        } else if (fieldType.getName().equals("java.util.Date")) {
+
+            o = Casting.dateValue(value, options);
+        } else
+            o = value;
+        return o;
     }
 }

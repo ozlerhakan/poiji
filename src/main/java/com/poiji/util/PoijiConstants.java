@@ -8,6 +8,7 @@ public final class PoijiConstants {
     public static final String DEFAULT_DATE_PATTERN = "dd/M/yyyy";
     public static final String XLS_EXTENSION = ".xls";
     public static final String XLSX_EXTENSION = ".xlsx";
+    public static final String ID_PATTERN = "^([A-Z]+)(\\d+)$";
 
     private PoijiConstants() {
     }
