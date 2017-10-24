@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import static org.apache.poi.xssf.eventusermodel.XSSFReader.*;
+
 /**
  * Created by hakan on 22/10/2017
  */
@@ -39,16 +41,22 @@ final class XSSFUnmarshaller extends Deserializer {
     @SuppressWarnings("unchecked")
     public <T> List<T> deserialize(Class<T> type) {
         try (OPCPackage open = OPCPackage.open(poijiFile.file())) {
-            ReadOnlySharedStringsTable readOnlySharedStringsTable = new ReadOnlySharedStringsTable(open);
-            XSSFReader reader = new XSSFReader(open);
 
+            ReadOnlySharedStringsTable readOnlySharedStringsTable = new ReadOnlySharedStringsTable(open);
             XSSFReader xssfReader = new XSSFReader(open);
             StylesTable styles = xssfReader.getStylesTable();
 
-            InputStream firstSheet = reader.getSheetsData().next();
-            processSheet(styles, readOnlySharedStringsTable, type, firstSheet);
-            firstSheet.close();
+            SheetIterator iter = (SheetIterator) xssfReader.getSheetsData();
+            int index = 0;
 
+            while (iter.hasNext()) {
+                InputStream stream = iter.next();
+                if (index == options.sheetIndex()) {
+                    processSheet(styles, readOnlySharedStringsTable, type, stream);
+                }
+                stream.close();
+                ++index;
+            }
             return poijiHandler.getDataset();
         } catch (SAXException | IOException | OpenXML4JException e) {
             throw new PoijiException("Problem occurred while reading data", e);
