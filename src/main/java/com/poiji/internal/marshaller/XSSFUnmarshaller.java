@@ -2,7 +2,6 @@ package com.poiji.internal.marshaller;
 
 import com.poiji.exception.PoijiException;
 import com.poiji.internal.PoijiFile;
-import com.poiji.internal.PoijiHandler;
 import com.poiji.option.PoijiOptions;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -40,14 +39,14 @@ final class XSSFUnmarshaller extends Deserializer {
     @SuppressWarnings("unchecked")
     public <T> List<T> deserialize(Class<T> type) {
         try (OPCPackage open = OPCPackage.open(poijiFile.file())) {
-            ReadOnlySharedStringsTable sst = new ReadOnlySharedStringsTable(open);
+            ReadOnlySharedStringsTable readOnlySharedStringsTable = new ReadOnlySharedStringsTable(open);
             XSSFReader reader = new XSSFReader(open);
 
             XSSFReader xssfReader = new XSSFReader(open);
             StylesTable styles = xssfReader.getStylesTable();
 
             InputStream firstSheet = reader.getSheetsData().next();
-            processSheet(styles, sst, type, firstSheet);
+            processSheet(styles, readOnlySharedStringsTable, type, firstSheet);
             firstSheet.close();
 
             return poijiHandler.getDataset();
@@ -56,19 +55,20 @@ final class XSSFUnmarshaller extends Deserializer {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private <T> void processSheet(StylesTable styles, ReadOnlySharedStringsTable readOnlySharedStringsTable,
-                                  Class<T> type, InputStream sheetInputStream) throws IOException, SAXException {
+                                  Class<T> type, InputStream sheetInputStream) {
 
         DataFormatter formatter = new DataFormatter();
         InputSource sheetSource = new InputSource(sheetInputStream);
         try {
             XMLReader sheetParser = SAXHelper.newXMLReader();
-            poijiHandler = new PoijiHandler(readOnlySharedStringsTable, type, options);
+            poijiHandler = new PoijiHandler(type, options);
             ContentHandler contentHandler =
                     new XSSFSheetXMLHandler(styles, null, readOnlySharedStringsTable, poijiHandler, formatter, false);
             sheetParser.setContentHandler(contentHandler);
             sheetParser.parse(sheetSource);
-        } catch (ParserConfigurationException e) {
+        } catch (ParserConfigurationException | SAXException | IOException e) {
             throw new PoijiException("Problem occurred while reading data", e);
         }
     }
