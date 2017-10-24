@@ -26,18 +26,16 @@ public class DerializersEmptyCellTest {
 
     private String path;
     private List<Employee> expectedEmployess;
-    private Class<?> expectedException;
 
-    public DerializersEmptyCellTest(String path, List<Employee> expectedEmployess, Class<?> expectedException) {
+    public DerializersEmptyCellTest(String path, List<Employee> expectedEmployess) {
         this.path = path;
         this.expectedEmployess = expectedEmployess;
-        this.expectedException = expectedException;
     }
 
     @Parameterized.Parameters(name = "{index}: ({0})={1}")
     public static Iterable<Object[]> queries() throws Exception {
         return Arrays.asList(new Object[][]{
-                {"src/test/resources/employeeswithemptycells.xlsx", unmarshalling(), null},
+                {"src/test/resources/employeeswithemptycells.xlsx", unmarshalling()},
         });
     }
 
