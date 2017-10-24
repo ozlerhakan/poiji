@@ -3,7 +3,7 @@ package com.poiji.deserialize;
 import com.poiji.deserialize.model.EmployeeExtended;
 import com.poiji.exception.PoijiException;
 import com.poiji.internal.Poiji;
-import com.poiji.internal.PoijiOptions;
+import com.poiji.option.PoijiOptions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -50,7 +50,7 @@ public class DerializersExtendedTest {
     public void shouldMapExcelToJava() {
 
         try {
-            PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().setSkip(1).setDatePattern("dd/M/yyyy").build();
+            PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().skip(1).datePattern("dd/M/yyyy").build();
             List<EmployeeExtended> actualEmployees = Poiji.fromExcel(new File(path), EmployeeExtended.class, options);
 
             assertThat(actualEmployees, notNullValue());

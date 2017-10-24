@@ -2,7 +2,7 @@ package com.poiji.deserialize;
 
 import com.poiji.deserialize.model.Employee;
 import com.poiji.internal.Poiji;
-import com.poiji.internal.PoijiOptions;
+import com.poiji.option.PoijiOptions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.poiji.internal.PoijiOptions.PoijiOptionsBuilder;
+import static com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -67,7 +67,7 @@ public class DerializersEmptyCellTest {
 
         Employee employee1 = new Employee();
         employee1.setEmployeeId(123123L);
-        employee1.setName("");
+        employee1.setName(null);
         employee1.setSurname("Derue");
         employee1.setSingle(false);
         employee1.setAge(0);

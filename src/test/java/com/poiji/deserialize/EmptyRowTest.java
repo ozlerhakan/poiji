@@ -35,7 +35,5 @@ public class EmptyRowTest {
         List<Employee> actualEmployees = Poiji.fromExcel(new File(path), Employee.class);
         assertThat(actualEmployees, notNullValue());
         assertThat(actualEmployees.size(), is(101));
-
-
     }
 }
