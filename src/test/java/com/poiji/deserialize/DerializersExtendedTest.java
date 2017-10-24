@@ -50,7 +50,7 @@ public class DerializersExtendedTest {
     public void shouldMapExcelToJava() {
 
         try {
-            PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().skip(1).datePattern("dd/M/yyyy").build();
+            PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().skip(1).datePattern("dd/mm/yyyy").build();
             List<EmployeeExtended> actualEmployees = Poiji.fromExcel(new File(path), EmployeeExtended.class, options);
 
             assertThat(actualEmployees, notNullValue());
@@ -82,7 +82,7 @@ public class DerializersExtendedTest {
     private static List<EmployeeExtended> unmarshalling() throws ParseException {
         List<EmployeeExtended> employees = new ArrayList<>(3);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/mm/yyyy");
 
         EmployeeExtended employee1 = new EmployeeExtended();
         employee1.setEmployeeId(123923L);
@@ -92,7 +92,7 @@ public class DerializersExtendedTest {
         employee1.setAge(30);
         employee1.setBirthday("4/9/1987");
         employee1.setRate(4.9);
-        employee1.setDate(sdf.parse("05/01/2017"));
+        employee1.setDate(sdf.parse("05/01/2017 22:00:01.0"));
         employees.add(employee1);
 
         EmployeeExtended employee2 = new EmployeeExtended();
@@ -103,7 +103,7 @@ public class DerializersExtendedTest {
         employee2.setAge(20);
         employee2.setBirthday("5/3/1997");
         employee2.setRate(5.3);
-        employee2.setDate(sdf.parse("05/01/2017"));
+        employee2.setDate((sdf).parse("05/01/2017 22:00:01.0"));
         employees.add(employee2);
 
         EmployeeExtended employee3 = new EmployeeExtended();
@@ -114,7 +114,7 @@ public class DerializersExtendedTest {
         employee3.setAge(31);
         employee3.setBirthday("4/9/1986");
         employee3.setRate(6.6);
-        employee3.setDate(sdf.parse("05/01/2017"));
+        employee3.setDate(sdf.parse("05/01/2017 22:00:01.0"));
         employees.add(employee3);
 
         return employees;
