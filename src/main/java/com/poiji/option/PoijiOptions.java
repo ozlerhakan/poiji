@@ -25,7 +25,7 @@ public final class PoijiOptions {
         return this;
     }
 
-    public PoijiOptions setSheetIndex(int sheetIndex) {
+    private PoijiOptions setSheetIndex(int sheetIndex) {
         this.sheetIndex = sheetIndex;
         return this;
     }
@@ -51,7 +51,7 @@ public final class PoijiOptions {
 
         private int skip = 1;
         private String datePattern = DEFAULT_DATE_PATTERN;
-        private int sheetNumber;
+        private int sheetIndex;
 
         private PoijiOptionsBuilder() {
         }
@@ -64,25 +64,43 @@ public final class PoijiOptions {
             return new PoijiOptions()
                     .setSkip(skip)
                     .setDatePattern(datePattern)
-                    .setSheetIndex(sheetNumber);
+                    .setSheetIndex(sheetIndex);
         }
 
         public static PoijiOptionsBuilder settings() {
             return new PoijiOptionsBuilder();
         }
 
-        public PoijiOptionsBuilder setDatePattern(String datePattern) {
+        /**
+         * set date pattern, default pattern is dd/M/yyyy
+         *
+         * @param datePattern date pattern
+         * @return this
+         */
+        public PoijiOptionsBuilder datePattern(String datePattern) {
             this.datePattern = datePattern;
             return this;
         }
 
-        public PoijiOptionsBuilder setSkip(int skip) {
+        /**
+         * skip number of row
+         *
+         * @param skip number
+         * @return this
+         */
+        public PoijiOptionsBuilder skip(int skip) {
             this.skip = skip;
             return this;
         }
 
-        public PoijiOptionsBuilder setSheetNumber() {
-            this.sheetNumber = sheetNumber;
+        /**
+         * set sheet index, default is 0
+         *
+         * @param sheetIndex number
+         * @return this
+         */
+        public PoijiOptionsBuilder sheetIndex(int sheetIndex) {
+            this.sheetIndex = sheetIndex;
             return this;
         }
 

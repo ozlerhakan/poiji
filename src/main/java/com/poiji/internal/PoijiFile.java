@@ -6,11 +6,11 @@ import java.io.InputStream;
 /**
  * Created by hakan on 16/01/2017.
  */
-class PoijiStream<T extends File> {
+public final class PoijiFile<T extends File> {
 
     private final T t;
 
-    PoijiStream(T t) {
+    PoijiFile(T t) {
         this.t = t;
     }
 
