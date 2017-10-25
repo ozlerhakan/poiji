@@ -121,6 +121,17 @@ Employee firstEmployee = employees.get(0);
 // Employee{employeeId=123123, name='Sophie', surname='Derue', age=20, single=true, birthday='5/3/1997'}
 ----
 
+By default, Poiji selects the first sheet of an excel file. You can override this behaviour like below:
+
+[source,java]
+----
+PoijiOptions options = PoijiOptionsBuilder.settings()
+                       .sheetIndex(1) <1>
+                       .build();
+----
+1. Poiji should look at the second (zero-based index) sheet of your excel file.
+
+
 === Example 2
 
 Your object model may be derived from a super class:
