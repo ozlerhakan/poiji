@@ -15,6 +15,9 @@ import java.util.List;
 import static org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.*;
 
 /**
+ * This class handles the processing of a .xlsx file,
+ * and generates a list of instances of a given type
+ *
  * Created by hakan on 22/10/2017
  */
 final class PoijiHandler<T> implements SheetContentsHandler {
@@ -31,7 +34,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     }
 
-    public List<T> getDataset() {
+    List<T> getDataset() {
         return dataset;
     }
 
