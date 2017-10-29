@@ -1,7 +1,7 @@
 package com.poiji.internal;
 
 import com.poiji.exception.InvalidExcelFileExtension;
-import com.poiji.internal.marshaller.Deserializer;
+import com.poiji.internal.mapping.Unmarshaller;
 import com.poiji.option.PoijiOptions;
 import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
 import com.poiji.util.Files;
@@ -22,34 +22,29 @@ public final class Poiji {
     private Poiji() {
     }
 
-    public static <T> List<T> fromExcel(File file, Class<T> clazz) {
-        final Deserializer unmarshaller = deserializer(file, PoijiOptionsBuilder.settings().build());
-        return deserialize(clazz, unmarshaller);
+    public static <T> List<T> fromExcel(final File file, final Class<T> clazz) {
+        final Unmarshaller unmarshaller = deserializer(file, PoijiOptionsBuilder.settings().build());
+        return unmarshaller.unmarshal(clazz);
     }
 
-    public static <T> List<T> fromExcel(File file, Class<T> clazz, PoijiOptions options) {
-        final Deserializer unmarshaller = deserializer(file, options);
-        return deserialize(clazz, unmarshaller);
+    public static <T> List<T> fromExcel(final File file, final Class<T> clazz, final PoijiOptions options) {
+        final Unmarshaller unmarshaller = deserializer(file, options);
+        return unmarshaller.unmarshal(clazz);
     }
 
     @SuppressWarnings("unchecked")
-    private static Deserializer deserializer(File file, PoijiOptions options) {
+    private static Unmarshaller deserializer(final File file, final PoijiOptions options) {
         final PoijiFile poijiFile = new PoijiFile(file);
 
         String extension = Files.getExtension(file.getName());
 
         if (XLS_EXTENSION.equals(extension)) {
             PoijiHSSHWorkbook poiWorkbookHSSH = new PoijiHSSHWorkbook(poijiFile);
-            return Deserializer.instance(poiWorkbookHSSH, options);
+            return Unmarshaller.instance(poiWorkbookHSSH, options);
         } else if (XLSX_EXTENSION.equals(extension)) {
-            return Deserializer.instance(poijiFile, options);
+            return Unmarshaller.instance(poijiFile, options);
         } else {
             throw new InvalidExcelFileExtension("Invalid file extension (" + extension + "), excepted .xls or .xlsx");
         }
     }
-
-    private static <T> List<T> deserialize(final Class<T> type, final Deserializer unmarshaller) {
-        return unmarshaller.deserialize(type);
-    }
-
 }

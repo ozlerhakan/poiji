@@ -1,4 +1,4 @@
-package com.poiji.internal.marshaller;
+package com.poiji.internal.mapping;
 
 import com.poiji.exception.PoijiException;
 import com.poiji.internal.PoijiFile;
@@ -27,7 +27,7 @@ import static org.apache.poi.xssf.eventusermodel.XSSFReader.*;
 /**
  * Created by hakan on 22/10/2017
  */
-final class XSSFUnmarshaller extends Deserializer {
+final class XSSFUnmarshaller extends Unmarshaller {
 
     private final PoijiFile poijiFile;
     private final PoijiOptions options;
@@ -39,7 +39,7 @@ final class XSSFUnmarshaller extends Deserializer {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> List<T> deserialize(Class<T> type) {
+    public <T> List<T> unmarshal(Class<T> type) {
         try (OPCPackage open = OPCPackage.open(poijiFile.file())) {
 
             ReadOnlySharedStringsTable readOnlySharedStringsTable = new ReadOnlySharedStringsTable(open);

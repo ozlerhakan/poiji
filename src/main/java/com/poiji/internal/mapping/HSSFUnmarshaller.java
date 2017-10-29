@@ -1,4 +1,4 @@
-package com.poiji.internal.marshaller;
+package com.poiji.internal.mapping;
 
 import com.poiji.annotation.ExcelCell;
 import com.poiji.exception.IllegalCastException;
@@ -22,19 +22,19 @@ import java.util.List;
  * <br>
  * Created by hakan on 16/01/2017.
  */
-final class Unmarshaller extends Deserializer {
+final class HSSFUnmarshaller extends Unmarshaller {
 
     private final DataFormatter dataFormatter;
     private final PoijiOptions options;
     private final PoijiWorkbook poijiWorkbook;
 
-    Unmarshaller(final PoijiWorkbook poijiWorkbook, PoijiOptions options) {
+    HSSFUnmarshaller(final PoijiWorkbook poijiWorkbook, PoijiOptions options) {
         this.poijiWorkbook = poijiWorkbook;
         this.options = options;
         dataFormatter = new DataFormatter();
     }
 
-    public <T> List<T> deserialize(Class<T> type) {
+    public <T> List<T> unmarshal(Class<T> type) {
         Workbook workbook = poijiWorkbook.workbook();
         Sheet sheet = workbook.getSheetAt(options.sheetIndex());
 
