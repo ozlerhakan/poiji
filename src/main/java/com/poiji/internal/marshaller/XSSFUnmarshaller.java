@@ -19,6 +19,7 @@ import org.xml.sax.XMLReader;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.poi.xssf.eventusermodel.XSSFReader.*;
@@ -30,7 +31,6 @@ final class XSSFUnmarshaller extends Deserializer {
 
     private final PoijiFile poijiFile;
     private final PoijiOptions options;
-    private PoijiHandler poijiHandler;
 
     XSSFUnmarshaller(PoijiFile poijiFile, PoijiOptions options) {
         this.poijiFile = poijiFile;
@@ -52,30 +52,31 @@ final class XSSFUnmarshaller extends Deserializer {
             while (iter.hasNext()) {
                 InputStream stream = iter.next();
                 if (index == options.sheetIndex()) {
-                    processSheet(styles, readOnlySharedStringsTable, type, stream);
+                    return processSheet(styles, readOnlySharedStringsTable, type, stream);
                 }
                 stream.close();
                 ++index;
             }
-            return poijiHandler.getDataset();
+            return new ArrayList<>();
         } catch (SAXException | IOException | OpenXML4JException e) {
             throw new PoijiException("Problem occurred while reading data", e);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private <T> void processSheet(StylesTable styles, ReadOnlySharedStringsTable readOnlySharedStringsTable,
+    private <T> List<T> processSheet(StylesTable styles, ReadOnlySharedStringsTable readOnlySharedStringsTable,
                                   Class<T> type, InputStream sheetInputStream) {
 
         DataFormatter formatter = new DataFormatter();
         InputSource sheetSource = new InputSource(sheetInputStream);
         try {
             XMLReader sheetParser = SAXHelper.newXMLReader();
-            poijiHandler = new PoijiHandler(type, options);
+            PoijiHandler poijiHandler = new PoijiHandler(type, options);
             ContentHandler contentHandler =
                     new XSSFSheetXMLHandler(styles, null, readOnlySharedStringsTable, poijiHandler, formatter, false);
             sheetParser.setContentHandler(contentHandler);
             sheetParser.parse(sheetSource);
+            return poijiHandler.getDataset();
         } catch (ParserConfigurationException | SAXException | IOException e) {
             throw new PoijiException("Problem occurred while reading data", e);
         }

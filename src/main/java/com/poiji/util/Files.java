@@ -13,6 +13,6 @@ public final class Files {
         if (i >= 0) {
             return fileName.substring(i);
         }
-        return fileName;
+        return "";
     }
 }
