@@ -2,7 +2,6 @@ package com.poiji.internal.mapping;
 
 import com.poiji.annotation.ExcelCell;
 import com.poiji.exception.IllegalCastException;
-import com.poiji.exception.PoijiInstantiationException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.Casting;
 import org.apache.poi.ss.util.CellAddress;
@@ -43,7 +42,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         try {
             newInstance = type.newInstance();
         } catch (IllegalAccessException | InstantiationException e) {
-            throw new PoijiInstantiationException("Cannot create a new instance of " + type.getName());
+            throw new IllegalCastException("Cannot create a new instance of " + type.getName());
         }
 
         return newInstance;

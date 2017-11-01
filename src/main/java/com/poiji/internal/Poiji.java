@@ -1,6 +1,8 @@
 package com.poiji.internal;
 
+import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.InvalidExcelFileExtension;
+import com.poiji.exception.PoijiException;
 import com.poiji.internal.mapping.Unmarshaller;
 import com.poiji.option.PoijiOptions;
 import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
@@ -22,11 +24,36 @@ public final class Poiji {
     private Poiji() {
     }
 
+    /**
+     * converts excel data into a list of Java objects
+     *
+     * @param file excel file ending with .xls or .xlsx
+     * @param clazz type to be mapped to
+     * @return
+     *         list of instances of the given type
+     *
+     * @throws PoijiException if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     */
     public static <T> List<T> fromExcel(final File file, final Class<T> clazz) {
         final Unmarshaller unmarshaller = deserializer(file, PoijiOptionsBuilder.settings().build());
         return unmarshaller.unmarshal(clazz);
     }
 
+    /**
+     * converts excel data into a list of Java objects
+     *
+     * @param file excel file ending with .xls or .xlsx
+     * @param clazz type to be mapped to
+     * @param options poiji options
+     * @return
+     *         list of instances of the given type (i.e. class)
+     *
+     * @throws PoijiException if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     */
     public static <T> List<T> fromExcel(final File file, final Class<T> clazz, final PoijiOptions options) {
         final Unmarshaller unmarshaller = deserializer(file, options);
         return unmarshaller.unmarshal(clazz);
