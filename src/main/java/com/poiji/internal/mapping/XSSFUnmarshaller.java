@@ -50,11 +50,11 @@ final class XSSFUnmarshaller extends Unmarshaller {
             int index = 0;
 
             while (iter.hasNext()) {
-                InputStream stream = iter.next();
-                if (index == options.sheetIndex()) {
-                    return processSheet(styles, readOnlySharedStringsTable, type, stream);
+                try (InputStream stream = iter.next()) {
+                    if (index == options.sheetIndex()) {
+                        return processSheet(styles, readOnlySharedStringsTable, type, stream);
+                    }
                 }
-                stream.close();
                 ++index;
             }
             return new ArrayList<>();
@@ -65,7 +65,7 @@ final class XSSFUnmarshaller extends Unmarshaller {
 
     @SuppressWarnings("unchecked")
     private <T> List<T> processSheet(StylesTable styles, ReadOnlySharedStringsTable readOnlySharedStringsTable,
-                                  Class<T> type, InputStream sheetInputStream) {
+                                     Class<T> type, InputStream sheetInputStream) {
 
         DataFormatter formatter = new DataFormatter();
         InputSource sheetSource = new InputSource(sheetInputStream);
