@@ -48,7 +48,7 @@ public final class Poiji {
     }
 
     /**
-     * converts excel data into a list of Java objects
+     * converts excel sheet into a list of objects
      *
      * @param file
      *          excel file ending with .xls or .xlsx.
