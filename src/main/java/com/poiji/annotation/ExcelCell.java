@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 /**
  * Indicates that a field declaration contains excel metadata.
- * <br/>
+ *
  * Created by hakan on 17/01/2017.
  */
 @Retention(RetentionPolicy.RUNTIME)

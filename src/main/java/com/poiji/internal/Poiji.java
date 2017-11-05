@@ -16,7 +16,6 @@ import static com.poiji.util.PoijiConstants.XLS_EXTENSION;
 
 /**
  * The main entry point of mapping excel data to Java classes
- * <br>
  * Created by hakan on 16/01/2017.
  */
 public final class Poiji {
@@ -29,6 +28,7 @@ public final class Poiji {
      *
      * @param file excel file ending with .xls or .xlsx
      * @param clazz type to be mapped to
+     * @param <T> type
      * @return
      *         list of instances of the given type
      *
@@ -46,6 +46,7 @@ public final class Poiji {
      *
      * @param file excel file ending with .xls or .xlsx
      * @param clazz type to be mapped to
+     * @param <T> type
      * @param options poiji options
      * @return
      *         list of instances of the given type (i.e. class)

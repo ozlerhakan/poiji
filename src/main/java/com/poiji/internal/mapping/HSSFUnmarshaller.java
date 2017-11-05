@@ -19,7 +19,6 @@ import java.util.List;
 
 /**
  * This is the main class that converts the excel sheet fromExcel Java object
- * <br>
  * Created by hakan on 16/01/2017.
  */
 final class HSSFUnmarshaller extends Unmarshaller {

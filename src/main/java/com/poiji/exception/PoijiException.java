@@ -3,7 +3,6 @@ package com.poiji.exception;
 /**
  * PoijiException is the superclass of RuntimeException that
  * can be thrown during the mapping process of excel service.
- * <br/>
  * Created by hakan on 18/01/2017.
  * @since   Poiji 1.0
  */
