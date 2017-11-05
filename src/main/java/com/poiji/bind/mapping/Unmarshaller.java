@@ -1,7 +1,7 @@
-package com.poiji.internal.mapping;
+package com.poiji.bind.mapping;
 
-import com.poiji.internal.PoijiFile;
-import com.poiji.internal.PoijiWorkbook;
+import com.poiji.bind.PoijiFile;
+import com.poiji.bind.PoijiWorkbook;
 import com.poiji.option.PoijiOptions;
 
 import java.util.List;

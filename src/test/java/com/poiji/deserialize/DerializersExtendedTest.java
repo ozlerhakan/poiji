@@ -2,7 +2,7 @@ package com.poiji.deserialize;
 
 import com.poiji.deserialize.model.EmployeeExtended;
 import com.poiji.exception.PoijiException;
-import com.poiji.internal.Poiji;
+import com.poiji.bind.Poiji;
 import com.poiji.option.PoijiOptions;
 import org.junit.Test;
 import org.junit.runner.RunWith;

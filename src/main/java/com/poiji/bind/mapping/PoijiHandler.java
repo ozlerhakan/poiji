@@ -1,4 +1,4 @@
-package com.poiji.internal.mapping;
+package com.poiji.bind.mapping;
 
 import com.poiji.annotation.ExcelCell;
 import com.poiji.exception.IllegalCastException;

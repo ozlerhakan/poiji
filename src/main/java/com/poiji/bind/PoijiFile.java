@@ -1,4 +1,4 @@
-package com.poiji.internal;
+package com.poiji.bind;
 
 import java.io.File;
 import java.io.InputStream;

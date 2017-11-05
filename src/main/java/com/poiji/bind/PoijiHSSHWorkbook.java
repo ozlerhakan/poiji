@@ -1,4 +1,4 @@
-package com.poiji.internal;
+package com.poiji.bind;
 
 import com.poiji.exception.PoijiException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;

@@ -11,7 +11,7 @@ public class Employee {
     protected long employeeId;
 
     @ExcelCell(1)
-    protected String name;
+    protected String name = "";
 
     @ExcelCell(2)
     protected String surname;

@@ -3,7 +3,7 @@ package com.poiji.deserialize;
 import com.poiji.deserialize.model.Car;
 import com.poiji.deserialize.model.Vehicle;
 import com.poiji.exception.InvalidExcelFileExtension;
-import com.poiji.internal.Poiji;
+import com.poiji.bind.Poiji;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

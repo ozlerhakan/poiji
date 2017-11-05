@@ -1,9 +1,9 @@
-package com.poiji.internal.mapping;
+package com.poiji.bind.mapping;
 
 import com.poiji.annotation.ExcelCell;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.PoijiInstantiationException;
-import com.poiji.internal.PoijiWorkbook;
+import com.poiji.bind.PoijiWorkbook;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.Casting;
 import org.apache.poi.ss.usermodel.Cell;

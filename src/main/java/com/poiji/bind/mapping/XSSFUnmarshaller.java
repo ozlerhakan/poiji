@@ -1,7 +1,7 @@
-package com.poiji.internal.mapping;
+package com.poiji.bind.mapping;
 
 import com.poiji.exception.PoijiException;
-import com.poiji.internal.PoijiFile;
+import com.poiji.bind.PoijiFile;
 import com.poiji.option.PoijiOptions;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
