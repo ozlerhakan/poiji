@@ -4,6 +4,8 @@ import com.poiji.deserialize.model.EmployeeExtended;
 import com.poiji.exception.PoijiException;
 import com.poiji.bind.Poiji;
 import com.poiji.option.PoijiOptions;
+import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -77,6 +79,28 @@ public class DerializersExtendedTest {
                 assertThat(e, instanceOf(expectedException));
             }
         }
+    }
+
+    @Test
+    public void shouldMapExcelDatesToJava() throws Exception {
+
+        File excelFile =
+                new File(this.getClass().getResource("/employees_extended.xls").getPath());
+
+        PoijiOptions options = PoijiOptionsBuilder.settings()
+                .skip(1)
+                .datePattern("dd/MM/yyyy")
+                .build();
+
+        List<EmployeeExtended> actualEmployees =
+                Poiji.fromExcel(excelFile, EmployeeExtended.class, options);
+
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+        assertEquals(actualEmployees.get(0).getDate(),formatter.parse("05/01/2017"));
+        assertEquals(actualEmployees.get(1).getDate(),formatter.parse("05/01/2017"));
+        assertEquals(actualEmployees.get(2).getDate(),formatter.parse("05/01/2017"));
+
     }
 
     private static List<EmployeeExtended> unmarshalling() throws ParseException {
