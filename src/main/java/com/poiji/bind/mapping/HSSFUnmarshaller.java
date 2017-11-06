@@ -14,6 +14,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,8 +62,8 @@ final class HSSFUnmarshaller extends Unmarshaller {
     private <T> T deserialize0(Row currentRow, Class<T> type) {
         T instance;
         try {
-            instance = type.newInstance();
-        } catch (IllegalAccessException | InstantiationException e) {
+            instance = type.getDeclaredConstructor().newInstance();
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
             throw new PoijiInstantiationException("Cannot create a new instance of " + type.getName());
         }
 
@@ -76,11 +77,8 @@ final class HSSFUnmarshaller extends Unmarshaller {
             if (index != null) {
                 Class<?> fieldType = field.getType();
                 Cell cell = currentRow.getCell(index.value());
+
                 Object o;
-
-                if (!field.isAccessible())
-                    field.setAccessible(true);
-
                 if (cell != null) {
                     String value = dataFormatter.formatCellValue(cell);
                     o = Casting.castValue(fieldType, value, options);
@@ -88,6 +86,7 @@ final class HSSFUnmarshaller extends Unmarshaller {
                     o = Casting.castValue(fieldType, "", options);
                 }
                 try {
+                    field.setAccessible(true);
                     field.set(instance, o);
                 } catch (IllegalAccessException e) {
                     throw new IllegalCastException("Unexpected cast type {" + o + "} of field" + field.getName());

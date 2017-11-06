@@ -4,6 +4,7 @@ import com.poiji.annotation.ExcelCell;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.Casting;
+import java.lang.reflect.InvocationTargetException;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.usermodel.XSSFComment;
 
@@ -40,8 +41,8 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     private <T> T newInstanceOf(Class<T> type) {
         T newInstance;
         try {
-            newInstance = type.newInstance();
-        } catch (IllegalAccessException | InstantiationException e) {
+            newInstance = type.getDeclaredConstructor().newInstance();
+        } catch (NoSuchMethodException| InvocationTargetException | IllegalAccessException | InstantiationException e) {
             throw new IllegalCastException("Cannot create a new instance of " + type.getName());
         }
 
@@ -64,13 +65,10 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                 Class<?> fieldType = field.getType();
 
                 if (column == index.value()) {
-
-                    if (!field.isAccessible())
-                        field.setAccessible(true);
-
                     Object o = Casting.castValue(fieldType, content, options);
 
                     try {
+                        field.setAccessible(true);
                         field.set(instance, o);
                     } catch (IllegalAccessException e) {
                         throw new IllegalCastException("Unexpected cast type {" + o + "} of field" + field.getName());
