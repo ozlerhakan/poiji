@@ -65,12 +65,10 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                 Class<?> fieldType = field.getType();
 
                 if (column == index.value()) {
-
-                        field.setAccessible(true);
-
                     Object o = Casting.castValue(fieldType, content, options);
 
                     try {
+                        field.setAccessible(true);
                         field.set(instance, o);
                     } catch (IllegalAccessException e) {
                         throw new IllegalCastException("Unexpected cast type {" + o + "} of field" + field.getName());
