@@ -3,6 +3,7 @@ package com.poiji.deserialize;
 import com.poiji.deserialize.model.Employee;
 import com.poiji.exception.PoijiException;
 import com.poiji.bind.Poiji;
+import com.poiji.option.PoijiOptions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -28,19 +29,25 @@ public class DerializersTest {
     private String path;
     private List<Employee> expectedEmployess;
     private Class<?> expectedException;
+    private int indexSheet;
 
-    public DerializersTest(String path, List<Employee> expectedEmployess, Class<?> expectedException) {
+    public DerializersTest(String path,
+                           List<Employee> expectedEmployess,
+                           Class<?> expectedException,
+                           int indexSheet) {
         this.path = path;
         this.expectedEmployess = expectedEmployess;
         this.expectedException = expectedException;
+        this.indexSheet = indexSheet;
     }
 
     @Parameterized.Parameters(name = "{index}: ({0})={1}")
     public static Iterable<Object[]> queries() throws Exception {
         return Arrays.asList(new Object[][]{
-                {"src/test/resources/employees.xlsx", unmarshalling(), null},
-                {"src/test/resources/cloud.xls", unmarshalling(), PoijiException.class},
-                {"src/test/resources/cloud", unmarshalling(), PoijiException.class},
+                {"src/test/resources/employees.xlsx", unmarshalling(), null, -1},
+                {"src/test/resources/employees_sheet2.xlsx", unmarshalling(), null, 1},
+                {"src/test/resources/cloud.xls", unmarshalling(), PoijiException.class, -1},
+                {"src/test/resources/cloud", unmarshalling(), PoijiException.class, -1},
         });
     }
 
@@ -48,12 +55,18 @@ public class DerializersTest {
     public void shouldMapExcelToJava() {
 
         try {
-            List<Employee> actualEmployees = Poiji.fromExcel(new File(path), Employee.class);
+
+            List<Employee> actualEmployees;
+            if (indexSheet == 1) {
+                PoijiOptions poijiOptions = PoijiOptions.PoijiOptionsBuilder.settings().sheetIndex(indexSheet).build();
+                actualEmployees = Poiji.fromExcel(new File(path), Employee.class, poijiOptions);
+            } else {
+                actualEmployees = Poiji.fromExcel(new File(path), Employee.class);
+            }
 
             assertThat(actualEmployees, notNullValue());
             assertThat(actualEmployees.size(), not(0));
             assertThat(actualEmployees.size(), is(expectedEmployess.size()));
-
 
             Employee actualEmployee1 = actualEmployees.get(0);
             Employee actualEmployee2 = actualEmployees.get(1);
@@ -66,7 +79,6 @@ public class DerializersTest {
             assertThat(actualEmployee1.toString(), is(expectedEmployee1.toString()));
             assertThat(actualEmployee2.toString(), is(expectedEmployee2.toString()));
             assertThat(actualEmployee3.toString(), is(expectedEmployee3.toString()));
-
         } catch (Exception e) {
             if (expectedException == null) {
                 fail(e.getMessage());
