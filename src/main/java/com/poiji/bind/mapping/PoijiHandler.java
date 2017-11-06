@@ -28,9 +28,13 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     private int internalCount;
     private PoijiOptions options;
 
+    private final Casting casting;
+
     PoijiHandler(Class<T> type, PoijiOptions options) {
         this.type = type;
         this.options = options;
+
+        casting = Casting.getInstance();
 
     }
 
@@ -65,7 +69,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                 Class<?> fieldType = field.getType();
 
                 if (column == index.value()) {
-                    Object o = Casting.castValue(fieldType, content, options);
+                    Object o = casting.castValue(fieldType, content, options);
 
                     try {
                         field.setAccessible(true);

@@ -20,6 +20,8 @@ import static com.poiji.util.PoijiConstants.XLS_EXTENSION;
  */
 public final class Poiji {
 
+    private static final Files files = Files.getInstance();
+
     private Poiji() {
     }
 
@@ -77,7 +79,7 @@ public final class Poiji {
     private static Unmarshaller deserializer(final File file, final PoijiOptions options) {
         final PoijiFile poijiFile = new PoijiFile(file);
 
-        String extension = Files.getExtension(file.getName());
+        String extension = files.getExtension(file.getName());
 
         if (XLS_EXTENSION.equals(extension)) {
             PoijiHSSHWorkbook poiWorkbookHSSH = new PoijiHSSHWorkbook(poijiFile);

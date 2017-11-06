@@ -13,10 +13,16 @@ import java.util.Objects;
  */
 public final class Casting {
 
+    private static final Casting instance = new Casting();
+
+    public static Casting getInstance() {
+        return instance;
+    }
+
     private Casting() {
     }
 
-    static Integer integerValue(String value) {
+    private Integer integerValue(String value) {
         try {
             return new Integer(value);
         } catch (NumberFormatException nfe) {
@@ -24,7 +30,7 @@ public final class Casting {
         }
     }
 
-    static Long longValue(String value) {
+    private Long longValue(String value) {
         try {
             return new Long(value);
         } catch (NumberFormatException nfe) {
@@ -32,7 +38,7 @@ public final class Casting {
         }
     }
 
-    static Short shortValue(String value) {
+    private Short shortValue(String value) {
         try {
             return new Short(value);
         } catch (NumberFormatException nfe) {
@@ -40,7 +46,7 @@ public final class Casting {
         }
     }
 
-    static Double doubleValue(String value) {
+    private Double doubleValue(String value) {
         try {
             return new Double(value);
         } catch (NumberFormatException nfe) {
@@ -48,7 +54,7 @@ public final class Casting {
         }
     }
 
-    static Float floatValue(String value) {
+    private Float floatValue(String value) {
         try {
             return new Float(value);
         } catch (NumberFormatException nfe) {
@@ -56,7 +62,7 @@ public final class Casting {
         }
     }
 
-    static Date dateValue(String value, PoijiOptions options) {
+    private Date dateValue(String value, PoijiOptions options) {
         try {
             final SimpleDateFormat sdf = new SimpleDateFormat(options.datePattern());
             return sdf.parse(value);
@@ -66,25 +72,25 @@ public final class Casting {
         }
     }
 
-    public static Object castValue(Class<?> fieldType, String value, PoijiOptions options) {
+    public Object castValue(Class<?> fieldType, String value, PoijiOptions options) {
         Object o;
         if (fieldType.getName().equals("int")) {
-            o = Casting.integerValue(Objects.equals(value, "") ? "0" : value);
+            o = integerValue(Objects.equals(value, "") ? "0" : value);
 
         } else if (fieldType.getName().equals("long")) {
-            o = Casting.longValue(Objects.equals(value, "") ? "0" : value);
+            o = longValue(Objects.equals(value, "") ? "0" : value);
 
         } else if (fieldType.getName().equals("double")) {
-            o = Casting.doubleValue(Objects.equals(value, "") ? "0" : value);
+            o = doubleValue(Objects.equals(value, "") ? "0" : value);
 
         } else if (fieldType.getName().equals("float")) {
-            o = Casting.floatValue(Objects.equals(value, "") ? "0" : value);
+            o = floatValue(Objects.equals(value, "") ? "0" : value);
 
         } else if (fieldType.getName().equals("boolean")) {
             o = Boolean.valueOf(value);
         } else if (fieldType.getName().equals("java.util.Date")) {
 
-            o = Casting.dateValue(value, options);
+            o = dateValue(value, options);
         } else
             o = value;
         return o;
