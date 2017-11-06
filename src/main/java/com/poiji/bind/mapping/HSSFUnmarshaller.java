@@ -6,6 +6,7 @@ import com.poiji.exception.PoijiInstantiationException;
 import com.poiji.bind.PoijiWorkbook;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.Casting;
+import java.lang.reflect.InvocationTargetException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -26,10 +27,12 @@ final class HSSFUnmarshaller extends Unmarshaller {
     private final DataFormatter dataFormatter;
     private final PoijiOptions options;
     private final PoijiWorkbook poijiWorkbook;
+    private final Casting casting;
 
     HSSFUnmarshaller(final PoijiWorkbook poijiWorkbook, PoijiOptions options) {
         this.poijiWorkbook = poijiWorkbook;
         this.options = options;
+        casting = Casting.getInstance();
         dataFormatter = new DataFormatter();
     }
 
@@ -61,8 +64,8 @@ final class HSSFUnmarshaller extends Unmarshaller {
     private <T> T deserialize0(Row currentRow, Class<T> type) {
         T instance;
         try {
-            instance = type.newInstance();
-        } catch (IllegalAccessException | InstantiationException e) {
+            instance = type.getConstructor().newInstance();
+        } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException | InstantiationException e) {
             throw new PoijiInstantiationException("Cannot create a new instance of " + type.getName());
         }
 
@@ -78,14 +81,13 @@ final class HSSFUnmarshaller extends Unmarshaller {
                 Cell cell = currentRow.getCell(index.value());
                 Object o;
 
-                if (!field.isAccessible())
                     field.setAccessible(true);
 
                 if (cell != null) {
                     String value = dataFormatter.formatCellValue(cell);
-                    o = Casting.castValue(fieldType, value, options);
+                    o = casting.castValue(fieldType, value, options);
                 } else {
-                    o = Casting.castValue(fieldType, "", options);
+                    o = casting.castValue(fieldType, "", options);
                 }
                 try {
                     field.set(instance, o);
