@@ -4,8 +4,8 @@ import com.poiji.annotation.ExcelCell;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.Casting;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.usermodel.XSSFComment;
 
@@ -66,8 +66,6 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                 Class<?> fieldType = field.getType();
 
                 if (column == index.value()) {
-
-                    AccessibleObject accessible = field;
 
                         field.setAccessible(true);
 
