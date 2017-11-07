@@ -27,11 +27,13 @@ final class HSSFUnmarshaller extends Unmarshaller {
     private final DataFormatter dataFormatter;
     private final PoijiOptions options;
     private final PoijiWorkbook poijiWorkbook;
+    private final Casting casting;
 
     HSSFUnmarshaller(final PoijiWorkbook poijiWorkbook, PoijiOptions options) {
         this.poijiWorkbook = poijiWorkbook;
         this.options = options;
         dataFormatter = new DataFormatter();
+        casting = Casting.getInstance();
     }
 
     public <T> List<T> unmarshal(Class<T> type) {
@@ -81,9 +83,9 @@ final class HSSFUnmarshaller extends Unmarshaller {
                 Object o;
                 if (cell != null) {
                     String value = dataFormatter.formatCellValue(cell);
-                    o = Casting.castValue(fieldType, value, options);
+                    o = casting.castValue(fieldType, value, options);
                 } else {
-                    o = Casting.castValue(fieldType, "", options);
+                    o = casting.castValue(fieldType, "", options);
                 }
                 try {
                     field.setAccessible(true);
