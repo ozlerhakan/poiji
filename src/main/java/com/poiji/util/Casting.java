@@ -38,14 +38,6 @@ public final class Casting {
         }
     }
 
-    private Short shortValue(String value) {
-        try {
-            return new Short(value);
-        } catch (NumberFormatException nfe) {
-            return 0;
-        }
-    }
-
     private Double doubleValue(String value) {
         try {
             return new Double(value);

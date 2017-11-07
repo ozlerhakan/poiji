@@ -23,9 +23,10 @@ import static org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.*;
 final class PoijiHandler<T> implements SheetContentsHandler {
 
     private T instance;
-    private Class<T> type;
     private List<T> dataset;
     private int internalCount;
+
+    private Class<T> type;
     private PoijiOptions options;
 
     private final Casting casting;
@@ -35,7 +36,6 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         this.options = options;
 
         casting = Casting.getInstance();
-
     }
 
     List<T> getDataset() {
