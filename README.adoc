@@ -181,6 +181,25 @@ Car car = cars.get(0);
 // 4
 ----
 
+=== Try with JShell
+
+Since we have a new pedagogic tool, Java 9 REPL, you can try Poiji in JShell. Clone the repo and follow the steps below. JShell should open up a new jshell session once loading the startup scripts and the specified jars that must be in the classpath. You must first import and create related packages and classes before using Poiji. We are able to use directly Poiji and Employee classes because they are already imported from `jshell/snippets` with `try-with-jshell.sh`.
+
+----
+$ cd poiji/
+
+$ ./try-with-jshell.sh
+|  Welcome to JShell -- Version 9
+|  For an introduction type: /help intro
+
+jshell> List<Employee> employees = Poiji.fromExcel(new File("src/test/resources/employees.xlsx"), Employee.class);
+
+jshell> employees.forEach(System.out::println)
+Employee{employeeId=123923, name='Joe', surname='Doe', age=30, single=true, birthday='4/9/1987'}
+Employee{employeeId=123123, name='Sophie', surname='Derue', age=20, single=false, birthday='5/3/1997'}
+Employee{employeeId=135923, name='Paul', surname='Raul', age=31, single=false, birthday='4/9/1986'}
+----
+
 == License
 
 MIT
