@@ -43,6 +43,8 @@ public final class Poiji {
      *          if the specified excel file extension is invalid.
      * @throws IllegalCastException
      *          if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     *
+     * @see Poiji#fromExcel(File, Class, PoijiOptions)
      */
     public static synchronized <T> List<T>  fromExcel(final File file, final Class<T> type) {
         final Unmarshaller unmarshaller = deserializer(file, PoijiOptionsBuilder.settings().build());
@@ -69,6 +71,8 @@ public final class Poiji {
      *          if the specified excel file extension is invalid.
      * @throws IllegalCastException
      *          if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     *
+     * @see Poiji#fromExcel(File, Class)
      */
     public static synchronized <T> List<T> fromExcel(final File file, final Class<T> type, final PoijiOptions options) {
         final Unmarshaller unmarshaller = deserializer(file, options);
