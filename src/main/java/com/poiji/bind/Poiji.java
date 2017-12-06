@@ -15,7 +15,17 @@ import static com.poiji.util.PoijiConstants.XLSX_EXTENSION;
 import static com.poiji.util.PoijiConstants.XLS_EXTENSION;
 
 /**
- * The main entry point of mapping excel data to Java classes
+ * The entry point of the mapping process.
+ * <p>
+ * Example:
+ * <pre>
+ * List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class);
+ * employees.size();
+ * // 3
+ * Employee firstEmployee = employees.get(0);
+ * // Employee{employeeId=123923, name='Joe', surname='Doe', age=30, single=true, birthday='4/9/1987'}
+ * </pre>
+ * <p>
  * Created by hakan on 16/01/2017.
  */
 public final class Poiji {
@@ -26,7 +36,7 @@ public final class Poiji {
     }
 
     /**
-     * converts a excel sheet into a list of objects
+     * converts excel rows into a list of objects
      *
      * @param file
      *         excel file ending with .xls or .xlsx.
@@ -52,7 +62,7 @@ public final class Poiji {
     }
 
     /**
-     * converts excel sheet into a list of objects
+     * converts excel rows into a list of objects
      *
      * @param file
      *          excel file ending with .xls or .xlsx.
