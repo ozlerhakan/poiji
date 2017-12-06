@@ -1,9 +1,9 @@
 package com.poiji.bind;
 
+import com.poiji.bind.mapping.Unmarshaller;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.InvalidExcelFileExtension;
 import com.poiji.exception.PoijiException;
-import com.poiji.bind.mapping.Unmarshaller;
 import com.poiji.option.PoijiOptions;
 import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
 import com.poiji.util.Files;
@@ -44,7 +44,7 @@ public final class Poiji {
      * @throws IllegalCastException
      *          if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
      */
-    public static <T> List<T> fromExcel(final File file, final Class<T> type) {
+    public static synchronized <T> List<T>  fromExcel(final File file, final Class<T> type) {
         final Unmarshaller unmarshaller = deserializer(file, PoijiOptionsBuilder.settings().build());
         return unmarshaller.unmarshal(type);
     }
@@ -70,7 +70,7 @@ public final class Poiji {
      * @throws IllegalCastException
      *          if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
      */
-    public static <T> List<T> fromExcel(final File file, final Class<T> type, final PoijiOptions options) {
+    public static synchronized <T> List<T> fromExcel(final File file, final Class<T> type, final PoijiOptions options) {
         final Unmarshaller unmarshaller = deserializer(file, options);
         return unmarshaller.unmarshal(type);
     }
