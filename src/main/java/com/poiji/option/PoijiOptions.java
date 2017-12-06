@@ -9,6 +9,7 @@ public final class PoijiOptions {
 
     private int skip;
     private String datePattern;
+    private boolean preferNullOverDefault;
     private int sheetIndex;
 
     private PoijiOptions() {
@@ -25,6 +26,11 @@ public final class PoijiOptions {
         return this;
     }
 
+    private PoijiOptions setPreferNullOverDefault(boolean preferNullOverDefault) {
+        this.preferNullOverDefault = preferNullOverDefault;
+        return this;
+    }
+
     private PoijiOptions setSheetIndex(int sheetIndex) {
         this.sheetIndex = sheetIndex;
         return this;
@@ -36,6 +42,10 @@ public final class PoijiOptions {
 
     public String datePattern() {
         return datePattern;
+    }
+
+    public boolean preferNullOverDefault() {
+        return preferNullOverDefault;
     }
 
     /**
@@ -51,6 +61,7 @@ public final class PoijiOptions {
 
         private int skip = 1;
         private String datePattern = DEFAULT_DATE_PATTERN;
+        private boolean preferNullOverDefault = false;
         private int sheetIndex;
 
         private PoijiOptionsBuilder() {
@@ -63,6 +74,7 @@ public final class PoijiOptions {
         public PoijiOptions build() {
             return new PoijiOptions()
                     .setSkip(skip)
+                    .setPreferNullOverDefault(preferNullOverDefault)
                     .setDatePattern(datePattern)
                     .setSheetIndex(sheetIndex);
         }
@@ -79,6 +91,17 @@ public final class PoijiOptions {
          */
         public PoijiOptionsBuilder datePattern(String datePattern) {
             this.datePattern = datePattern;
+            return this;
+        }
+
+        /**
+         * set whether or not to use null instead of default object
+         *
+         * @param preferNullOverDefault boolean
+         * @return this
+         */
+        public PoijiOptionsBuilder preferNullOverDefault(boolean preferNullOverDefault) {
+            this.preferNullOverDefault = preferNullOverDefault;
             return this;
         }
 

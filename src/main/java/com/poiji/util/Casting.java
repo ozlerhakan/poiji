@@ -59,8 +59,12 @@ public final class Casting {
             final SimpleDateFormat sdf = new SimpleDateFormat(options.datePattern());
             return sdf.parse(value);
         } catch (ParseException e) {
-            Calendar calendar = Calendar.getInstance();
-            return calendar.getTime();
+            if (Boolean.TRUE.equals(options.preferNullOverDefault())) {
+                return null;
+            } else {
+                Calendar calendar = Calendar.getInstance();
+                return calendar.getTime();
+            }
         }
     }
 
