@@ -1,26 +1,30 @@
 package com.poiji.util;
 
-import com.poiji.exception.IllegalCastException;
-import com.poiji.exception.PoijiInstantiationException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+
 public class CastingTest {
+
     private Casting casting;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
 
         casting = Casting.getInstance();
     }
 
     @Test
-    public void getInstance() throws Exception {
+    public void getInstance() {
 
         assertNotNull(casting);
     }
@@ -34,118 +38,77 @@ public class CastingTest {
 
         Date expectedDate = formatter.parse("05/01/2016");
 
-        Date testDate = (Date) casting.castValue(Date.class,"05/01/2016",options);
+        Date testDate = (Date) casting.castValue(Date.class, "05/01/2016", options);
 
-        assertEquals(expectedDate ,testDate);
+        assertEquals(expectedDate, testDate);
     }
 
     @Test
-    public void castInteger() throws Exception {
+    public void castInteger() {
 
-        PoijiOptions options = PoijiOptionsBuilder.settings().datePattern("dd/MM/yyyy").build();
+        PoijiOptions options = PoijiOptionsBuilder.settings().build();
 
-        Integer testVal = new Integer((String) casting.castValue(Integer.class,"10",options));
+        Integer testVal = (Integer) casting.castValue(int.class, "10", options);
 
-        assertEquals(new Integer(10) ,testVal);
+        assertEquals(new Integer(10), testVal);
     }
 
     @Test
-    public void castDouble() throws Exception {
-        // required
-        PoijiOptions options = PoijiOptionsBuilder.settings().datePattern("dd/MM/yyyy").build();
+    public void castDouble() {
 
-        Double testVal = Double.valueOf((String) casting.castValue(Integer.class,"81.56891",options));
+        PoijiOptions options = PoijiOptionsBuilder.settings().build();
 
-        assertEquals(new Double(81.56891) ,testVal);
+        Double testVal = (Double) casting.castValue(double.class, "81.56891", options);
+
+        assertEquals(new Double(81.56891), testVal);
     }
 
-    @Test(expected = NumberFormatException.class)
-    public void castDoubleException() throws Exception {
-        // required
-        PoijiOptions options = PoijiOptionsBuilder.settings().datePattern("dd/MM/yyyy").build();
+    public void castDoubleException() {
 
-        Integer testVal = new Integer((String) casting.castValue(Integer.class,"81.56891",options));
+        PoijiOptions options = PoijiOptionsBuilder.settings().build();
+
+        Integer value = (Integer) casting.castValue(int.class, "81.56891", options);
+
+        int expectedValue = 0;
+
+        assertThat(expectedValue, is(value));
     }
 
     @Test
-    public void castBoolean() throws Exception {
-        // required
-        PoijiOptions options = PoijiOptionsBuilder.settings().datePattern("dd/MM/yyyy").build();
+    public void castBoolean() {
 
-        Boolean testVal = Boolean.valueOf(String.valueOf(casting.castValue(Boolean.class,"True",options)));
+        PoijiOptions options = PoijiOptionsBuilder.settings().build();
 
-        assertEquals(true ,testVal);
+        Boolean testVal = (Boolean) casting.castValue(boolean.class, "True", options);
+
+        assertEquals(true, testVal);
+    }
+
+    @Test
+    public void castFloat() {
+
+        PoijiOptions options = PoijiOptionsBuilder.settings().build();
+
+        Float testVal = (Float) casting.castValue(float.class, "81.56891", options);
+
+        assertEquals(new Float(81.56891), testVal);
     }
 
     @Test(expected = ClassCastException.class)
-    public void castBooleanException() throws Exception {
-        // required
-        PoijiOptions options = PoijiOptionsBuilder.settings().datePattern("dd/MM/yyyy").build();
+    public void castLongWrongFormat() {
 
-        Boolean testVal = Boolean.valueOf((Boolean) casting.castValue(Boolean.class,"True",options));
+        PoijiOptions options = PoijiOptionsBuilder.settings().build();
 
-        assertEquals(true ,testVal);
+        Long testVal = (Long) casting.castValue(int.class, "9223372036854775808", options);
     }
 
     @Test
-    public void castFloat() throws Exception {
-        // required
-        PoijiOptions options = PoijiOptionsBuilder.settings().datePattern("dd/MM/yyyy").build();
+    public void castLong() {
 
-        Float testVal = Float.valueOf((String) casting.castValue(Integer.class,"81.56891",options));
+        PoijiOptions options = PoijiOptionsBuilder.settings().build();
 
-        assertEquals(new Float(81.56891) ,testVal);
-    }
+        Long testVal = (Long) casting.castValue(long.class, "9223372036854775807", options);
 
-    @Test
-    public void castShort() throws Exception {
-        // required
-        PoijiOptions options = PoijiOptionsBuilder.settings().datePattern("dd/MM/yyyy").build();
-
-        Short testVal = Short.valueOf((String) casting.castValue(Integer.class,"32767",options));
-
-        assertEquals(new Short("32767") ,testVal);
-    }
-
-    @Test(expected = NumberFormatException.class)
-    public void castShortException() throws Exception {
-        // required
-        PoijiOptions options = PoijiOptionsBuilder.settings().datePattern("dd/MM/yyyy").build();
-
-        Short testVal = Short.valueOf((String) casting.castValue(Integer.class,"81.56891",options));
-
-        assertEquals(new Short("81.56891") ,testVal);
-    }
-
-    @Test(expected = NumberFormatException.class)
-    public void castShortWrongFormat() throws Exception {
-        // required
-        PoijiOptions options = PoijiOptionsBuilder.settings().datePattern("dd/MM/yyyy").build();
-
-        Short testVal = Short.valueOf((String) casting.castValue(Integer.class,"32768",options));
-
-        assertEquals(new Short("32768") ,testVal);
-    }
-
-    @Test(expected = NumberFormatException.class)
-    public void castLongWrongFormat() throws Exception {
-        // required
-        PoijiOptions options = PoijiOptionsBuilder.settings().datePattern("dd/MM/yyyy").build();
-
-        Long testVal =
-                Long.valueOf((String) casting.castValue(Integer.class,"9223372036854775808",options));
-
-        assertEquals(new Long("9223372036854775808") ,testVal);
-    }
-
-    @Test
-    public void castLong() throws Exception {
-        // required
-        PoijiOptions options = PoijiOptionsBuilder.settings().datePattern("dd/MM/yyyy").build();
-
-        Long testVal =
-                Long.valueOf((String) casting.castValue(Integer.class,"9223372036854775807",options));
-
-        assertEquals(new Long("9223372036854775807") ,testVal);
+        assertEquals(new Long("9223372036854775807"), testVal);
     }
 }
