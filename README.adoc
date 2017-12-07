@@ -1,5 +1,5 @@
 = Poiji
-:version: v1.7
+:version: v1.8
 
 image:https://travis-ci.org/ozlerhakan/poiji.svg?branch=master["Build Status", link="https://travis-ci.org/ozlerhakan/poiji"] image:https://api.codacy.com/project/badge/Grade/6587e90886184da29a1b7c5634695c9d["Codacy code quality", link="https://www.codacy.com/app/ozlerhakan/poiji?utm_source=github.com&utm_medium=referral&utm_content=ozlerhakan/poiji&utm_campaign=Badge_Grade"] image:https://coveralls.io/repos/github/ozlerhakan/poiji/badge.svg?branch=master["Coverage Status", link="https://coveralls.io/github/ozlerhakan/poiji?branch=master"] image:https://img.shields.io/badge/license-MIT-blue.svg[]
 
@@ -15,7 +15,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 <dependency>
   <groupId>com.github.ozlerhakan</groupId>
   <artifactId>poiji</artifactId>
-  <version>1.7</version>
+  <version>1.8</version>
 </dependency>
 ----
 
@@ -23,7 +23,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    compile 'com.github.ozlerhakan:poiji:1.7'
+    compile 'com.github.ozlerhakan:poiji:1.8'
 }
 ----
 
@@ -131,6 +131,15 @@ PoijiOptions options = PoijiOptionsBuilder.settings()
 ----
 1. Poiji should look at the second (zero-based index) sheet of your excel file.
 
+If you want a date field to return `null` rather than a default date, use `PoijiOptionsBuilder` with the `preferNullOverDefault` method as follows:
+
+[source,java]
+----
+PoijiOptions options = PoijiOptionsBuilder.settings()
+                       .preferNullOverDefault(true) <1>
+                       .build();
+----
+1. Annotated date fields will have a `null` value, if the specified date pattern cannot be parsed.
 
 === Example 2
 
