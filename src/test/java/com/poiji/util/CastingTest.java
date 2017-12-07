@@ -63,6 +63,7 @@ public class CastingTest {
         assertEquals(new Double(81.56891), testVal);
     }
 
+    @Test
     public void castDoubleException() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings().build();
