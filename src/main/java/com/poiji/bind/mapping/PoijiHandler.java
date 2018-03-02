@@ -4,15 +4,15 @@ import com.poiji.annotation.ExcelCell;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.Casting;
-import java.lang.reflect.InvocationTargetException;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.usermodel.XSSFComment;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.*;
+import static org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 
 /**
  * This class handles the processing of a .xlsx file,
@@ -35,6 +35,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         this.type = type;
         this.options = options;
 
+        dataset = new ArrayList<>();
         casting = Casting.getInstance();
     }
 
@@ -84,10 +85,6 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     @Override
     public void startRow(int rowNum) {
-        if (rowNum == 1) {
-            dataset = new ArrayList<>();
-        }
-
         if (rowNum + 1 > options.skip()) {
             instance = newInstanceOf(type);
         }
