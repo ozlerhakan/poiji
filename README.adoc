@@ -23,7 +23,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    compile 'com.github.ozlerhakan:poiji:1.8'
+    compile 'com.github.ozlerhakan:poiji:1.9'
 }
 ----
 
