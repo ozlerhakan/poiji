@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.*;
 
 /**
  * Created by ar on 9/03/2018.
@@ -21,10 +22,12 @@ public class RowNumberTest {
 
     private String path;
     private List<Person> expectedPersonList;
+    private Class<?> expectedException;
 
-    public RowNumberTest(String path, List<Person> expectedPersonList) {
+    public RowNumberTest(String path, List<Person> expectedPersonList, Class<?> expectedException) {
         this.path = path;
         this.expectedPersonList = expectedPersonList;
+        this.expectedException = expectedException;
     }
 
     @Parameterized.Parameters(name = "{index}: ({0})={1}")
@@ -37,12 +40,20 @@ public class RowNumberTest {
 
     @Test
     public void testRowNumberForXLSXFormatFile() {
-        List<Person> actualCars = Poiji.fromExcel(new File(path), Person.class);
-        assertEquals(expectedPersonList.get(0).getRow(), actualCars.get(0).getRow());
-        assertEquals(expectedPersonList.get(1).getRow(), actualCars.get(1).getRow());
-        assertEquals(expectedPersonList.get(2).getRow(), actualCars.get(2).getRow());
-        assertEquals(expectedPersonList.get(3).getRow(), actualCars.get(3).getRow());
-        assertEquals(expectedPersonList.get(4).getRow(), actualCars.get(4).getRow());
+        try {
+            List<Person> actualCars = Poiji.fromExcel(new File(path), Person.class);
+            assertEquals(expectedPersonList.get(0).getRow(), actualCars.get(0).getRow());
+            assertEquals(expectedPersonList.get(1).getRow(), actualCars.get(1).getRow());
+            assertEquals(expectedPersonList.get(2).getRow(), actualCars.get(2).getRow());
+            assertEquals(expectedPersonList.get(3).getRow(), actualCars.get(3).getRow());
+            assertEquals(expectedPersonList.get(4).getRow(), actualCars.get(4).getRow());
+        } catch (Exception e) {
+            if (expectedException == null) {
+                fail(e.getMessage());
+            } else {
+                assertThat(e, instanceOf(expectedException));
+            }
+        }
     }
 
     private static List<Person> unmarshalling() {
