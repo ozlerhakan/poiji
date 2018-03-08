@@ -21,12 +21,10 @@ public class RowNumberTest {
 
     private String path;
     private List<Person> expectedPersonList;
-    private Class<?> expectedException;
 
-    public RowNumberTest(String path, List<Person> expectedPersonList, Class<?> expectedException) {
+    public RowNumberTest(String path, List<Person> expectedPersonList) {
         this.path = path;
         this.expectedPersonList = expectedPersonList;
-        this.expectedException = expectedException;
     }
 
     @Parameterized.Parameters(name = "{index}: ({0})={1}")
