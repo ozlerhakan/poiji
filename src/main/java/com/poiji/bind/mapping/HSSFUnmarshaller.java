@@ -1,9 +1,9 @@
 package com.poiji.bind.mapping;
 
 import com.poiji.annotation.ExcelCell;
+import com.poiji.bind.Unmarshaller;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.PoijiInstantiationException;
-import com.poiji.bind.PoijiWorkbook;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.Casting;
 import org.apache.poi.ss.usermodel.Cell;
@@ -22,22 +22,21 @@ import java.util.List;
  * This is the main class that converts the excel sheet fromExcel Java object
  * Created by hakan on 16/01/2017.
  */
-final class HSSFUnmarshaller extends Unmarshaller {
+abstract class HSSFUnmarshaller implements Unmarshaller {
 
     private final DataFormatter dataFormatter;
     private final PoijiOptions options;
-    private final PoijiWorkbook poijiWorkbook;
     private final Casting casting;
 
-    HSSFUnmarshaller(final PoijiWorkbook poijiWorkbook, PoijiOptions options) {
-        this.poijiWorkbook = poijiWorkbook;
+    HSSFUnmarshaller(PoijiOptions options) {
         this.options = options;
         dataFormatter = new DataFormatter();
         casting = Casting.getInstance();
     }
 
+    @Override
     public <T> List<T> unmarshal(Class<T> type) {
-        Workbook workbook = poijiWorkbook.workbook();
+        Workbook workbook = workbook();
         Sheet sheet = workbook.getSheetAt(options.sheetIndex());
 
         int skip = options.skip();
@@ -116,4 +115,6 @@ final class HSSFUnmarshaller extends Unmarshaller {
         }
         return true;
     }
+
+    protected abstract Workbook workbook();
 }

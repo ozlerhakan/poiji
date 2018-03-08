@@ -1,7 +1,7 @@
 package com.poiji.bind.mapping;
 
+import com.poiji.bind.Unmarshaller;
 import com.poiji.exception.PoijiException;
-import com.poiji.bind.PoijiFile;
 import com.poiji.option.PoijiOptions;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -22,45 +22,37 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.apache.poi.xssf.eventusermodel.XSSFReader.*;
+import static org.apache.poi.xssf.eventusermodel.XSSFReader.SheetIterator;
 
 /**
  * Created by hakan on 22/10/2017
  */
-final class XSSFUnmarshaller extends Unmarshaller {
+abstract class XSSFUnmarshaller implements Unmarshaller {
 
-    private final PoijiFile poijiFile;
-    private final PoijiOptions options;
+    protected final PoijiOptions options;
 
-    XSSFUnmarshaller(PoijiFile poijiFile, PoijiOptions options) {
-        this.poijiFile = poijiFile;
+    XSSFUnmarshaller(PoijiOptions options) {
         this.options = options;
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> List<T> unmarshal(Class<T> type) {
-        try (OPCPackage open = OPCPackage.open(poijiFile.file())) {
+    <T> List<T> unmarshal0(Class<T> type, OPCPackage open) throws IOException, SAXException, OpenXML4JException {
 
-            ReadOnlySharedStringsTable readOnlySharedStringsTable = new ReadOnlySharedStringsTable(open);
-            XSSFReader xssfReader = new XSSFReader(open);
-            StylesTable styles = xssfReader.getStylesTable();
+        ReadOnlySharedStringsTable readOnlySharedStringsTable = new ReadOnlySharedStringsTable(open);
+        XSSFReader xssfReader = new XSSFReader(open);
+        StylesTable styles = xssfReader.getStylesTable();
 
-            SheetIterator iter = (SheetIterator) xssfReader.getSheetsData();
-            int index = 0;
+        SheetIterator iter = (SheetIterator) xssfReader.getSheetsData();
+        int index = 0;
 
-            while (iter.hasNext()) {
-                try (InputStream stream = iter.next()) {
-                    if (index == options.sheetIndex()) {
-                        return processSheet(styles, readOnlySharedStringsTable, type, stream);
-                    }
+        while (iter.hasNext()) {
+            try (InputStream stream = iter.next()) {
+                if (index == options.sheetIndex()) {
+                    return processSheet(styles, readOnlySharedStringsTable, type, stream);
                 }
-                ++index;
             }
-            return new ArrayList<>();
-        } catch (SAXException | IOException | OpenXML4JException e) {
-            throw new PoijiException("Problem occurred while reading data", e);
+            ++index;
         }
+        return new ArrayList<>();
     }
 
     @SuppressWarnings("unchecked")
