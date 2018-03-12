@@ -1,5 +1,5 @@
 = Poiji
-:version: v1.9
+:version: v1.10
 
 image:https://travis-ci.org/ozlerhakan/poiji.svg?branch=master["Build Status", link="https://travis-ci.org/ozlerhakan/poiji"] image:https://api.codacy.com/project/badge/Grade/6587e90886184da29a1b7c5634695c9d["Codacy code quality", link="https://www.codacy.com/app/ozlerhakan/poiji?utm_source=github.com&utm_medium=referral&utm_content=ozlerhakan/poiji&utm_campaign=Badge_Grade"] image:https://coveralls.io/repos/github/ozlerhakan/poiji/badge.svg?branch=master["Coverage Status", link="https://coveralls.io/github/ozlerhakan/poiji?branch=master"] image:https://img.shields.io/badge/license-MIT-blue.svg[]
 
@@ -15,7 +15,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 <dependency>
   <groupId>com.github.ozlerhakan</groupId>
   <artifactId>poiji</artifactId>
-  <version>1.9</version>
+  <version>1.10</version>
 </dependency>
 ----
 
@@ -23,7 +23,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    compile 'com.github.ozlerhakan:poiji:1.9'
+    compile 'com.github.ozlerhakan:poiji:1.10'
 }
 ----
 
@@ -37,8 +37,11 @@ Create your object model:
 ----
 public class Employee {
 
-    @ExcelCell(0)                <1>
-    private long employeeId;     <2>
+    @ExcelRow                    <1>
+    private int rowIndex;
+
+    @ExcelCell(0)                <2>
+    private long employeeId;     <3>
 
     @ExcelCell(1)
     private String name;
@@ -70,8 +73,9 @@ public class Employee {
     }
 }
 ----
-<1> a field must be annotated with `@ExcelCell` along with its property in order to get the value from the right coordinate in the target excel sheet.
-<2> an annotated field can be either protected, private or public modifier. The field may be either of `boolean`, `int`, `long`, `float`, `double`, `java.util.Date` or `String`.
+<1> As of 1.10, we're able to access the index of each row item by using the `ExcelRow` annotation. Annotated variable should be of type `int`, `double`, `float` or `long`.
+<2> A field must be annotated with `@ExcelCell` along with its property in order to get the value from the right coordinate in the target excel sheet.
+<3> An annotated field can be either protected, private or public modifier. The field may be either of `boolean`, `int`, `long`, `float`, `double`, `java.util.Date` or `String`.
 
 This is the excel file (`employees.xlsx`) we want to map to a list of `Employee` instance:
 
@@ -105,6 +109,10 @@ The snippet below shows how to obtain the excel data using `Poiji`.
 [source,java]
 ----
 List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class);
+// alternatively
+InputStream stream = new FileInputStream(new File("employees.xls"))
+List<Employee> employees = Poiji.fromExcel(stream, PoijiExcelType.XLS, Employee.class, options);
+
 employees.size();
 // 3
 Employee firstEmployee = employees.get(0);
