@@ -116,7 +116,7 @@ List<Employee> employees = Poiji.fromExcel(stream, PoijiExcelType.XLS, Employee.
 employees.size();
 // 3
 Employee firstEmployee = employees.get(0);
-// Employee{employeeId=123923, name='Joe', surname='Doe', age=30, single=true, birthday='4/9/1987'}
+// Employee{rowIndex=1, employeeId=123923, name='Joe', surname='Doe', age=30, single=true, birthday='4/9/1987'}
 ----
 
 By default, Poiji ignores the first row of the excel data. You can override this behaviour by setting a `PoijiOptions`.
@@ -126,7 +126,7 @@ By default, Poiji ignores the first row of the excel data. You can override this
 PoijiOptions options = PoijiOptionsBuilder.settings(2).build();
 List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class, options);
 Employee firstEmployee = employees.get(0);
-// Employee{employeeId=123123, name='Sophie', surname='Derue', age=20, single=true, birthday='5/3/1997'}
+// Employee{rowIndex=2, employeeId=123123, name='Sophie', surname='Derue', age=20, single=true, birthday='5/3/1997'}
 ----
 
 By default, Poiji selects the first sheet of an excel file. You can override this behaviour like below:
