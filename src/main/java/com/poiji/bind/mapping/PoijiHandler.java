@@ -1,6 +1,7 @@
 package com.poiji.bind.mapping;
 
 import com.poiji.annotation.ExcelCell;
+import com.poiji.annotation.ExcelRow;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.Casting;
@@ -12,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.String.valueOf;
 import static org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 
 /**
@@ -47,7 +49,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         T newInstance;
         try {
             newInstance = type.getDeclaredConstructor().newInstance();
-        } catch (NoSuchMethodException| InvocationTargetException | IllegalAccessException | InstantiationException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
             throw new IllegalCastException("Cannot create a new instance of " + type.getName());
         }
 
@@ -64,7 +66,12 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     private void setValue(String content, Class<? super T> type, int column) {
         for (Field field : type.getDeclaredFields()) {
-
+            ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
+            if (excelRow != null) {
+                Object o;
+                o = casting.castValue(field.getType(), valueOf(internalCount), options);
+                setFieldData(field, o);
+            }
             ExcelCell index = field.getAnnotation(ExcelCell.class);
             if (index != null) {
                 Class<?> fieldType = field.getType();
@@ -72,14 +79,18 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                 if (column == index.value()) {
                     Object o = casting.castValue(fieldType, content, options);
 
-                    try {
-                        field.setAccessible(true);
-                        field.set(instance, o);
-                    } catch (IllegalAccessException e) {
-                        throw new IllegalCastException("Unexpected cast type {" + o + "} of field" + field.getName());
-                    }
+                    setFieldData(field, o);
                 }
             }
+        }
+    }
+
+    private void setFieldData(Field field, Object o) {
+        try {
+            field.setAccessible(true);
+            field.set(instance, o);
+        } catch (IllegalAccessException e) {
+            throw new IllegalCastException("Unexpected cast type {" + o + "} of field" + field.getName());
         }
     }
 
