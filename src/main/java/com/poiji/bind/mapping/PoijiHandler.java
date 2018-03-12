@@ -115,7 +115,6 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     @Override
     public void cell(String cellReference, String formattedValue, XSSFComment comment) {
 
-//        System.out.println(cellReference);
         CellAddress cellAddress = new CellAddress(cellReference);
         int row = cellAddress.getRow();
 
@@ -125,8 +124,6 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
         internalCount = row;
         int column = cellAddress.getColumn();
-
-//        System.out.println(CellReference.convertNumToColString(column));
 
         setFieldValue(formattedValue, type, column);
     }
