@@ -1,14 +1,18 @@
 package com.poiji.deserialize;
 
+import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.Car;
 import com.poiji.deserialize.model.Vehicle;
 import com.poiji.exception.InvalidExcelFileExtension;
-import com.poiji.bind.Poiji;
+import com.poiji.exception.PoijiExcelType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,22 +30,24 @@ import static org.junit.Assert.fail;
 @RunWith(Parameterized.class)
 public class InheritanceTest {
 
+    private final boolean fromStream;
     private String path;
     private List<Car> expectedCars;
     private Class<?> expectedException;
 
-    public InheritanceTest(String path, List<Car> expectedCars, Class<?> expectedException) {
+    public InheritanceTest(String path, List<Car> expectedCars, Class<?> expectedException, boolean fromStream) {
         this.path = path;
         this.expectedCars = expectedCars;
         this.expectedException = expectedException;
+        this.fromStream = fromStream;
     }
 
     @Parameterized.Parameters(name = "{index}: ({0})={1}")
-    public static Iterable<Object[]> queries() throws Exception {
+    public static Iterable<Object[]> queries() {
         return Arrays.asList(new Object[][]{
-                {"src/test/resources/cars.xlsx", unmarshalling(), null},
-                {"src/test/resources/cars.xls", unmarshalling(), null},
-                {"src/test/resources/cars.xl", unmarshalling(), InvalidExcelFileExtension.class},
+                {"src/test/resources/cars.xlsx", unmarshalling(), null, false},
+                {"src/test/resources/cars.xls", unmarshalling(), null, true},
+                {"src/test/resources/cars.xl", unmarshalling(), InvalidExcelFileExtension.class, false},
         });
     }
 
@@ -49,7 +55,18 @@ public class InheritanceTest {
     public void shouldMapExcelToJava() {
 
         try {
-            List<Car> actualCars = Poiji.fromExcel(new File(path), Car.class);
+            List<Car> actualCars;
+
+            if (fromStream) {
+                try (InputStream stream = new FileInputStream(new File(path))) {
+                    actualCars = Poiji.fromExcel(stream, PoijiExcelType.XLS, Car.class);
+                } catch (IOException e) {
+                    fail(e.getMessage());
+                    return;
+                }
+            } else {
+                actualCars = Poiji.fromExcel(new File(path), Car.class);
+            }
 
             assertThat(actualCars, notNullValue());
             assertThat(actualCars.size(), not(0));
