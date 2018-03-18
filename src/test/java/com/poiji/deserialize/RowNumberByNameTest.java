@@ -2,7 +2,6 @@ package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.byid.Person;
-import com.poiji.deserialize.model.byname.PersonByName;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -21,13 +20,13 @@ import static org.junit.Assert.fail;
  * Created by ar on 9/03/2018.
  */
 @RunWith(Parameterized.class)
-public class RowNumberTest {
+public class RowNumberByNameTest {
 
     private String path;
     private List<Person> expectedPersonList;
     private Class<?> expectedException;
 
-    public RowNumberTest(String path, List<Person> expectedPersonList, Class<?> expectedException) {
+    public RowNumberByNameTest(String path, List<Person> expectedPersonList, Class<?> expectedException) {
         this.path = path;
         this.expectedPersonList = expectedPersonList;
         this.expectedException = expectedException;
@@ -44,7 +43,7 @@ public class RowNumberTest {
     @Test
     public void testRowNumberForXLSXFormatFile() {
         try {
-            List<PersonByName> actualCars = Poiji.fromExcel(new File(path), PersonByName.class);
+            List<Person> actualCars = Poiji.fromExcel(new File(path), Person.class);
             assertEquals(expectedPersonList.get(0).getRow(), actualCars.get(0).getRow());
             assertEquals(expectedPersonList.get(1).getRow(), actualCars.get(1).getRow());
             assertEquals(expectedPersonList.get(2).getRow(), actualCars.get(2).getRow());

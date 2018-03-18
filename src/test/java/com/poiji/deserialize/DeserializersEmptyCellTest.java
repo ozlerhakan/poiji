@@ -1,7 +1,7 @@
 package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
-import com.poiji.deserialize.model.Employee;
+import com.poiji.deserialize.model.byid.Employee;
 import com.poiji.exception.PoijiExcelType;
 import com.poiji.option.PoijiOptions;
 import org.junit.Test;
@@ -27,13 +27,13 @@ import static org.junit.Assert.fail;
  * Created by hakan on 17/01/2017.
  */
 @RunWith(Parameterized.class)
-public class DerializersEmptyCellTest {
+public class DeserializersEmptyCellTest {
 
     private String path;
     private List<Employee> expectedEmployess;
     private boolean fromStream;
 
-    public DerializersEmptyCellTest(String path, List<Employee> expectedEmployess, boolean fromStream) {
+    public DeserializersEmptyCellTest(String path, List<Employee> expectedEmployess, boolean fromStream) {
         this.path = path;
         this.expectedEmployess = expectedEmployess;
         this.fromStream = fromStream;

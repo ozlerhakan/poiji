@@ -1,7 +1,7 @@
 package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
-import com.poiji.deserialize.model.Employee;
+import com.poiji.deserialize.model.byid.Employee;
 import com.poiji.option.PoijiOptions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,19 +19,19 @@ import static org.junit.Assert.assertThat;
  * Created by hakan on 17/01/2017.
  */
 @RunWith(Parameterized.class)
-public class DerializersEmptySheetTest {
+public class DeserializersEmptySheetTest {
 
     private String path;
     private int indexSheet;
 
-    public DerializersEmptySheetTest(String path,
-                                     int indexSheet) {
+    public DeserializersEmptySheetTest(String path,
+                                       int indexSheet) {
         this.path = path;
         this.indexSheet = indexSheet;
     }
 
     @Parameterized.Parameters(name = "{index}: ({0})={1}")
-    public static Iterable<Object[]> queries() throws Exception {
+    public static Iterable<Object[]> queries() {
         return Arrays.asList(new Object[][]{
                 {"src/test/resources/employees_sheet2.xlsx", 2},
         });

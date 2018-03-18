@@ -1,8 +1,8 @@
 package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
-import com.poiji.deserialize.model.Car;
-import com.poiji.deserialize.model.Vehicle;
+import com.poiji.deserialize.model.byid.Car;
+import com.poiji.deserialize.model.byid.Vehicle;
 import com.poiji.exception.InvalidExcelFileExtension;
 import com.poiji.exception.PoijiExcelType;
 import org.junit.Test;

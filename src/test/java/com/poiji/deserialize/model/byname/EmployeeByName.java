@@ -1,28 +1,28 @@
-package com.poiji.deserialize.model;
+package com.poiji.deserialize.model.byname;
 
-import com.poiji.annotation.ExcelCell;
+import com.poiji.annotation.ExcelCellName;
 
 /**
  * Created by hakan on 17/01/2017.
  */
-public class Employee {
+public class EmployeeByName {
 
-    @ExcelCell(0)
+    @ExcelCellName("ID")
     protected long employeeId;
 
-    @ExcelCell(1)
+    @ExcelCellName("NAME")
     protected String name = "";
 
-    @ExcelCell(2)
+    @ExcelCellName("SURNAME")
     protected String surname;
 
-    @ExcelCell(3)
+    @ExcelCellName("AGE")
     protected int age;
 
-    @ExcelCell(4)
+    @ExcelCellName("SINGLE")
     protected boolean single;
 
-    @ExcelCell(5)
+    @ExcelCellName("BIRTHDAY")
     protected String birthday;
 
     /*

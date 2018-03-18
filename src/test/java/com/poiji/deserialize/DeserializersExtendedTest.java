@@ -1,11 +1,10 @@
 package com.poiji.deserialize;
 
-import com.poiji.deserialize.model.EmployeeExtended;
-import com.poiji.exception.PoijiException;
 import com.poiji.bind.Poiji;
+import com.poiji.deserialize.model.byid.EmployeeExtended;
+import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -21,6 +20,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -28,13 +28,13 @@ import static org.junit.Assert.fail;
  * Created by hakan on 17/01/2017.
  */
 @RunWith(Parameterized.class)
-public class DerializersExtendedTest {
+public class DeserializersExtendedTest {
 
     private String path;
     private List<EmployeeExtended> expectedEmployess;
     private Class<?> expectedException;
 
-    public DerializersExtendedTest(String path, List<EmployeeExtended> expectedEmployess, Class<?> expectedException) {
+    public DeserializersExtendedTest(String path, List<EmployeeExtended> expectedEmployess, Class<?> expectedException) {
         this.path = path;
         this.expectedEmployess = expectedEmployess;
         this.expectedException = expectedException;

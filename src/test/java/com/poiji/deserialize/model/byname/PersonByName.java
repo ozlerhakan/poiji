@@ -1,27 +1,28 @@
-package com.poiji.deserialize.model;
+package com.poiji.deserialize.model.byname;
 
-import com.poiji.annotation.ExcelCell;
+import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelRow;
 
 /**
  * Created by ar on 9/03/2018.
  */
-public class Person {
+public class PersonByName {
 
     @ExcelRow
     protected int row;
 
-    @ExcelCell(0)
+    @ExcelCellName("Name")
     protected String name;
 
-    @ExcelCell(1)
+    @ExcelCellName("Address")
     protected String address;
 
-    @ExcelCell(2)
+    @ExcelCellName("Mobile")
     protected String mobile;
 
-    @ExcelCell(3)
+    @ExcelCellName("Email")
     protected String email;
+
 
     public int getRow() {
         return row;

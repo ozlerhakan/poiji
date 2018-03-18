@@ -1,6 +1,7 @@
 package com.poiji.bind.mapping;
 
 import com.poiji.annotation.ExcelCell;
+import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelRow;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
@@ -11,7 +12,9 @@ import org.apache.poi.xssf.usermodel.XSSFComment;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.lang.String.valueOf;
 import static org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
@@ -19,7 +22,7 @@ import static org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetConten
 /**
  * This class handles the processing of a .xlsx file,
  * and generates a list of instances of a given type
- *
+ * <p>
  * Created by hakan on 22/10/2017
  */
 final class PoijiHandler<T> implements SheetContentsHandler {
@@ -32,6 +35,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     private PoijiOptions options;
 
     private final Casting casting;
+    private Map<String, Integer> titles;
 
     PoijiHandler(Class<T> type, PoijiOptions options) {
         this.type = type;
@@ -39,6 +43,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
         dataset = new ArrayList<>();
         casting = Casting.getInstance();
+        titles = new HashMap<String, Integer>();
     }
 
     List<T> getDataset() {
@@ -81,6 +86,20 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
                     setFieldData(field, o);
                 }
+
+            } else {
+
+                ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
+                if (excelCellName != null) {
+                    Class<?> fieldType = field.getType();
+                    Integer titleColumn = titles.get(excelCellName.value());
+                    if (titleColumn != null && column == titleColumn) {
+
+                        Object o = casting.castValue(fieldType, content, options);
+
+                        setFieldData(field, o);
+                    }
+                }
             }
         }
     }
@@ -118,12 +137,16 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         CellAddress cellAddress = new CellAddress(cellReference);
         int row = cellAddress.getRow();
 
+        internalCount = row;
+        int column = cellAddress.getColumn();
+
+        if (row == 0) {
+            titles.put(formattedValue, column);
+        }
+
         if (row + 1 <= options.skip()) {
             return;
         }
-
-        internalCount = row;
-        int column = cellAddress.getColumn();
 
         setFieldValue(formattedValue, type, column);
     }

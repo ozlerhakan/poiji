@@ -1,7 +1,7 @@
 package com.poiji.deserialize;
 
-import com.poiji.deserialize.model.Employee;
 import com.poiji.bind.Poiji;
+import com.poiji.deserialize.model.byid.Employee;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -25,7 +25,7 @@ public class EmptyRowTest {
     }
 
     @Parameters
-    public static Object[] excel() throws Exception {
+    public static Object[] excel() {
         return new Object[]{"src/test/resources/synonyms-test.xlsx"};
     }
 
