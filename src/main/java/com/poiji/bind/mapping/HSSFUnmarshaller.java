@@ -1,18 +1,26 @@
 package com.poiji.bind.mapping;
 
 import com.poiji.annotation.ExcelCell;
-import com.poiji.bind.Unmarshaller;
+import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelRow;
+import com.poiji.bind.Unmarshaller;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.PoijiInstantiationException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.Casting;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.lang.String.valueOf;
 
@@ -25,10 +33,12 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     private final DataFormatter dataFormatter;
     private final PoijiOptions options;
     private final Casting casting;
+    private Map<String, Integer> titles;
 
     HSSFUnmarshaller(PoijiOptions options) {
         this.options = options;
         dataFormatter = new DataFormatter();
+        titles = new HashMap<String, Integer>();
         casting = Casting.getInstance();
     }
 
@@ -40,6 +50,8 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
         int skip = options.skip();
         int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
         List<T> list = new ArrayList<>(maxPhysicalNumberOfRows);
+
+        loadColumnTitles(sheet, maxPhysicalNumberOfRows);
 
         for (Row currentRow : sheet) {
 
@@ -56,6 +68,15 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
         }
 
         return list;
+    }
+
+    private void loadColumnTitles(Sheet sheet, int maxPhysicalNumberOfRows) {
+        if (maxPhysicalNumberOfRows > 0) {
+            Row firstRow = sheet.getRow(0);
+            for (Cell cell : firstRow) {
+                titles.put(cell.getStringCellValue(), cell.getColumnIndex());
+            }
+        }
     }
 
     private <T> T deserialize0(Row currentRow, Class<T> type) {
@@ -79,20 +100,35 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
             }
             ExcelCell index = field.getAnnotation(ExcelCell.class);
             if (index != null) {
-                Class<?> fieldType = field.getType();
-                Cell cell = currentRow.getCell(index.value());
+                constructTypeValue(currentRow, instance, field, index.value());
+            } else {
 
-                Object o;
-                if (cell != null) {
-                    String value = dataFormatter.formatCellValue(cell);
-                    o = casting.castValue(fieldType, value, options);
-                } else {
-                    o = casting.castValue(fieldType, "", options);
+                ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
+                if (excelCellName != null) {
+                    Integer titleColumn = titles.get(excelCellName.value());
+
+                    if (titleColumn != null) {
+                        constructTypeValue(currentRow, instance, field, titleColumn);
+                    }
                 }
-                setFieldData(instance, field, o);
             }
         }
         return instance;
+    }
+
+    private <T> void constructTypeValue(Row currentRow, T instance, Field field, int column) {
+        Class<?> fieldType = field.getType();
+        Cell cell = currentRow.getCell(column);
+
+        Object o;
+        if (cell != null) {
+            String value = dataFormatter.formatCellValue(cell);
+            o = casting.castValue(fieldType, value, options);
+        } else {
+            o = casting.castValue(fieldType, "", options);
+        }
+
+        setFieldData(instance, field, o);
     }
 
     private <T> void setFieldData(T instance, Field field, Object o) {
