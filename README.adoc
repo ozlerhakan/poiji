@@ -1,5 +1,5 @@
 = Poiji
-:version: v1.10
+:version: v1.11
 
 image:https://travis-ci.org/ozlerhakan/poiji.svg?branch=master["Build Status", link="https://travis-ci.org/ozlerhakan/poiji"] image:https://api.codacy.com/project/badge/Grade/6587e90886184da29a1b7c5634695c9d["Codacy code quality", link="https://www.codacy.com/app/ozlerhakan/poiji?utm_source=github.com&utm_medium=referral&utm_content=ozlerhakan/poiji&utm_campaign=Badge_Grade"] image:https://coveralls.io/repos/github/ozlerhakan/poiji/badge.svg?branch=master["Coverage Status", link="https://coveralls.io/github/ozlerhakan/poiji?branch=master"] image:https://img.shields.io/badge/license-MIT-blue.svg[]
 
@@ -15,7 +15,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 <dependency>
   <groupId>com.github.ozlerhakan</groupId>
   <artifactId>poiji</artifactId>
-  <version>1.10</version>
+  <version>1.11</version>
 </dependency>
 ----
 
@@ -23,7 +23,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    compile 'com.github.ozlerhakan:poiji:1.10'
+    compile 'com.github.ozlerhakan:poiji:1.11'
 }
 ----
 
@@ -150,6 +150,78 @@ PoijiOptions options = PoijiOptionsBuilder.settings()
 1. Annotated date fields will have a `null` value, if the specified date pattern cannot be parsed.
 
 === Example 2
+
+The version `1.11` introduces a new annotation called `ExcelCellName` so that we can read the values by column names directly.
+
+----
+public class Person {
+
+    @ExcelCellName("Name")  <1>
+    protected String name;
+
+    @ExcelCellName("Address")
+    protected String address;
+
+    @ExcelCellName("Age")
+    protected int age;
+
+    @ExcelCellName("Email")
+    protected String email;
+
+}
+----
+1. We need to specify the `name` of the column for which the corresponding value is looking. `@ExcelCellName` is case-sensitive and the excel file should't contain duplicated column names.
+
+For example, here is the excel (`person.xls`) file we want to use:
+
+|===
+| Name |Address |Age |Email
+
+|Joe
+|San Francisco, CA
+|30
+|joe@doe.com
+
+|Sophie
+|Costa Mesa, CA
+|20
+|sophie@doe.com
+
+|===
+
+[source,java]
+----
+List<Person> people = Poiji.fromExcel(new File("person.xls"), Person.class);
+people.size();
+// 2
+Person person = people.get(0);
+// Joe
+// San Francisco, CA
+// 30
+// joe@doe.com
+----
+
+Given that the first column always stands for the names of people, you're able to combine the `ExcelCell` annotation with `ExcelCellName` in your object model:
+
+----
+public class Person {
+
+    @ExcelCell(0)
+    protected String name;
+
+    @ExcelCellName("Address")
+    protected String address;
+
+    @ExcelCellName("Age")
+    protected int age;
+
+    @ExcelCellName("Email")
+    protected String email;
+
+}
+----
+
+=== Example 3
 
 Your object model may be derived from a super class:
 
