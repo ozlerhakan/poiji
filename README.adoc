@@ -153,6 +153,7 @@ PoijiOptions options = PoijiOptionsBuilder.settings()
 
 The version `1.11` introduces a new annotation called `ExcelCellName` so that we can read the values by column names directly.
 
+[source,java]
 ----
 public class Person {
 
@@ -170,7 +171,7 @@ public class Person {
 
 }
 ----
-1. We need to specify the `name` of the column for which the corresponding value is looking. `@ExcelCellName` is case-sensitive and the excel file should't contain duplicated column names.
+1. We need to specify the `name` of the column for which the corresponding value is looked. `@ExcelCellName` is case-sensitive and the excel file should't contain duplicated column names.
 
 For example, here is the excel (`person.xls`) file we want to use:
 
@@ -203,6 +204,7 @@ Person person = people.get(0);
 
 Given that the first column always stands for the names of people, you're able to combine the `ExcelCell` annotation with `ExcelCellName` in your object model:
 
+[source,java]
 ----
 public class Person {
 
