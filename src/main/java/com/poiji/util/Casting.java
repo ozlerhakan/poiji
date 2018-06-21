@@ -70,23 +70,24 @@ public final class Casting {
 
     public Object castValue(Class<?> fieldType, String value, PoijiOptions options) {
         Object o;
-        if (fieldType.getName().equals("int")) {
+        if (fieldType.getName().equals("int") || fieldType.getName().equals("java.lang.Integer")) {
             o = integerValue(Objects.equals(value, "") ? "0" : value);
 
-        } else if (fieldType.getName().equals("long")) {
+        } else if (fieldType.getName().equals("long") || fieldType.getName().equals("java.lang.Long")) {
             o = longValue(Objects.equals(value, "") ? "0" : value);
 
-        } else if (fieldType.getName().equals("double")) {
+        } else if (fieldType.getName().equals("double")  || fieldType.getName().equals("java.lang.Double")) {
             o = doubleValue(Objects.equals(value, "") ? "0" : value);
 
-        } else if (fieldType.getName().equals("float")) {
+        } else if (fieldType.getName().equals("float") || fieldType.getName().equals("java.lang.Float")) {
             o = floatValue(Objects.equals(value, "") ? "0" : value);
 
-        } else if (fieldType.getName().equals("boolean")) {
+        } else if (fieldType.getName().equals("boolean") || fieldType.getName().equals("java.lang.Boolean")) {
             o = Boolean.valueOf(value);
-        } else if (fieldType.getName().equals("java.util.Date")) {
 
+        } else if (fieldType.getName().equals("java.util.Date")) {
             o = dateValue(value, options);
+
         } else
             o = value;
         return o;

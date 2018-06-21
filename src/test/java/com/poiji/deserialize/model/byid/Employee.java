@@ -17,7 +17,7 @@ public class Employee {
     protected String surname;
 
     @ExcelCell(3)
-    protected int age;
+    protected Integer age;
 
     @ExcelCell(4)
     protected boolean single;
@@ -83,7 +83,7 @@ public class Employee {
                 "employeeId=" + employeeId +
                 ", name='" + name + '\'' +
                 ", surname='" + surname + '\'' +
-                ", age=" + age +
+                ", age=" + (age == null ? 0 : age)  +
                 ", single=" + single +
                 ", birthday='" + birthday + '\'' +
                 '}';
