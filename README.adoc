@@ -1,7 +1,7 @@
 = Poiji
 :version: v1.12
 
-image:https://travis-ci.org/ozlerhakan/poiji.svg?branch=master["Build Status", link="https://travis-ci.org/ozlerhakan/poiji"] image:https://api.codacy.com/project/badge/Grade/6587e90886184da29a1b7c5634695c9d["Codacy code quality", link="https://www.codacy.com/app/ozlerhakan/poiji?utm_source=github.com&utm_medium=referral&utm_content=ozlerhakan/poiji&utm_campaign=Badge_Grade"] image:https://coveralls.io/repos/github/ozlerhakan/poiji/badge.svg?branch=master["Coverage Status", link="https://coveralls.io/github/ozlerhakan/poiji?branch=master"] image:https://img.shields.io/badge/license-MIT-blue.svg[]
+image:https://travis-ci.org/ozlerhakan/poiji.svg?branch=master["Build Status", link="https://travis-ci.org/ozlerhakan/poiji"] image:https://api.codacy.com/project/badge/Grade/6587e90886184da29a1b7c5634695c9d["Codacy code quality", link="https://www.codacy.com/app/ozlerhakan/poiji?utm_source=github.com&utm_medium=referral&utm_content=ozlerhakan/poiji&utm_campaign=Badge_Grade"] image:https://coveralls.io/repos/github/ozlerhakan/poiji/badge.svg?branch=master["Coverage Status", link="https://coveralls.io/github/ozlerhakan/poiji?branch=master"] image:https://img.shields.io/badge/gitter-join%20chat-blue.svg["Gitter", link="https://gitter.im/poiji/Lobby"] image:https://img.shields.io/badge/license-MIT-blue.svg[]
 
 Poiji is a teeny Java library that provides one way mapping from Excel sheets to Java classes. In a way it lets us convert each row of the specified excel data into Java objects. Poiji uses https://poi.apache.org/[Apache Poi] (the Java API for Microsoft Documents) under the hood to fulfill the mapping process.
 
