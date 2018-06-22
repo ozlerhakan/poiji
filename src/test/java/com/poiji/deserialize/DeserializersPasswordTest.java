@@ -2,7 +2,6 @@ package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.byid.Employee;
-import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +20,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 /**
- * Created by hakan on 17/01/2017.
+ * Created by hakan on 22/06/2018.
  */
 @RunWith(Parameterized.class)
 public class DeserializersPasswordTest {
@@ -29,25 +28,23 @@ public class DeserializersPasswordTest {
     private String path;
     private List<Employee> expectedEmployess;
     private Class<?> expectedException;
-    private int indexSheet;
+    private String password;
 
     public DeserializersPasswordTest(String path,
                                      List<Employee> expectedEmployess,
                                      Class<?> expectedException,
-                                     int indexSheet) {
+                                     String password) {
         this.path = path;
         this.expectedEmployess = expectedEmployess;
         this.expectedException = expectedException;
-        this.indexSheet = indexSheet;
+        this.password = password;
     }
 
     @Parameterized.Parameters(name = "{index}: ({0})={1}")
     public static Iterable<Object[]> queries() {
         return Arrays.asList(new Object[][]{
-                {"src/test/resources/employees.xlsx", unmarshallingDeserialize(), null, -1},
-                {"src/test/resources/employees_sheet2.xlsx", unmarshallingDeserialize(), null, 1},
-                {"src/test/resources/cloud.xls", unmarshallingDeserialize(), PoijiException.class, -1},
-                {"src/test/resources/cloud", unmarshallingDeserialize(), PoijiException.class, -1},
+                {"src/test/resources/employees-password.xlsx", unmarshallingDeserialize(), null, "1234"},
+                {"src/test/resources/employees-password.xls", unmarshallingDeserialize(), null, "9876"},
         });
     }
 
@@ -56,13 +53,8 @@ public class DeserializersPasswordTest {
 
         try {
 
-            List<Employee> actualEmployees;
-            if (indexSheet == 1) {
-                PoijiOptions poijiOptions = PoijiOptions.PoijiOptionsBuilder.settings().sheetIndex(indexSheet).build();
-                actualEmployees = Poiji.fromExcel(new File(path), Employee.class, poijiOptions);
-            } else {
-                actualEmployees = Poiji.fromExcel(new File(path), Employee.class);
-            }
+            PoijiOptions poijiOptions = PoijiOptions.PoijiOptionsBuilder.settings().password(password).build();
+            List<Employee> actualEmployees = Poiji.fromExcel(new File(path), Employee.class, poijiOptions);
 
             assertThat(actualEmployees, notNullValue());
             assertThat(actualEmployees.size(), not(0));
