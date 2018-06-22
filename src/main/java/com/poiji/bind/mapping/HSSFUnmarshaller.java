@@ -31,7 +31,7 @@ import static java.lang.String.valueOf;
 abstract class HSSFUnmarshaller implements Unmarshaller {
 
     private final DataFormatter dataFormatter;
-    private final PoijiOptions options;
+    protected final PoijiOptions options;
     private final Casting casting;
     private Map<String, Integer> titles;
 

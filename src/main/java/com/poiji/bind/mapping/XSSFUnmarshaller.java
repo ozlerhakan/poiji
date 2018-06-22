@@ -5,7 +5,10 @@ import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
+import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.SAXHelper;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
@@ -56,8 +59,10 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> List<T> processSheet(StylesTable styles, ReadOnlySharedStringsTable readOnlySharedStringsTable,
-                                     Class<T> type, InputStream sheetInputStream) {
+    private <T> List<T> processSheet(StylesTable styles,
+                                     ReadOnlySharedStringsTable readOnlySharedStringsTable,
+                                     Class<T> type,
+                                     InputStream sheetInputStream) {
 
         DataFormatter formatter = new DataFormatter();
         InputSource sheetSource = new InputSource(sheetInputStream);
@@ -73,4 +78,20 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
             throw new PoijiException("Problem occurred while reading data", e);
         }
     }
+
+    <T> List<T> listOfEncryptedItems(Class<T> type, NPOIFSFileSystem fs) throws IOException {
+        InputStream stream = DocumentFactoryHelper.getDecryptedStream(fs, options.getPassword());
+
+        try (OPCPackage open = OPCPackage.open(stream)) {
+            return unmarshal0(type, open);
+
+        } catch (SAXException | IOException | OpenXML4JException e) {
+            IOUtils.closeQuietly(fs);
+            throw new PoijiException("Problem occurred while reading data", e);
+        }
+    }
+
+    abstract <T> List<T> returnFromExcelFile(Class<T> type);
+
+    abstract <T> List<T> returnFromEncryptedFile(Class<T> type);
 }

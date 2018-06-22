@@ -25,6 +25,11 @@ final class HSSFUnmarshallerStream extends HSSFUnmarshaller implements Unmarshal
     @Override
     protected Workbook workbook() {
         try {
+
+            if (options.getPassword() != null) {
+                return WorkbookFactory.create(poijiInputStream.stream(), options.getPassword());
+            }
+
             return WorkbookFactory.create(poijiInputStream.stream());
         } catch (InvalidFormatException | IOException e) {
             throw new PoijiException("Problem occurred while creating HSSFWorkbook", e);

@@ -11,6 +11,7 @@ public final class PoijiOptions {
     private String datePattern;
     private boolean preferNullOverDefault;
     private int sheetIndex;
+    private String password;
 
     private PoijiOptions() {
         super();
@@ -33,6 +34,15 @@ public final class PoijiOptions {
 
     private PoijiOptions setSheetIndex(int sheetIndex) {
         this.sheetIndex = sheetIndex;
+        return this;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    private PoijiOptions setPassword(String password) {
+        this.password = password;
         return this;
     }
 
@@ -63,6 +73,7 @@ public final class PoijiOptions {
         private String datePattern = DEFAULT_DATE_PATTERN;
         private boolean preferNullOverDefault = false;
         private int sheetIndex;
+        private String password;
 
         private PoijiOptionsBuilder() {
         }
@@ -74,6 +85,7 @@ public final class PoijiOptions {
         public PoijiOptions build() {
             return new PoijiOptions()
                     .setSkip(skip)
+                    .setPassword(password)
                     .setPreferNullOverDefault(preferNullOverDefault)
                     .setDatePattern(datePattern)
                     .setSheetIndex(sheetIndex);
@@ -135,6 +147,18 @@ public final class PoijiOptions {
          */
         public static PoijiOptionsBuilder settings(int skip) {
             return new PoijiOptionsBuilder(skip);
+        }
+
+
+        /**
+         * set password for encrypted excel file, Default is null
+         *
+         * @param password
+         * @return this
+         */
+        public PoijiOptionsBuilder password(String password) {
+            this.password = password;
+            return this;
         }
 
     }
