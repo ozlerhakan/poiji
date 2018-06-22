@@ -152,7 +152,7 @@ PoijiOptions options = PoijiOptionsBuilder.settings()
 
 === Encrypted Excel Files
 
-Consider that you excel file are protected with a password, you can define the password via `PoijiOptionsBuilder`:
+Consider that your excel file is protected with a password, you can define the password via `PoijiOptionsBuilder` to read rows:
 
 ----
 PoijiOptions options = PoijiOptionsBuilder.settings()
