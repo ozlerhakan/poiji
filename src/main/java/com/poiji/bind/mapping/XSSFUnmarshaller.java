@@ -22,8 +22,7 @@ import org.xml.sax.XMLReader;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.function.Consumer;
 
 import static org.apache.poi.xssf.eventusermodel.XSSFReader.SheetIterator;
 
@@ -38,7 +37,7 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         this.options = options;
     }
 
-    <T> List<T> unmarshal0(Class<T> type, OPCPackage open) throws IOException, SAXException, OpenXML4JException {
+    <T> void unmarshal0(Class<T> type, Consumer<? super T> consumer, OPCPackage open) throws IOException, SAXException, OpenXML4JException {
 
         ReadOnlySharedStringsTable readOnlySharedStringsTable = new ReadOnlySharedStringsTable(open);
         XSSFReader xssfReader = new XSSFReader(open);
@@ -50,40 +49,40 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         while (iter.hasNext()) {
             try (InputStream stream = iter.next()) {
                 if (index == options.sheetIndex()) {
-                    return processSheet(styles, readOnlySharedStringsTable, type, stream);
+                    processSheet(styles, readOnlySharedStringsTable, type, stream, consumer);
+                    return;
                 }
             }
             ++index;
         }
-        return new ArrayList<>();
     }
 
     @SuppressWarnings("unchecked")
-    private <T> List<T> processSheet(StylesTable styles,
+    private <T> void processSheet(StylesTable styles,
                                      ReadOnlySharedStringsTable readOnlySharedStringsTable,
                                      Class<T> type,
-                                     InputStream sheetInputStream) {
+                                     InputStream sheetInputStream,
+                                     Consumer<? super T> consumer) {
 
         DataFormatter formatter = new DataFormatter();
         InputSource sheetSource = new InputSource(sheetInputStream);
         try {
             XMLReader sheetParser = SAXHelper.newXMLReader();
-            PoijiHandler poijiHandler = new PoijiHandler(type, options);
+            PoijiHandler poijiHandler = new PoijiHandler(type, options, consumer);
             ContentHandler contentHandler =
                     new XSSFSheetXMLHandler(styles, null, readOnlySharedStringsTable, poijiHandler, formatter, false);
             sheetParser.setContentHandler(contentHandler);
             sheetParser.parse(sheetSource);
-            return poijiHandler.getDataset();
         } catch (ParserConfigurationException | SAXException | IOException e) {
             throw new PoijiException("Problem occurred while reading data", e);
         }
     }
 
-    <T> List<T> listOfEncryptedItems(Class<T> type, NPOIFSFileSystem fs) throws IOException {
+    <T> void listOfEncryptedItems(Class<T> type, Consumer<? super T> consumer, NPOIFSFileSystem fs) throws IOException {
         InputStream stream = DocumentFactoryHelper.getDecryptedStream(fs, options.getPassword());
 
         try (OPCPackage open = OPCPackage.open(stream)) {
-            return unmarshal0(type, open);
+            unmarshal0(type, consumer, open);
 
         } catch (SAXException | IOException | OpenXML4JException e) {
             IOUtils.closeQuietly(fs);
@@ -91,7 +90,7 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         }
     }
 
-    abstract <T> List<T> returnFromExcelFile(Class<T> type);
+    abstract <T> void returnFromExcelFile(Class<T> type, Consumer<? super T> consumer);
 
-    abstract <T> List<T> returnFromEncryptedFile(Class<T> type);
+    abstract <T> void returnFromEncryptedFile(Class<T> type, Consumer<? super T> consumer);
 }

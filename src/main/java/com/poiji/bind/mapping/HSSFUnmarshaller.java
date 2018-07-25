@@ -17,9 +17,9 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
+import java.util.function.Consumer;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 
 import static java.lang.String.valueOf;
@@ -43,31 +43,23 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     }
 
     @Override
-    public <T> List<T> unmarshal(Class<T> type) {
+    public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
         Workbook workbook = workbook();
         Sheet sheet = workbook.getSheetAt(options.sheetIndex());
 
         int skip = options.skip();
         int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
-        List<T> list = new ArrayList<>(maxPhysicalNumberOfRows);
 
         loadColumnTitles(sheet, maxPhysicalNumberOfRows);
 
-        for (Row currentRow : sheet) {
-
-            if (skip(currentRow, skip))
-                continue;
-
-            if (isRowEmpty(currentRow))
-                continue;
-
-            if (maxPhysicalNumberOfRows > list.size()) {
+        Iterator<Row> currentItRow = sheet.iterator();
+        while (currentItRow.hasNext()) {
+            Row currentRow = currentItRow.next();
+            if (!skip(currentRow, skip) && !isRowEmpty(currentRow)) {
                 T t = deserialize0(currentRow, type);
-                list.add(t);
+                consumer.accept(t);
             }
         }
-
-        return list;
     }
 
     private void loadColumnTitles(Sheet sheet, int maxPhysicalNumberOfRows) {

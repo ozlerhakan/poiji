@@ -11,9 +11,8 @@ import org.apache.poi.xssf.usermodel.XSSFComment;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
+import java.util.function.Consumer;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.valueOf;
@@ -28,7 +27,7 @@ import static org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetConten
 final class PoijiHandler<T> implements SheetContentsHandler {
 
     private T instance;
-    private List<T> dataset;
+    private Consumer<? super T> consumer;
     private int internalCount;
 
     private Class<T> type;
@@ -37,17 +36,13 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     private final Casting casting;
     private Map<String, Integer> titles;
 
-    PoijiHandler(Class<T> type, PoijiOptions options) {
+    PoijiHandler(Class<T> type, PoijiOptions options, Consumer<T> consumer) {
         this.type = type;
         this.options = options;
+        this.consumer = consumer;
 
-        dataset = new ArrayList<>();
         casting = Casting.getInstance();
         titles = new HashMap<String, Integer>();
-    }
-
-    List<T> getDataset() {
-        return dataset;
     }
 
     private <T> T newInstanceOf(Class<T> type) {
@@ -127,7 +122,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             return;
 
         if (rowNum + 1 > options.skip()) {
-            dataset.add(instance);
+            consumer.accept(instance);
         }
     }
 

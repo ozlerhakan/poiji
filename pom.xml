@@ -55,8 +55,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
-        <jdk.source>1.7</jdk.source>
-        <jdk.target>1.7</jdk.target>
+        <jdk.source>1.8</jdk.source>
+        <jdk.target>1.8</jdk.target>
     </properties>
 
     <dependencies>

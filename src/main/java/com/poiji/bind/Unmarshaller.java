@@ -1,11 +1,11 @@
 package com.poiji.bind;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Created by hakan on 08/03/2018
  */
 public interface Unmarshaller {
 
-    <T> List<T> unmarshal(Class<T> type);
+    <T> void unmarshal(Class<T> type, Consumer<? super T> consumer);
 }
