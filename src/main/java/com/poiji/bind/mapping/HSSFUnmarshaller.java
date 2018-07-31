@@ -17,10 +17,9 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.function.Consumer;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static java.lang.String.valueOf;
 
@@ -52,9 +51,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
 
         loadColumnTitles(sheet, maxPhysicalNumberOfRows);
 
-        Iterator<Row> currentItRow = sheet.iterator();
-        while (currentItRow.hasNext()) {
-            Row currentRow = currentItRow.next();
+        for (Row currentRow : sheet) {
             if (!skip(currentRow, skip) && !isRowEmpty(currentRow)) {
                 T t = deserialize0(currentRow, type);
                 consumer.accept(t);
