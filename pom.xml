@@ -15,10 +15,6 @@
     </description>
     <url>http://github.com/ozlerhakan/poiji</url>
 
-    <prerequisites>
-        <maven>3.0.4</maven>
-    </prerequisites>
-
     <licenses>
         <license>
             <name>The MIT License (MIT)</name>
@@ -55,8 +51,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+        <maven-enforcer-plugin.version>1.2</maven-enforcer-plugin.version>
         <jdk.source>1.8</jdk.source>
         <jdk.target>1.8</jdk.target>
+
+        <maven.version>3.0.4</maven.version>
     </properties>
 
     <dependencies>
@@ -175,6 +174,31 @@
                     <aggregate>true</aggregate>
                     <check/>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>${maven-enforcer-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>enforce-versions</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <!--Enforce maven version-->
+                                <requireMavenVersion>
+                                    <version>${maven.version}</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>${jdk.source}</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
