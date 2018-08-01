@@ -15,7 +15,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 <dependency>
   <groupId>com.github.ozlerhakan</groupId>
   <artifactId>poiji</artifactId>
-  <version>1.13</version>
+  <version>1.14</version>
 </dependency>
 ----
 
@@ -23,7 +23,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    compile 'com.github.ozlerhakan:poiji:1.13'
+    compile 'com.github.ozlerhakan:poiji:1.14'
 }
 ----
 
@@ -282,6 +282,59 @@ Car car = cars.get(0);
 // Honda Civic
 // 2017
 // 4
+----
+
+=== Example 4
+
+As of 1.14, Poiji supports Consumer Interface. As https://github.com/ozlerhakan/poiji/pull/39#issuecomment-409521808[@fmarazita] explained the usage, there are several benefits of having a Consumer:
+
+1. Huge excel file ( without you have all in memory)
+2. Run time processing/filtering data
+3. DB batch insertion
+
+For example, we have a Calculation entity class and want to insert each row while retrieving:
+
+[source, java]
+----
+class Calculation {
+
+  @ExcelCell(0)
+  String Name
+
+  @ExcelCell(1)
+  int a
+
+  @ExcelCell(2)
+  int b
+
+  public int getA(){
+    return a;
+  }
+
+  public int getB(){
+    return b;
+  }
+
+  public int getNanem){
+    return name;
+  }
+
+}
+----
+
+[source, java]
+----
+File fileCalculation = new File(example.xlsx);
+
+PoijiOptions options = PoijiOptionsBuilder.settings(1).sheetIndex(1).build();
+
+Poiji.fromExcel(fileCalculation, Calculation.class, options, this::dbInsertion);
+
+private void dbInsertion(Calculation siCalculation) {
+  int value= siCalculation.getA() + siCalculation.getB();
+  String name = siCalculation.getName();
+  return insertDB(name , value);
+}
 ----
 
 === Try with JShell

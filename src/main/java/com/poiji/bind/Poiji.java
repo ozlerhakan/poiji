@@ -11,13 +11,13 @@ import com.poiji.util.Files;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import static com.poiji.util.PoijiConstants.XLSX_EXTENSION;
 import static com.poiji.util.PoijiConstants.XLS_EXTENSION;
-import java.util.ArrayList;
-import java.util.function.Consumer;
 
 /**
  * The entry point of the mapping process.
@@ -115,7 +115,7 @@ public final class Poiji {
      * @param excelType type of the excel file, xls or xlsx
      * @param type type of the root object.
      * @param <T> type of the root object.
-     * @param consumer
+     * @param consumer represents an operation that accepts the type argument
      * @throws PoijiException if an internal exception occurs during the mapping process.
      * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
      * @throws IllegalCastException if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
@@ -157,7 +157,7 @@ public final class Poiji {
      * @param type type of the root object.
      * @param <T> type of the root object.
      * @param options specifies to change the default behaviour of the poiji.
-     * @param consumer output retrieves records
+     * @param consumer represents an operation that accepts the type argument
      * @throws PoijiException if an internal exception occurs during the mapping process.
      * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
      * @throws IllegalCastException if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
@@ -200,7 +200,7 @@ public final class Poiji {
      * @param type type of the root object.
      * @param <T> type of the root object.
      * @param options specifies to change the default behaviour of the poiji.
-     * @param consumer output retrieves records
+     * @param consumer represents an operation that accepts the type argument
      * @throws PoijiException if an internal exception occurs during the mapping process.
      * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
      * @throws IllegalCastException if this Field object is enforcing Java
