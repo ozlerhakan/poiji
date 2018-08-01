@@ -292,14 +292,14 @@ As of 1.14, Poiji supports Consumer Interface. As https://github.com/ozlerhakan/
 2. Run time processing/filtering data
 3. DB batch insertion
 
-For example, we have a Calculation entity class and want to insert each row while retrieving:
+For example, we have a Calculation entity class and want to insert each row into a database while retrieving:
 
 [source, java]
 ----
 class Calculation {
 
   @ExcelCell(0)
-  String Name
+  String name
 
   @ExcelCell(1)
   int a
@@ -315,7 +315,7 @@ class Calculation {
     return b;
   }
 
-  public int getNanem){
+  public int getName(){
     return name;
   }
 
