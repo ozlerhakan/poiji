@@ -114,7 +114,7 @@ public class DeserializersExtendedTest {
         employee1.setSurname("Doe");
         employee1.setSingle(true);
         employee1.setAge(30);
-        employee1.setBirthday("4/9/1987");
+        employee1.setBirthday("31/12/1987");
         employee1.setRate(4.9);
         employee1.setDate(sdf.parse("05/01/2017 22:00:01.0"));
         employees.add(employee1);
@@ -125,7 +125,7 @@ public class DeserializersExtendedTest {
         employee2.setSurname("Derue");
         employee2.setSingle(false);
         employee2.setAge(20);
-        employee2.setBirthday("5/3/1997");
+        employee2.setBirthday("3/5/1997");
         employee2.setRate(5.3);
         employee2.setDate((sdf).parse("05/01/2017 22:00:01.0"));
         employees.add(employee2);
@@ -136,7 +136,7 @@ public class DeserializersExtendedTest {
         employee3.setSurname("Raul");
         employee3.setSingle(false);
         employee3.setAge(31);
-        employee3.setBirthday("4/9/1986");
+        employee3.setBirthday("9/4/1986");
         employee3.setRate(6.6);
         employee3.setDate(sdf.parse("05/01/2017 22:00:01.0"));
         employees.add(employee3);

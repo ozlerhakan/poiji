@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -111,5 +112,29 @@ public class CastingTest {
         Long testVal = (Long) casting.castValue(long.class, "9223372036854775807", options);
 
         assertEquals(new Long("9223372036854775807"), testVal);
+    }
+
+    @Test
+    public void castLocalDate() {
+        PoijiOptions options = PoijiOptionsBuilder.settings().datePattern("dd/MM/yyyy").build();
+
+        LocalDate expectedDate = LocalDate.of(2018, 8, 1);
+
+        LocalDate actualDate = (LocalDate) casting.castValue(LocalDate.class, "01/08/2018", options);
+
+        assertEquals(expectedDate, actualDate);
+    }
+
+    @Test
+    public void castEnum() {
+        PoijiOptions options = PoijiOptionsBuilder.settings().build();
+
+        TestEnum testEnum = (TestEnum) casting.castValue(TestEnum.class, "ITEM1", options);
+
+        assertEquals(TestEnum.ITEM1, testEnum);
+    }
+
+    private enum TestEnum {
+        ITEM1, ITEM2;
     }
 }

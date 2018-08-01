@@ -4,9 +4,9 @@ import com.poiji.option.PoijiOptions;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Objects;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 /**
  * Created by hakan on 22/01/2017.
@@ -68,6 +68,19 @@ public final class Casting {
         }
     }
 
+    private LocalDate localDateValue(String value, PoijiOptions options) {
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(options.datePattern());
+        return LocalDate.parse(value, formatter);
+    }
+
+    private Object enumValue(String value, Class type) {
+        return Arrays
+                .stream(type.getEnumConstants())
+                .filter(o -> ((Enum) o).name().equals(value))
+                .findFirst()
+                .orElse(null);
+    }
+
     public Object castValue(Class<?> fieldType, String value, PoijiOptions options) {
         Object o;
         if (fieldType.getName().equals("int") || fieldType.getName().equals("java.lang.Integer")) {
@@ -76,7 +89,7 @@ public final class Casting {
         } else if (fieldType.getName().equals("long") || fieldType.getName().equals("java.lang.Long")) {
             o = longValue(Objects.equals(value, "") ? "0" : value);
 
-        } else if (fieldType.getName().equals("double")  || fieldType.getName().equals("java.lang.Double")) {
+        } else if (fieldType.getName().equals("double") || fieldType.getName().equals("java.lang.Double")) {
             o = doubleValue(Objects.equals(value, "") ? "0" : value);
 
         } else if (fieldType.getName().equals("float") || fieldType.getName().equals("java.lang.Float")) {
@@ -87,6 +100,12 @@ public final class Casting {
 
         } else if (fieldType.getName().equals("java.util.Date")) {
             o = dateValue(value, options);
+
+        } else if (fieldType.getName().equals("java.time.LocalDate")) {
+            o = localDateValue(value, options);
+
+        } else if (fieldType.isEnum()) {
+            o = enumValue(value, fieldType);
 
         } else
             o = value;
