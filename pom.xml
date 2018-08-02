@@ -52,6 +52,7 @@
         <!--Plugins-->
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-enforcer-plugin.version>1.2</maven-enforcer-plugin.version>
+        <maven-install-plugin.version>2.5.2</maven-install-plugin.version>
         <maven-shade-plugin-version>3.1.1</maven-shade-plugin-version>
 
         <!--Env-->
@@ -250,182 +251,6 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-install-plugin</artifactId>
-                <version>2.5</version>
-                <executions>
-                    <execution>
-                        <id>poi-installation</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>install-file</goal>
-                        </goals>
-                        <!--Files to be added by lifecycle mapping-->
-                        <configuration>
-                            <groupId>org.apache.poi</groupId>
-                            <artifactId>poi</artifactId>
-                            <version>4.0.0-SNAPSHOT</version>
-                            <packaging>jar</packaging>
-                            <file>${basedir}/lib/poi-4.0.0-SNAPSHOT.jar</file>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>poi-ooxml-installation</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>install-file</goal>
-                        </goals>
-                        <!--Files to be added by lifecycle mapping-->
-                        <configuration>
-                            <groupId>org.apache.poi</groupId>
-                            <artifactId>poi-ooxml</artifactId>
-                            <version>4.0.0-SNAPSHOT</version>
-                            <packaging>jar</packaging>
-                            <file>${basedir}/lib/poi-ooxml-4.0.0-SNAPSHOT.jar</file>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>poi-excelant-installation</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>install-file</goal>
-                        </goals>
-                        <!--Files to be added by lifecycle mapping-->
-                        <configuration>
-                            <groupId>org.apache.poi</groupId>
-                            <artifactId>poi-excelant</artifactId>
-                            <version>4.0.0-SNAPSHOT</version>
-                            <packaging>jar</packaging>
-                            <file>${basedir}/lib/poi-excelant-4.0.0-SNAPSHOT.jar</file>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>poi-ooxml-schemas-installation</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>install-file</goal>
-                        </goals>
-                        <!--Files to be added by lifecycle mapping-->
-                        <configuration>
-                            <groupId>org.apache.poi</groupId>
-                            <artifactId>poi-ooxml-schemas</artifactId>
-                            <version>4.0.0-SNAPSHOT</version>
-                            <packaging>jar</packaging>
-                            <file>${basedir}/lib/poi-ooxml-schemas-4.0.0-SNAPSHOT.jar</file>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>poi-examples-installation</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>install-file</goal>
-                        </goals>
-                        <!--Files to be added by lifecycle mapping-->
-                        <configuration>
-                            <groupId>org.apache.poi</groupId>
-                            <artifactId>poi-examples</artifactId>
-                            <version>4.0.0-SNAPSHOT</version>
-                            <packaging>jar</packaging>
-                            <file>${basedir}/lib/poi-examples-4.0.0-SNAPSHOT.jar</file>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>poi-scratchpad-installation</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>install-file</goal>
-                        </goals>
-                        <!--Files to be added by lifecycle mapping-->
-                        <configuration>
-                            <groupId>org.apache.poi</groupId>
-                            <artifactId>poi-scratchpad</artifactId>
-                            <version>4.0.0-SNAPSHOT</version>
-                            <packaging>jar</packaging>
-                            <file>${basedir}/lib/poi-scratchpad-4.0.0-SNAPSHOT.jar</file>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>curvesapi-installation</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>install-file</goal>
-                        </goals>
-                        <!--Files to be added by lifecycle mapping-->
-                        <configuration>
-                            <groupId>com.github.virtuald</groupId>
-                            <artifactId>curvesapi</artifactId>
-                            <version>1.05</version>
-                            <packaging>jar</packaging>
-                            <file>${basedir}/lib/ooxml-lib/curvesapi-1.05.jar</file>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>xmlbeans-installation</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>install-file</goal>
-                        </goals>
-                        <!--Files to be added by lifecycle mapping-->
-                        <configuration>
-                            <groupId>org.apache.xmlbeans</groupId>
-                            <artifactId>xmlbeans</artifactId>
-                            <version>3.0.0</version>
-                            <packaging>jar</packaging>
-                            <file>${basedir}/lib/ooxml-lib/xmlbeans-3.0.0.jar</file>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!--Install libs to local repo-->
-            <plugin>
-                <groupId>org.eclipse.m2e</groupId>
-                <artifactId>lifecycle-mapping</artifactId>
-                <version>1.0.0</version>
-                <configuration>
-                    <lifecycleMappingMetadata>
-                        <pluginExecutions>
-                            <pluginExecution>
-                                <pluginExecutionFilter>
-                                    <groupId>org.codehaus.mojo</groupId>
-                                    <artifactId>aspectj-maven-plugin</artifactId>
-                                    <versionRange>[1.0,)</versionRange>
-                                    <goals>
-                                        <goal>test-compile</goal>
-                                        <goal>compile</goal>
-                                    </goals>
-                                </pluginExecutionFilter>
-                                <action>
-                                    <execute />
-                                </action>
-                            </pluginExecution>
-                            <pluginExecution>
-                                <pluginExecutionFilter>
-                                    <groupId>
-                                        org.apache.maven.plugins
-                                    </groupId>
-                                    <artifactId>
-                                        maven-install-plugin
-                                    </artifactId>
-                                    <versionRange>
-                                        [2.5,)
-                                    </versionRange>
-                                    <goals>
-                                        <goal>install-file</goal>
-                                    </goals>
-                                </pluginExecutionFilter>
-                                <action>
-                                    <execute>
-                                        <runOnIncremental>false</runOnIncremental>
-                                    </execute>
-                                </action>
-                            </pluginExecution>
-                        </pluginExecutions>
-                    </lifecycleMappingMetadata>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>${maven-shade-plugin-version}</version>
                 <executions>
@@ -441,6 +266,7 @@
                 </configuration>
             </plugin>
         </plugins>
+
     </build>
 
     <profiles>
@@ -493,12 +319,12 @@
         </profile>
     </profiles>
 
-    <!--<repositories>
-        &lt;!&ndash;temporary&ndash;&gt;
+    <repositories>
+        <!--temporary use only-->
         <repository>
-            <id>local-maven-repo</id>
-            <url>file:///${basedir}/local-maven-repo</url>
+            <id>poi4-repo</id>
+            <url>https://github.com/mali-fasaha/poi4-repo/raw/master/</url>
         </repository>
-    </repositories>-->
+    </repositories>
 
 </project>
