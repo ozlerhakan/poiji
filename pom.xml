@@ -45,17 +45,21 @@
     </issueManagement>
 
     <properties>
+        <!--Dependencies-->
         <apache.poi.version>4.0.0-SNAPSHOT</apache.poi.version>
         <junit.version>4.12</junit.version>
-        <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <!--Plugins-->
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-enforcer-plugin.version>1.2</maven-enforcer-plugin.version>
+        <maven-shade-plugin-version>3.1.1</maven-shade-plugin-version>
+
+        <!--Env-->
         <jdk.source>1.8</jdk.source>
         <jdk.target>1.8</jdk.target>
-
         <maven.version>3.0.4</maven.version>
+        <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
@@ -423,6 +427,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
+                <version>${maven-shade-plugin-version}</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -432,7 +437,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <finalName>${name}</finalName>
+                    <finalName>${project.name}</finalName>
                 </configuration>
             </plugin>
         </plugins>
