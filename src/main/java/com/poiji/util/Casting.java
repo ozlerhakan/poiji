@@ -5,8 +5,10 @@ import com.poiji.option.PoijiOptions;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Objects;
 
 /**
  * Created by hakan on 22/01/2017.
@@ -69,8 +71,7 @@ public final class Casting {
     }
 
     private LocalDate localDateValue(String value, PoijiOptions options) {
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(options.datePattern());
-        return LocalDate.parse(value, formatter);
+        return LocalDate.parse(value, options.dateTimeFormatter());
     }
 
     private Object enumValue(String value, Class type) {
