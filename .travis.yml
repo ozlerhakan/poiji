@@ -2,6 +2,9 @@ language: java
 jdk:
 - oraclejdk8
 - oraclejdk9
+- oraclejdk10
+- oraclejdk11
+- oraclejdk-ea
 notifications:
   email: false
 before_script:
