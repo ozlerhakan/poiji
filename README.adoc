@@ -333,7 +333,7 @@ Poiji.fromExcel(fileCalculation, Calculation.class, options, this::dbInsertion);
 private void dbInsertion(Calculation siCalculation) {
   int value= siCalculation.getA() + siCalculation.getB();
   String name = siCalculation.getName();
-  return insertDB(name , value);
+  insertDB(name , value);
 }
 ----
 
