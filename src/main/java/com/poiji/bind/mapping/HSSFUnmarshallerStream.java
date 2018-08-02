@@ -31,7 +31,7 @@ final class HSSFUnmarshallerStream extends HSSFUnmarshaller implements Unmarshal
             }
 
             return WorkbookFactory.create(poijiInputStream.stream());
-        } catch (InvalidFormatException | IOException e) {
+        } catch (IOException e) {
             throw new PoijiException("Problem occurred while creating HSSFWorkbook", e);
         }
     }

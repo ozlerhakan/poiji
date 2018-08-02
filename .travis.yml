@@ -1,11 +1,53 @@
 language: java
-jdk:
-- oraclejdk8
-- oraclejdk9
+sudo: false
+dist: trusty
+
+before_install:
+- wget https://github.com/sormuras/bach/raw/master/install-jdk.sh
+
+matrix:
+  include:
+  # 8
+  - env: JDK='Oracle JDK 8'
+    jdk: oraclejdk8
+  - env: JDK='OpenJDK 8'
+    jdk: openjdk8
+  # 9
+  - env: JDK='Oracle JDK 9'
+    jdk: oraclejdk9
+  - env: JDK='OpenJDK 9'
+    install: . ./install-jdk.sh -F 9
+  # 10
+  - env: JDK='Oracle JDK 10'
+    jdk: oraclejdk10
+  - env: JDK='OpenJDK 10'
+    install: . ./install-jdk.sh -F 10 -L GPL
+  # 11
+  - env: JDK='Oracle JDK 11'
+    install: . ./install-jdk.sh -F 11 -L BCL
+  - env: JDK='OpenJDK 11'
+    install: . ./install-jdk.sh -F 11 -L GPL
+  allow_failures:
+  - env: JDK='Oracle JDK 10'
+
+#jdk:
+#- oraclejdk8
+#- oraclejdk9
+#- oraclejdk10
+#- oraclejdk11
+#- oraclejdk-ea
+
 notifications:
   email: false
+
 before_script:
 - mvn clean
+
 after_success:
 - mvn clean cobertura:cobertura coveralls:report
-script: mvn install -Dmaven.javadoc.skip=true -B -V
+
+script:
+- echo PATH = ${PATH}
+- echo JAVA_HOME = ${JAVA_HOME}
+- java -version
+- mvn install -Dmaven.javadoc.skip=true -B -V
