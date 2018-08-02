@@ -32,7 +32,7 @@ final class HSSFUnmarshallerFile extends HSSFUnmarshaller implements Unmarshalle
             }
 
             return WorkbookFactory.create(poijiFile.file());
-        } catch (InvalidFormatException | IOException e) {
+        } catch (IOException e) {
             throw new PoijiException("Problem occurred while creating HSSFWorkbook", e);
         }
     }
