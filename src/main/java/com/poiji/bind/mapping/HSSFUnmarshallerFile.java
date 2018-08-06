@@ -11,7 +11,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import java.io.IOException;
 
 /**
- * This is the main class that converts the excel sheet fromExcel Java object
+ *
  * Created by hakan on 16/01/2017.
  */
 final class HSSFUnmarshallerFile extends HSSFUnmarshaller implements Unmarshaller {
