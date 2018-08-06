@@ -5,6 +5,7 @@ import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.xml.sax.SAXException;
 
@@ -36,7 +37,7 @@ final class XSSFUnmarshallerFile extends XSSFUnmarshaller {
 
     public <T> void returnFromExcelFile(Class<T> type, Consumer<? super T> consumer) {
 
-        try (OPCPackage open = OPCPackage.open(poijiFile.file())) {
+        try (OPCPackage open = OPCPackage.open(poijiFile.file(), PackageAccess.READ)) {
 
             unmarshal0(type, consumer, open);
 
@@ -47,7 +48,7 @@ final class XSSFUnmarshallerFile extends XSSFUnmarshaller {
 
     public <T> void returnFromEncryptedFile(Class<T> type, Consumer<? super T> consumer) {
 
-        try (NPOIFSFileSystem fs = new NPOIFSFileSystem(poijiFile.file())) {
+        try (NPOIFSFileSystem fs = new NPOIFSFileSystem(poijiFile.file(), true)) {
 
             listOfEncryptedItems(type, consumer, fs);
 

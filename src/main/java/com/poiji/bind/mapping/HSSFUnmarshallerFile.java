@@ -26,13 +26,8 @@ final class HSSFUnmarshallerFile extends HSSFUnmarshaller implements Unmarshalle
     @Override
     protected Workbook workbook() {
         try {
-
-            if (options.getPassword() != null) {
-                return WorkbookFactory.create(poijiFile.file(), options.getPassword());
-            }
-
-            return WorkbookFactory.create(poijiFile.file());
-        } catch (InvalidFormatException | IOException e) {
+            return WorkbookFactory.create(poijiFile.file(), options.getPassword(), true);
+        } catch (IOException | InvalidFormatException e) {
             throw new PoijiException("Problem occurred while creating HSSFWorkbook", e);
         }
     }

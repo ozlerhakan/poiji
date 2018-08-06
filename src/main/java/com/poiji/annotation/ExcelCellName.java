@@ -14,5 +14,10 @@ import java.lang.annotation.Target;
 @Documented
 public @interface ExcelCellName {
 
+    /**
+     * Specifies the column name where the corresponding value is mapped from the excel data
+     *
+     * @return column name
+     */
     String value();
 }
