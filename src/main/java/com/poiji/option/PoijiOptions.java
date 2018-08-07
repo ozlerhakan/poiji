@@ -11,11 +11,11 @@ import static com.poiji.util.PoijiConstants.DEFAULT_DATE_TIME_FORMATTER;
 public final class PoijiOptions {
 
     private int skip;
-    private DateTimeFormatter dateTimeFormatter;
-    private String datePattern;
-    private boolean preferNullOverDefault;
     private int sheetIndex;
     private String password;
+    private String datePattern;
+    private boolean preferNullOverDefault;
+    private DateTimeFormatter dateTimeFormatter;
 
     private PoijiOptions() {
         super();
@@ -83,11 +83,11 @@ public final class PoijiOptions {
     public static class PoijiOptionsBuilder {
 
         private int skip = 1;
-        private String datePattern = DEFAULT_DATE_PATTERN;
-        private DateTimeFormatter dateTimeFormatter = DEFAULT_DATE_TIME_FORMATTER;
-        private boolean preferNullOverDefault = false;
         private int sheetIndex;
         private String password;
+        private boolean preferNullOverDefault = false;
+        private String datePattern = DEFAULT_DATE_PATTERN;
+        private DateTimeFormatter dateTimeFormatter = DEFAULT_DATE_TIME_FORMATTER;
 
         private PoijiOptionsBuilder() {
         }
@@ -133,7 +133,7 @@ public final class PoijiOptions {
         }
 
         /**
-         * set whether or not to use null instead of default object
+         * set whether or not to use null instead of default values for Integer, Double, Float, Long, String and java.util.Date types.
          *
          * @param preferNullOverDefault boolean
          * @return this

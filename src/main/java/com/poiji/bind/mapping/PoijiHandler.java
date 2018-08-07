@@ -11,9 +11,9 @@ import org.apache.poi.xssf.usermodel.XSSFComment;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.function.Consumer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static java.lang.String.valueOf;
 import static org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
@@ -68,8 +68,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         for (Field field : type.getDeclaredFields()) {
             ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
             if (excelRow != null) {
-                Object o;
-                o = casting.castValue(field.getType(), valueOf(internalCount), options);
+                Object o = casting.castValue(field.getType(), valueOf(internalCount), options);
                 setFieldData(field, o);
             }
             ExcelCell index = field.getAnnotation(ExcelCell.class);

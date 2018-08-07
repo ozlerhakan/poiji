@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * Created by hakan on 22/01/2017.
@@ -24,7 +23,7 @@ public final class Casting {
     private Casting() {
     }
 
-    private Integer integerValue(String value) {
+    private int primitiveIntegerValue(String value) {
         try {
             return new Integer(value);
         } catch (NumberFormatException nfe) {
@@ -32,7 +31,18 @@ public final class Casting {
         }
     }
 
-    private Long longValue(String value) {
+    private Integer integerValue(String value, PoijiOptions options) {
+        try {
+            return new Integer(value);
+        } catch (NumberFormatException nfe) {
+            if (Boolean.TRUE.equals(options.preferNullOverDefault())) {
+                return null;
+            }
+            return 0;
+        }
+    }
+
+    private long primitiveLongValue(String value) {
         try {
             return new Long(value);
         } catch (NumberFormatException nfe) {
@@ -40,7 +50,18 @@ public final class Casting {
         }
     }
 
-    private Double doubleValue(String value) {
+    private Long longValue(String value, PoijiOptions options) {
+        try {
+            return new Long(value);
+        } catch (NumberFormatException nfe) {
+            if (Boolean.TRUE.equals(options.preferNullOverDefault())) {
+                return null;
+            }
+            return 0L;
+        }
+    }
+
+    private double primitiveDoubleValue(String value) {
         try {
             return new Double(value);
         } catch (NumberFormatException nfe) {
@@ -48,10 +69,32 @@ public final class Casting {
         }
     }
 
-    private Float floatValue(String value) {
+    private Double doubleValue(String value, PoijiOptions options) {
+        try {
+            return new Double(value);
+        } catch (NumberFormatException nfe) {
+            if (Boolean.TRUE.equals(options.preferNullOverDefault())) {
+                return null;
+            }
+            return 0d;
+        }
+    }
+
+    private float primitiveFloatValue(String value) {
         try {
             return new Float(value);
         } catch (NumberFormatException nfe) {
+            return 0f;
+        }
+    }
+
+    private Float floatValue(String value, PoijiOptions options) {
+        try {
+            return new Float(value);
+        } catch (NumberFormatException nfe) {
+            if (Boolean.TRUE.equals(options.preferNullOverDefault())) {
+                return null;
+            }
             return 0f;
         }
     }
@@ -84,17 +127,29 @@ public final class Casting {
 
     public Object castValue(Class<?> fieldType, String value, PoijiOptions options) {
         Object o;
-        if (fieldType.getName().equals("int") || fieldType.getName().equals("java.lang.Integer")) {
-            o = integerValue(Objects.equals(value, "") ? "0" : value);
+        if (fieldType.getName().equals("int")) {
+            o = primitiveIntegerValue(value);
 
-        } else if (fieldType.getName().equals("long") || fieldType.getName().equals("java.lang.Long")) {
-            o = longValue(Objects.equals(value, "") ? "0" : value);
+        } else if (fieldType.getName().equals("java.lang.Integer")) {
+            o = integerValue(value, options);
 
-        } else if (fieldType.getName().equals("double") || fieldType.getName().equals("java.lang.Double")) {
-            o = doubleValue(Objects.equals(value, "") ? "0" : value);
+        } else if (fieldType.getName().equals("long")) {
+            o = primitiveLongValue(value);
 
-        } else if (fieldType.getName().equals("float") || fieldType.getName().equals("java.lang.Float")) {
-            o = floatValue(Objects.equals(value, "") ? "0" : value);
+        } else if (fieldType.getName().equals("java.lang.Long")) {
+            o = longValue(value, options);
+
+        } else if (fieldType.getName().equals("double")) {
+            o = primitiveDoubleValue(value);
+
+        } else if (fieldType.getName().equals("java.lang.Double")) {
+            o = doubleValue(value, options);
+
+        } else if (fieldType.getName().equals("float")) {
+            o = primitiveFloatValue(value);
+
+        } else if (fieldType.getName().equals("java.lang.Float")) {
+            o = floatValue(value, options);
 
         } else if (fieldType.getName().equals("boolean") || fieldType.getName().equals("java.lang.Boolean")) {
             o = Boolean.valueOf(value);
@@ -108,8 +163,13 @@ public final class Casting {
         } else if (fieldType.isEnum()) {
             o = enumValue(value, fieldType);
 
-        } else
-            o = value;
+        } else {
+            if (Boolean.TRUE.equals(options.preferNullOverDefault())) {
+                o = null;
+            } else {
+                o = value;
+            }
+        }
         return o;
     }
 }

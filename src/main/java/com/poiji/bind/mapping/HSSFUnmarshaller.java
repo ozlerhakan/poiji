@@ -109,15 +109,11 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
         Class<?> fieldType = field.getType();
         Cell cell = currentRow.getCell(column);
 
-        Object o;
         if (cell != null) {
             String value = dataFormatter.formatCellValue(cell);
-            o = casting.castValue(fieldType, value, options);
-        } else {
-            o = casting.castValue(fieldType, "", options);
+            Object o = casting.castValue(fieldType, value, options);
+            setFieldData(instance, field, o);
         }
-
-        setFieldData(instance, field, o);
     }
 
     private <T> void setFieldData(T instance, Field field, Object o) {
