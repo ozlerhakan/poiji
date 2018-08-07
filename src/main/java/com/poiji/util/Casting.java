@@ -164,8 +164,12 @@ public final class Casting {
             o = enumValue(value, fieldType);
 
         } else {
-            if (Boolean.TRUE.equals(options.preferNullOverDefault())) {
-                o = null;
+            if (value.length() == 0) {
+                if (Boolean.TRUE.equals(options.preferNullOverDefault())) {
+                    o = null;
+                } else {
+                    o = value;
+                }
             } else {
                 o = value;
             }
