@@ -5,6 +5,7 @@ import com.poiji.option.PoijiOptions;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -114,7 +115,11 @@ public final class Casting {
     }
 
     private LocalDate localDateValue(String value, PoijiOptions options) {
-        return LocalDate.parse(value, options.dateTimeFormatter());
+        try {
+            return LocalDate.parse(value, options.dateTimeFormatter());
+        } catch (DateTimeParseException e) {
+            return null;
+        }
     }
 
     private Object enumValue(String value, Class type) {
