@@ -2,6 +2,7 @@ package com.poiji.util;
 
 import com.poiji.deserialize.model.byid.Employee;
 import com.poiji.deserialize.model.byid.Person;
+import com.poiji.deserialize.model.byid.Sample;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,5 +83,24 @@ public final class Data {
         person5.setMobile("617019");
         persons.add(person5);
         return persons;
+    }
+
+    public static List<Sample> unmarshallingSamples() {
+        List<Sample> samples = new ArrayList<>(2);
+
+        Sample sample1 = new Sample();
+        sample1.setAmount(null);
+        sample1.setMonth(null);
+        sample1.setOther("foo");
+
+        Sample sample2 = new Sample();
+        sample2.setAmount(27.5);
+        sample2.setMonth("APR");
+        sample2.setOther("bar");
+
+
+        samples.add(sample1);
+        samples.add(sample2);
+        return samples;
     }
 }
