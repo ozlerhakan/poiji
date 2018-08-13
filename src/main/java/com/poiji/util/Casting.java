@@ -132,6 +132,13 @@ public final class Casting {
 
     public Object castValue(Class<?> fieldType, String value, PoijiOptions options) {
         Object o;
+
+        //ISSUE #55 : additioanl functionality
+        //if set in options, will trim any leading and trailing white spaces.
+        if (options.trimCellValue()) {
+            value = value.trim();
+        }
+
         if (fieldType.getName().equals("int")) {
             o = primitiveIntegerValue(value);
 
