@@ -8,12 +8,15 @@ import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.SAXHelper;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.model.StylesTable;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -23,11 +26,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Consumer;
-import org.apache.poi.ss.usermodel.Workbook;
 
 import static org.apache.poi.xssf.eventusermodel.XSSFReader.SheetIterator;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  * Created by hakan on 22/10/2017
@@ -42,10 +42,9 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
 
     <T> void unmarshal0(Class<T> type, Consumer<? super T> consumer, OPCPackage open) throws IOException, SAXException, OpenXML4JException {
 
-        //ISSUE #55
         XSSFWorkbook wb = new XSSFWorkbook(open);
         Workbook workbook = new SXSSFWorkbook(wb);
-        //work out which sheet must process
+
         int processIndex = PoijiOptions.getSheetIndexToProcess(workbook, options);
 
         ReadOnlySharedStringsTable readOnlySharedStringsTable = new ReadOnlySharedStringsTable(open);
@@ -57,7 +56,6 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
 
         while (iter.hasNext()) {
             try (InputStream stream = iter.next()) {
-                //if (index == options.sheetIndex()) {
                 if (index == processIndex) {
                     processSheet(styles, readOnlySharedStringsTable, type, stream, consumer);
                     return;

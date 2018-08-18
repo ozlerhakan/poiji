@@ -2,13 +2,16 @@ package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.byid.Person;
+import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+
 import static com.poiji.util.Data.unmarshallingPersons;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
@@ -31,8 +34,8 @@ public class DeserializersHiddenSheetTest {
     @Parameterized.Parameters(name = "{index}: ({0})={1}")
     public static Iterable<Object[]> queries() {
         return Arrays.asList(new Object[][]{
-            {"src/test/resources/hidden.xlsx", unmarshallingPersons(), null},
-            {"src/test/resources/hidden.xls", unmarshallingPersons(), null}
+                {"src/test/resources/hidden.xlsx", unmarshallingPersons(), PoijiException.class},
+                {"src/test/resources/hidden.xls", unmarshallingPersons(), PoijiException.class}
         });
     }
 
@@ -58,9 +61,18 @@ public class DeserializersHiddenSheetTest {
 
     @Test
     public void testProcessHiddenSheets() {
-        PoijiOptions poijiOptions = PoijiOptions.PoijiOptionsBuilder.settings().ignoreHiddenSheets(false).build();
-        List<Person> people = Poiji.fromExcel(new File(path), Person.class, poijiOptions);
-        assertEquals(people.size(), 0);
+        try {
+
+            PoijiOptions poijiOptions = PoijiOptions.PoijiOptionsBuilder.settings().ignoreHiddenSheets(false).build();
+            List<Person> people = Poiji.fromExcel(new File(path), Person.class, poijiOptions);
+
+        } catch (Exception e) {
+            if (expectedException == null) {
+                fail(e.getMessage());
+            } else {
+                assertThat(e, instanceOf(expectedException));
+            }
+        }
     }
 
 }

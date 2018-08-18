@@ -44,10 +44,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     @Override
     public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
         Workbook workbook = workbook();
-        //Sheet sheet = workbook.getSheetAt(options.sheetIndex());
 
-        //work out which sheet must process
-        //ISSUE #55
         int processIndex = PoijiOptions.getSheetIndexToProcess(workbook, options);
         Sheet sheet = workbook.getSheetAt(processIndex);
 

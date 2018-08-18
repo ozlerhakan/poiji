@@ -2,13 +2,16 @@ package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.byid.Person;
+import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+
 import static com.poiji.util.Data.unmarshallingPersons;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
@@ -31,8 +34,8 @@ public class DeserializersHiddenSheetIndexTest {
     @Parameterized.Parameters(name = "{index}: ({0})={1}")
     public static Iterable<Object[]> queries() {
         return Arrays.asList(new Object[][]{
-            {"src/test/resources/hidden_sheet_index.xlsx", unmarshallingPersons(), null},
-            {"src/test/resources/hidden_sheet_index.xls", unmarshallingPersons(), null}
+                {"src/test/resources/hidden_sheet_index.xlsx", unmarshallingPersons(), PoijiException.class},
+                {"src/test/resources/hidden_sheet_index.xls", unmarshallingPersons(), PoijiException.class}
         });
     }
 
@@ -58,8 +61,15 @@ public class DeserializersHiddenSheetIndexTest {
 
     @Test
     public void testProcessHiddenSheets() {
-        PoijiOptions poijiOptions = PoijiOptions.PoijiOptionsBuilder.settings().sheetIndex(2).ignoreHiddenSheets(false).build();
-        List<Person> people = Poiji.fromExcel(new File(path), Person.class, poijiOptions);
-        assertEquals(people.size(), 0);
+        try {
+            PoijiOptions poijiOptions = PoijiOptions.PoijiOptionsBuilder.settings().sheetIndex(2).ignoreHiddenSheets(false).build();
+            List<Person> people = Poiji.fromExcel(new File(path), Person.class, poijiOptions);
+        } catch (Exception e) {
+            if (expectedException == null) {
+                fail(e.getMessage());
+            } else {
+                assertThat(e, instanceOf(expectedException));
+            }
+        }
     }
 }

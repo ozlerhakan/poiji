@@ -1,10 +1,13 @@
 package com.poiji.option;
 
+import com.poiji.exception.PoijiException;
+import org.apache.poi.ss.usermodel.Workbook;
+
 import java.time.format.DateTimeFormatter;
+import java.util.stream.IntStream;
 
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_PATTERN;
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_TIME_FORMATTER;
-import org.apache.poi.ss.usermodel.Workbook;
 
 /**
  * Created by hakan on 17/01/2017.
@@ -12,8 +15,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 public final class PoijiOptions {
 
     private int skip;
-    //ISSUE #55 changed form int to integer, in order to check if null when trying to work out which sheet to process in getSheetIndexToProcess below
-    private Integer sheetIndex;
+    private int sheetIndex;
     private String password;
     private String datePattern;
     private boolean preferNullOverDefault;
@@ -49,9 +51,17 @@ public final class PoijiOptions {
         return this;
     }
 
-    private PoijiOptions setSheetIndex(Integer sheetIndex) {
-        this.sheetIndex = sheetIndex;
-        return this;
+    //ISSUE #55
+    //if visiable return sheet index, else throw exception
+    private static int findVisibleSheetAtIndex(Workbook workbook, int requestedIndex) {
+
+        return IntStream.range(0, workbook.getNumberOfSheets())
+                .filter(workbook::isSheetHidden)
+                .filter(workbook::isSheetVeryHidden)
+                .filter(index -> index == requestedIndex)
+                .findFirst()
+                .orElseThrow(() -> new PoijiException("Expected sheet index error. Control the sheet index."));
+
     }
 
     public String getPassword() {
@@ -63,8 +73,15 @@ public final class PoijiOptions {
         return this;
     }
 
-    public Integer sheetIndex() {
-        return sheetIndex;
+    //ISSUE #55
+    public static int getSheetIndexToProcess(Workbook workbook, PoijiOptions options) {
+        int requestedIndex = options.sheetIndex();
+
+        //if set to ignore hidden find the visible sheet that matches the index requested
+        if (options.ignoreHiddenSheets()) {
+            return findVisibleSheetAtIndex(workbook, requestedIndex);
+        }
+        return requestedIndex;
     }
 
     public String datePattern() {
@@ -109,10 +126,19 @@ public final class PoijiOptions {
         return this;
     }
 
+    private PoijiOptions setSheetIndex(int sheetIndex) {
+        this.sheetIndex = sheetIndex;
+        return this;
+    }
+
+    public int sheetIndex() {
+        return sheetIndex;
+    }
+
     public static class PoijiOptionsBuilder {
 
         private int skip = 1;
-        private Integer sheetIndex;
+        private int sheetIndex;
         private String password;
         private boolean preferNullOverDefault = false;
         private String datePattern = DEFAULT_DATE_PATTERN;
@@ -197,7 +223,9 @@ public final class PoijiOptions {
          * @param sheetIndex number
          * @return this
          */
-        public PoijiOptionsBuilder sheetIndex(Integer sheetIndex) {
+        public PoijiOptionsBuilder sheetIndex(int sheetIndex) {
+            if (sheetIndex < 0)
+                throw new PoijiException("Sheet index must be greater than or equal to 0");
             this.sheetIndex = sheetIndex;
             return this;
         }
@@ -246,57 +274,5 @@ public final class PoijiOptions {
             return this;
         }
 
-    }
-
-    //ISSUE #55
-    //loop througth all sheets and check if visiable
-    //if visiable return sheet index, else null so can fall back to default
-    private static Integer findVisiableSheetAtIndex(Workbook workbook, int findIndex) {
-
-        int visiableIndex = 0;
-
-        for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
-            if (!workbook.isSheetHidden(i) && !workbook.isSheetVeryHidden(i)) {
-
-                if (visiableIndex == findIndex) {
-                    return i;
-                } else {
-                    visiableIndex++;
-                }
-            }
-        }
-        return null;
-    }
-
-    //ISSUE #55
-    //from the given work book, using the oprions set work out which sheet to process
-    //if given an sheet number, process that
-    //else set to use the default first sheet
-    //if ignore hidden sheets is true, then loop the nuber of hidden sheets and match requested index
-    public static final int getSheetIndexToProcess(Workbook workbook, PoijiOptions options) {
-        int findIndex;
-        //if given sheet index to use, use that
-        if (options.sheetIndex() != null && options.sheetIndex() > -1) {
-            findIndex = options.sheetIndex();
-        } else {
-            //else default
-            findIndex = 0;
-        }
-
-        int sheetIndex;
-        //if set to hignore hidden find the visiable sheet that matches the index requested
-        if (options.ignoreHiddenSheets()) {
-            Integer visiableSheetIndex = findVisiableSheetAtIndex(workbook, findIndex);
-            if (visiableSheetIndex != null) {
-                sheetIndex = visiableSheetIndex;
-            } else {
-                //if no sheet found, default back
-                sheetIndex = findIndex;
-            }
-        } else {
-            //if dont want to ignore hidden sheets, use index given or default
-            sheetIndex = findIndex;
-        }
-        return sheetIndex;
     }
 }
