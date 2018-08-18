@@ -4,6 +4,7 @@ import java.time.format.DateTimeFormatter;
 
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_PATTERN;
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_TIME_FORMATTER;
+import org.apache.poi.ss.usermodel.Workbook;
 
 /**
  * Created by hakan on 17/01/2017.
@@ -11,11 +12,18 @@ import static com.poiji.util.PoijiConstants.DEFAULT_DATE_TIME_FORMATTER;
 public final class PoijiOptions {
 
     private int skip;
-    private int sheetIndex;
+    //ISSUE #55 changed form int to integer, in order to check if null when trying to work out which sheet to process in getSheetIndexToProcess below
+    private Integer sheetIndex;
     private String password;
     private String datePattern;
     private boolean preferNullOverDefault;
     private DateTimeFormatter dateTimeFormatter;
+    //ISSUE #55
+    //whether or not to ignore any hidden sheets in the work book
+    //default to false so not to break existing, and so must be explicitly set to true
+    private boolean ignoreHiddenSheets;
+    //if set to true will trim(remove leading and trailing) white spaces from cell value
+    private boolean trimCellValue;
 
     private PoijiOptions() {
         super();
@@ -41,7 +49,7 @@ public final class PoijiOptions {
         return this;
     }
 
-    private PoijiOptions setSheetIndex(int sheetIndex) {
+    private PoijiOptions setSheetIndex(Integer sheetIndex) {
         this.sheetIndex = sheetIndex;
         return this;
     }
@@ -55,7 +63,7 @@ public final class PoijiOptions {
         return this;
     }
 
-    public int sheetIndex() {
+    public Integer sheetIndex() {
         return sheetIndex;
     }
 
@@ -80,14 +88,38 @@ public final class PoijiOptions {
         return skip;
     }
 
+    //ISSUE #55
+    public boolean ignoreHiddenSheets() {
+        return ignoreHiddenSheets;
+    }
+
+    //ISSUE #55
+    public PoijiOptions setIgnoreHiddenSheets(boolean ignoreHiddenSheets) {
+        this.ignoreHiddenSheets = ignoreHiddenSheets;
+        return this;
+    }
+
+    //ISSUE #55 : additional
+    public boolean trimCellValue() {
+        return trimCellValue;
+    }
+
+    public PoijiOptions setTrimCellValue(boolean trimCellValue) {
+        this.trimCellValue = trimCellValue;
+        return this;
+    }
+
     public static class PoijiOptionsBuilder {
 
         private int skip = 1;
-        private int sheetIndex;
+        private Integer sheetIndex;
         private String password;
         private boolean preferNullOverDefault = false;
         private String datePattern = DEFAULT_DATE_PATTERN;
         private DateTimeFormatter dateTimeFormatter = DEFAULT_DATE_TIME_FORMATTER;
+        //ISSUE #55
+        private boolean ignoreHiddenSheets = false;
+        private boolean trimCellValue = false;
 
         private PoijiOptionsBuilder() {
         }
@@ -103,7 +135,9 @@ public final class PoijiOptions {
                     .setPreferNullOverDefault(preferNullOverDefault)
                     .setDatePattern(datePattern)
                     .setDateTimeFormatter(dateTimeFormatter)
-                    .setSheetIndex(sheetIndex);
+                    .setSheetIndex(sheetIndex)
+                    .setIgnoreHiddenSheets(ignoreHiddenSheets)
+                    .setTrimCellValue(trimCellValue);
         }
 
         public static PoijiOptionsBuilder settings() {
@@ -111,7 +145,8 @@ public final class PoijiOptions {
         }
 
         /**
-         * set a date time formatter, default date time formatter is "dd/M/yyyy" for java.time.LocalDate
+         * set a date time formatter, default date time formatter is "dd/M/yyyy"
+         * for java.time.LocalDate
          *
          * @param dateTimeFormatter date time formatter
          * @return this
@@ -122,7 +157,8 @@ public final class PoijiOptions {
         }
 
         /**
-         * set date pattern, default date format is "dd/M/yyyy" for java.util.Date
+         * set date pattern, default date format is "dd/M/yyyy" for
+         * java.util.Date
          *
          * @param datePattern date time formatter
          * @return this
@@ -133,7 +169,8 @@ public final class PoijiOptions {
         }
 
         /**
-         * set whether or not to use null instead of default values for Integer, Double, Float, Long, String and java.util.Date types.
+         * set whether or not to use null instead of default values for Integer,
+         * Double, Float, Long, String and java.util.Date types.
          *
          * @param preferNullOverDefault boolean
          * @return this
@@ -160,7 +197,7 @@ public final class PoijiOptions {
          * @param sheetIndex number
          * @return this
          */
-        public PoijiOptionsBuilder sheetIndex(int sheetIndex) {
+        public PoijiOptionsBuilder sheetIndex(Integer sheetIndex) {
             this.sheetIndex = sheetIndex;
             return this;
         }
@@ -175,7 +212,6 @@ public final class PoijiOptions {
             return new PoijiOptionsBuilder(skip);
         }
 
-
         /**
          * set password for encrypted excel file, Default is null
          *
@@ -187,5 +223,68 @@ public final class PoijiOptions {
             return this;
         }
 
+        /**
+         * Ignore hidden sheets
+         *
+         * @param ignoreHiddenSheets whether or not to ignore any hidden sheets
+         * in the work book.
+         * @return this
+         */
+        public PoijiOptionsBuilder ignoreHiddenSheets(boolean ignoreHiddenSheets) {
+            this.ignoreHiddenSheets = ignoreHiddenSheets;
+            return this;
+        }
+
+        /**
+         * Trim cell value
+         *
+         * @param trimCellValue trim the cell value before processing work book.
+         * @return this
+         */
+        public PoijiOptionsBuilder trimCellValue(boolean trimCellValue) {
+            this.trimCellValue = trimCellValue;
+            return this;
+        }
+
+    }
+
+    //ISSUE #55
+    //loop througth all sheets and check if visiable
+    //if visiable return sheet index, else null so can fall back to default
+    private static Integer findFirstVisiableSheetIndex(Workbook workbook) {
+        for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+            if (!workbook.isSheetHidden(i) && !workbook.isSheetVeryHidden(i)) {
+                return i;
+            }
+        }
+        return null;
+    }
+
+    //ISSUE #55
+    //from the given work book, using the oprions set work out which sheet to process
+    //if given an sheet number, process that
+    //else if no index set, and ignore hidden is true, find the first visiable
+    //else get the default first sheet
+    public static final int getSheetIndexToProcess(Workbook workbook, PoijiOptions options) {
+        int index;
+        //if specify whick exact sheet index to get, using the options, then get that sheet regardless
+        if (options.sheetIndex() != null && options.sheetIndex() > -1) {
+            index = options.sheetIndex();
+        } else {
+            //else if set to only process visiable sheets, get the first visiable one
+            if (options.ignoreHiddenSheets()) {
+                Integer visiableSheetIndex = findFirstVisiableSheetIndex(workbook);
+                if (visiableSheetIndex != null) {
+                    index = visiableSheetIndex;
+                } else {
+                    //else get default, first (0 based) sheet
+                    index = 0;
+                }
+            } else {
+                //else get default, first (0 based) sheet
+                index = 0;
+            }
+        }
+        return index;
     }
 }

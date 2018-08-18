@@ -137,4 +137,29 @@ public class CastingTest {
     private enum TestEnum {
         ITEM1, ITEM2;
     }
+
+    @Test
+    //ISSUE #55 : additioanl functionality, trim string values
+    public void trimStringDefault() {
+        PoijiOptions options = PoijiOptionsBuilder.settings().build();
+        String testVal = (String) casting.castValue(String.class, "    value    ", options);
+        assertEquals("    value    ", testVal);
+    }
+
+    @Test
+    //ISSUE #55 : additioanl functionality, trim string values
+    public void trimStringTrue() {
+        PoijiOptions options = PoijiOptionsBuilder.settings().build().setTrimCellValue(true);
+        String testVal = (String) casting.castValue(String.class, "    value    ", options);
+        assertEquals("value", testVal);
+    }
+
+    @Test
+    //ISSUE #55 : additioanl functionality, trim string values
+    public void trimStringFalse() {
+        PoijiOptions options = PoijiOptionsBuilder.settings().build().setTrimCellValue(false);
+        String testVal = (String) casting.castValue(String.class, "    value    ", options);
+        assertEquals("    value    ", testVal);
+    }
+
 }

@@ -44,7 +44,12 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     @Override
     public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
         Workbook workbook = workbook();
-        Sheet sheet = workbook.getSheetAt(options.sheetIndex());
+        //Sheet sheet = workbook.getSheetAt(options.sheetIndex());
+
+        //work out which sheet must process
+        //ISSUE #55
+        int processIndex = PoijiOptions.getSheetIndexToProcess(workbook, options);
+        Sheet sheet = workbook.getSheetAt(processIndex);
 
         int skip = options.skip();
         int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
@@ -138,8 +143,9 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     private boolean isRowEmpty(Row row) {
         for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
             Cell cell = row.getCell(c, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-            if (cell != null && cell.getCellTypeEnum() != CellType.BLANK)
+            if (cell != null && cell.getCellTypeEnum() != CellType.BLANK) {
                 return false;
+            }
         }
         return true;
     }
