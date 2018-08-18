@@ -251,10 +251,18 @@ public final class PoijiOptions {
     //ISSUE #55
     //loop througth all sheets and check if visiable
     //if visiable return sheet index, else null so can fall back to default
-    private static Integer findFirstVisiableSheetIndex(Workbook workbook) {
+    private static Integer findVisiableSheetAtIndex(Workbook workbook, int findIndex) {
+
+        int visiableIndex = 0;
+
         for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
             if (!workbook.isSheetHidden(i) && !workbook.isSheetVeryHidden(i)) {
-                return i;
+
+                if (visiableIndex == findIndex) {
+                    return i;
+                } else {
+                    visiableIndex++;
+                }
             }
         }
         return null;
@@ -263,28 +271,32 @@ public final class PoijiOptions {
     //ISSUE #55
     //from the given work book, using the oprions set work out which sheet to process
     //if given an sheet number, process that
-    //else if no index set, and ignore hidden is true, find the first visiable
-    //else get the default first sheet
+    //else set to use the default first sheet
+    //if ignore hidden sheets is true, then loop the nuber of hidden sheets and match requested index
     public static final int getSheetIndexToProcess(Workbook workbook, PoijiOptions options) {
-        int index;
-        //if specify whick exact sheet index to get, using the options, then get that sheet regardless
+        int findIndex;
+        //if given sheet index to use, use that
         if (options.sheetIndex() != null && options.sheetIndex() > -1) {
-            index = options.sheetIndex();
+            findIndex = options.sheetIndex();
         } else {
-            //else if set to only process visiable sheets, get the first visiable one
-            if (options.ignoreHiddenSheets()) {
-                Integer visiableSheetIndex = findFirstVisiableSheetIndex(workbook);
-                if (visiableSheetIndex != null) {
-                    index = visiableSheetIndex;
-                } else {
-                    //else get default, first (0 based) sheet
-                    index = 0;
-                }
-            } else {
-                //else get default, first (0 based) sheet
-                index = 0;
-            }
+            //else default
+            findIndex = 0;
         }
-        return index;
+
+        int sheetIndex;
+        //if set to hignore hidden find the visiable sheet that matches the index requested
+        if (options.ignoreHiddenSheets()) {
+            Integer visiableSheetIndex = findVisiableSheetAtIndex(workbook, findIndex);
+            if (visiableSheetIndex != null) {
+                sheetIndex = visiableSheetIndex;
+            } else {
+                //if no sheet found, default back
+                sheetIndex = findIndex;
+            }
+        } else {
+            //if dont want to ignore hidden sheets, use index given or default
+            sheetIndex = findIndex;
+        }
+        return sheetIndex;
     }
 }
