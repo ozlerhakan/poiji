@@ -1,5 +1,5 @@
 = Poiji
-:version: v1.16
+:version: v1.17.0
 
 image:https://travis-ci.org/ozlerhakan/poiji.svg?branch=master["Build Status", link="https://travis-ci.org/ozlerhakan/poiji"] image:https://api.codacy.com/project/badge/Grade/6587e90886184da29a1b7c5634695c9d["Codacy code quality", link="https://www.codacy.com/app/ozlerhakan/poiji?utm_source=github.com&utm_medium=referral&utm_content=ozlerhakan/poiji&utm_campaign=Badge_Grade"] image:https://coveralls.io/repos/github/ozlerhakan/poiji/badge.svg?branch=master["Coverage Status", link="https://coveralls.io/github/ozlerhakan/poiji?branch=master"] image:https://img.shields.io/badge/apache.poi-3.17-brightgreen.svg[] image:https://img.shields.io/badge/gitter-join%20chat-blue.svg["Gitter", link="https://gitter.im/poiji/Lobby"] image:https://img.shields.io/badge/license-MIT-blue.svg[]
 
@@ -15,7 +15,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 <dependency>
   <groupId>com.github.ozlerhakan</groupId>
   <artifactId>poiji</artifactId>
-  <version>1.16</version>
+  <version>1.17.0</version>
 </dependency>
 ----
 
@@ -23,11 +23,39 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    compile 'com.github.ozlerhakan:poiji:1.16'
+    compile 'com.github.ozlerhakan:poiji:1.17.0'
 }
 ----
 
 You can find the latest and earlier development versions including javadoc and source files on https://oss.sonatype.org/content/groups/public/com/github/ozlerhakan/poiji/[Sonatypes OSS repository].
+
+.`Poiji.fromExcel` Structure
+----
+com.poiji.bind.Poiji#fromExcel(java.io.File, java.lang.Class<T>)
+com.poiji.bind.Poiji#fromExcel(java.io.File, java.lang.Class<T>, java.util.function.Consumer<? super T>)
+com.poiji.bind.Poiji#fromExcel(java.io.File, java.lang.Class<T>, com.poiji.option.PoijiOptions)
+com.poiji.bind.Poiji#fromExcel(java.io.File, java.lang.Class<T>, com.poiji.option.PoijiOptions, java.util.function.Consumer<? super T>)
+com.poiji.bind.Poiji#fromExcel(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>)
+com.poiji.bind.Poiji#fromExcel(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>, java.util.function.Consumer<? super T>)
+com.poiji.bind.Poiji#fromExcel(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>, com.poiji.option.PoijiOptions)
+com.poiji.bind.Poiji#fromExcel(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>, com.poiji.option.PoijiOptions, java.util.function.Consumer<? super T>)
+----
+
+.`PoijiOptions.PoijiOptionsBuilder` Structure
+----
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#settings()
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#settings(int)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#build()
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#datePattern(String)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#dateTimeFormatter(java.time.format.DateTimeFormatter)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#ignoreHiddenSheets(boolean)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#password(String)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#preferNullOverDefault(boolean)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#settings(int)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#sheetIndex(int)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#skip(int)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#trimCellValue(boolean)
+----
 
 === Example 1
 
