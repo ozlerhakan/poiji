@@ -1,10 +1,8 @@
 package com.poiji.option;
 
 import com.poiji.exception.PoijiException;
-import org.apache.poi.ss.usermodel.Workbook;
 
 import java.time.format.DateTimeFormatter;
-import java.util.stream.IntStream;
 
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_PATTERN;
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_TIME_FORMATTER;
@@ -20,11 +18,7 @@ public final class PoijiOptions {
     private String datePattern;
     private boolean preferNullOverDefault;
     private DateTimeFormatter dateTimeFormatter;
-    //ISSUE #55
-    //whether or not to ignore any hidden sheets in the work book
-    //default to false so not to break existing, and so must be explicitly set to true
     private boolean ignoreHiddenSheets;
-    //if set to true will trim(remove leading and trailing) white spaces from cell value
     private boolean trimCellValue;
 
     private PoijiOptions() {
@@ -51,19 +45,6 @@ public final class PoijiOptions {
         return this;
     }
 
-    //ISSUE #55
-    //if visiable return sheet index, else throw exception
-    private static int findVisibleSheetAtIndex(Workbook workbook, int requestedIndex) {
-
-        return IntStream.range(0, workbook.getNumberOfSheets())
-                .filter(workbook::isSheetHidden)
-                .filter(workbook::isSheetVeryHidden)
-                .filter(index -> index == requestedIndex)
-                .findFirst()
-                .orElseThrow(() -> new PoijiException("Expected sheet index error. Control the sheet index."));
-
-    }
-
     public String getPassword() {
         return password;
     }
@@ -71,17 +52,6 @@ public final class PoijiOptions {
     private PoijiOptions setPassword(String password) {
         this.password = password;
         return this;
-    }
-
-    //ISSUE #55
-    public static int getSheetIndexToProcess(Workbook workbook, PoijiOptions options) {
-        int requestedIndex = options.sheetIndex();
-
-        //if set to ignore hidden find the visible sheet that matches the index requested
-        if (options.ignoreHiddenSheets()) {
-            return findVisibleSheetAtIndex(workbook, requestedIndex);
-        }
-        return requestedIndex;
     }
 
     public String datePattern() {
@@ -105,18 +75,15 @@ public final class PoijiOptions {
         return skip;
     }
 
-    //ISSUE #55
     public boolean ignoreHiddenSheets() {
         return ignoreHiddenSheets;
     }
 
-    //ISSUE #55
-    public PoijiOptions setIgnoreHiddenSheets(boolean ignoreHiddenSheets) {
+    private PoijiOptions setIgnoreHiddenSheets(boolean ignoreHiddenSheets) {
         this.ignoreHiddenSheets = ignoreHiddenSheets;
         return this;
     }
 
-    //ISSUE #55 : additional
     public boolean trimCellValue() {
         return trimCellValue;
     }
@@ -255,7 +222,7 @@ public final class PoijiOptions {
          * Ignore hidden sheets
          *
          * @param ignoreHiddenSheets whether or not to ignore any hidden sheets
-         * in the work book.
+         *                           in the work book.
          * @return this
          */
         public PoijiOptionsBuilder ignoreHiddenSheets(boolean ignoreHiddenSheets) {

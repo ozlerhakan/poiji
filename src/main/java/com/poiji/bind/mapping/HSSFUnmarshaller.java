@@ -45,8 +45,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
         Workbook workbook = workbook();
 
-        int processIndex = PoijiOptions.getSheetIndexToProcess(workbook, options);
-        Sheet sheet = workbook.getSheetAt(processIndex);
+        Sheet sheet = this.getSheetToProcess(workbook, options);
 
         int skip = options.skip();
         int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
@@ -59,6 +58,24 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
                 consumer.accept(t);
             }
         }
+    }
+
+    private Sheet getSheetToProcess(Workbook workbook, PoijiOptions options) {
+        int requestedIndex = options.sheetIndex();
+
+        if (options.ignoreHiddenSheets()) {
+            int nonHiddenSheetIndex = 0;
+            for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                if (!workbook.isSheetHidden(i) && !workbook.isSheetVeryHidden(i)) {
+                    if (nonHiddenSheetIndex == requestedIndex) {
+                        return workbook.getSheetAt(i);
+                    }
+                    nonHiddenSheetIndex++;
+                }
+            }
+        }
+
+        return workbook.getSheetAt(requestedIndex);
     }
 
     private void loadColumnTitles(Sheet sheet, int maxPhysicalNumberOfRows) {

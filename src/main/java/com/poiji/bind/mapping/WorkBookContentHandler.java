@@ -1,43 +1,52 @@
 package com.poiji.bind.mapping;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.poiji.option.PoijiOptions;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- *
  * @author Matthew 2018/09/01
  */
-public class WorkBookContentHandler implements ContentHandler {
+final class WorkBookContentHandler implements ContentHandler {
 
-    public List<WorkBookSheet> sheets = new ArrayList<>();
     private WorkBookSheet individualSheet;
+    private final List<WorkBookSheet> sheets = new ArrayList<>();
+    private final PoijiOptions options;
+
+    WorkBookContentHandler(final PoijiOptions options) {
+        this.options = options;
+    }
+
+    List<WorkBookSheet> getSheets() {
+        return sheets;
+    }
 
     @Override
     public void setDocumentLocator(Locator locator) {
     }
 
     @Override
-    public void startDocument() throws SAXException {
+    public void startDocument() {
     }
 
     @Override
-    public void endDocument() throws SAXException {
+    public void endDocument() {
     }
 
     @Override
-    public void startPrefixMapping(String prefix, String uri) throws SAXException {
+    public void startPrefixMapping(String prefix, String uri) {
     }
 
     @Override
-    public void endPrefixMapping(String prefix) throws SAXException {
+    public void endPrefixMapping(String prefix) {
     }
 
     @Override
-    public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
+    public void startElement(String uri, String localName, String qName, Attributes atts) {
 
         if (qName.equals("sheet")) {
             individualSheet = new WorkBookSheet();
@@ -48,20 +57,24 @@ public class WorkBookContentHandler implements ContentHandler {
                 //    Attribute: sheetId:3
                 //    Attribute: state:hidden
                 if (atts.getQName(i).equals("name")) {
-                    individualSheet.name = atts.getValue(i);
+                    individualSheet.setName(atts.getValue(i));
                 }
                 if (atts.getQName(i).equals("sheetId")) {
-                    individualSheet.sheetId = atts.getValue(i);
+                    individualSheet.setSheetId(atts.getValue(i));
                 }
                 if (atts.getQName(i).equals("state")) {
-                    individualSheet.state = atts.getValue(i);
+                    String state = atts.getValue(i);
+                    if (!options.ignoreHiddenSheets()){
+                        state = "visible";
+                    }
+                    individualSheet.setState(state);
                 }
             }
         }
     }
 
     @Override
-    public void endElement(String uri, String localName, String qName) throws SAXException {
+    public void endElement(String uri, String localName, String qName) {
 
         if (qName.equals("sheet")) {
             sheets.add(individualSheet);
@@ -71,19 +84,19 @@ public class WorkBookContentHandler implements ContentHandler {
     }
 
     @Override
-    public void characters(char[] ch, int start, int length) throws SAXException {
+    public void characters(char[] ch, int start, int length) {
     }
 
     @Override
-    public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
+    public void ignorableWhitespace(char[] ch, int start, int length) {
     }
 
     @Override
-    public void processingInstruction(String target, String data) throws SAXException {
+    public void processingInstruction(String target, String data) {
     }
 
     @Override
-    public void skippedEntity(String name) throws SAXException {
+    public void skippedEntity(String name) {
     }
 
 }

@@ -9,6 +9,7 @@ import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.function.Consumer;
 
@@ -41,7 +42,7 @@ final class XSSFUnmarshallerFile extends XSSFUnmarshaller {
 
             unmarshal0(type, consumer, open);
 
-        } catch (SAXException | IOException | OpenXML4JException e) {
+        } catch (ParserConfigurationException | SAXException | IOException | OpenXML4JException e) {
             throw new PoijiException("Problem occurred while reading data", e);
         }
     }
