@@ -26,6 +26,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Consumer;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import static org.apache.poi.xssf.eventusermodel.XSSFReader.SheetIterator;
 
@@ -42,10 +44,72 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
 
     <T> void unmarshal0(Class<T> type, Consumer<? super T> consumer, OPCPackage open) throws IOException, SAXException, OpenXML4JException {
 
-        XSSFWorkbook wb = new XSSFWorkbook(open);
-        Workbook workbook = new SXSSFWorkbook(wb);
+        WorkBookContentHandler wbch = null;
+        try {
 
-        int processIndex = PoijiOptions.getSheetIndexToProcess(workbook, options);
+            XSSFReader workbookReader = new XSSFReader(open);
+            SAXParserFactory spf = SAXParserFactory.newInstance();
+            SAXParser parser = spf.newSAXParser();
+            XMLReader reader = parser.getXMLReader();
+            reader.setContentHandler(new WorkBookContentHandler());
+            InputSource is = new InputSource(workbookReader.getWorkbookData());
+            reader.parse(is);
+            wbch = (WorkBookContentHandler) reader.getContentHandler();
+
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            throw new PoijiException("Problem occurred while reading workbook data", e);
+        }
+
+        int processIndex = 0;
+        if (wbch != null) {
+
+//            System.out.println("wbch.sheets" + wbch.sheets);
+            int findIndex = options.sheetIndex();
+
+//            System.out.println("findIndex " + findIndex);
+            int sheetIndex;
+            //if set to hignore hidden find the visiable sheet that matches the index requested
+            if (options.ignoreHiddenSheets()) {
+//                System.out.println("ignoreHiddenSheets  true ");
+                Integer visiableIndex = null;
+
+                int sheetCount = 0;
+                for (WorkBookSheet s : wbch.sheets) {
+
+//                    System.out.println("WorkBookSheet  s " + s);
+                    if (s.state == null) {
+//                        System.out.println("WorkBookSheet NULL");
+                        //cannot use sheet is, cos that is its id not its index, they seem to be diffent things
+                        visiableIndex = sheetCount;
+                    }
+
+                    sheetCount++;
+
+                }
+
+//                System.out.println("visiableIndex" + visiableIndex);
+                if (visiableIndex != null) {
+                    sheetIndex = visiableIndex;
+                } else {
+                    //if no sheet found, default back
+                    sheetIndex = findIndex;
+                }
+
+//                System.out.println("sheetIndex" + sheetIndex);
+            } else {
+
+                //if dont want to ignore hidden sheets, use index given or default
+                sheetIndex = findIndex;
+//                System.out.println("ELSE sheetIndex" + sheetIndex);
+            }
+            processIndex = sheetIndex;
+        }
+
+//        System.out.println("processIndex" + processIndex);
+//        XSSFWorkbook wb = new XSSFWorkbook(open);
+//        Workbook workbook = new SXSSFWorkbook(wb);
+//        //work out which sheet must process
+//        int processIndex = PoijiOptions.getSheetIndexToProcess(workbook, options);
 
         ReadOnlySharedStringsTable readOnlySharedStringsTable = new ReadOnlySharedStringsTable(open);
         XSSFReader xssfReader = new XSSFReader(open);
