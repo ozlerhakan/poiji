@@ -27,23 +27,6 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import static org.apache.poi.xssf.eventusermodel.XSSFReader.SheetIterator;
-import org.xml.sax.Attributes;
-import org.xml.sax.Locator;
-////
-//import java.io.InputStream;
-//
-//import org.apache.commons.logging.Log;
-//import org.apache.commons.logging.LogFactory;
-//import org.apache.poi.openxml4j.opc.OPCPackage;
-//import org.apache.poi.xssf.eventusermodel.XSSFReader;
-//import org.apache.poi.xssf.model.SharedStringsTable;
-//import org.apache.xerces.parsers.SAXParser;
-//import org.xml.sax.InputSource;
-//import org.xml.sax.XMLReader;
-//
-//import poi.example.eventmodel.SheetHandler;
-//import poi.example.eventmodel.WorkbookHandler;
-//import poi.example.eventmodel.mapping.annotation.Sheet;
 
 /**
  * Created by hakan on 22/10/2017
@@ -58,78 +41,58 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
 
     <T> void unmarshal0(Class<T> type, Consumer<? super T> consumer, OPCPackage open) throws IOException, SAXException, OpenXML4JException {
 
-        WorkBookContentHandler wbch = null;
-        try {
-            XSSFReader workbookReader = new XSSFReader(open);
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            SAXParser parser = spf.newSAXParser();
-            XMLReader reader = parser.getXMLReader();
-            reader.setContentHandler(new WorkBookContentHandler());
-            InputSource is = new InputSource(workbookReader.getWorkbookData());
-            reader.parse(is);
-            wbch = (WorkBookContentHandler) reader.getContentHandler();
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            throw new PoijiException("Problem occurred while reading workbook data", e);
+        int findIndex;
+        //if given sheet index to use, use that
+        if (options.sheetIndex() != null && options.sheetIndex() > -1) {
+            findIndex = options.sheetIndex();
+        } else {
+            //else default
+            findIndex = 0;
         }
 
-//        System.out.println("wbch" + wbch);
-        int processIndex = 0;
-        if (wbch != null) {
+        int sheetIndex;
+        //if set to hignore hidden find the visiable sheet that matches the index requested
+        if (options.ignoreHiddenSheets()) {
+            Integer visiableIndex = null;
 
-//            System.out.println("wbch.sheets" + wbch.sheets);
-            int findIndex;
-            //if given sheet index to use, use that
-            if (options.sheetIndex() != null && options.sheetIndex() > -1) {
-                findIndex = options.sheetIndex();
-            } else {
-                //else default
-                findIndex = 0;
-            }
-
-//            System.out.println("findIndex " + findIndex);
-            int sheetIndex;
-            //if set to hignore hidden find the visiable sheet that matches the index requested
-            if (options.ignoreHiddenSheets()) {
-//                System.out.println("ignoreHiddenSheets  true ");
-                Integer visiableIndex = null;
+            try {
+                //open work book as XML
+                XSSFReader workbookReader = new XSSFReader(open);
+                SAXParserFactory spf = SAXParserFactory.newInstance();
+                SAXParser parser = spf.newSAXParser();
+                XMLReader reader = parser.getXMLReader();
+                //read with specific reader to find sheets and their attributes to see is hidden
+                reader.setContentHandler(new WorkBookContentHandler());
+                InputSource is = new InputSource(workbookReader.getWorkbookData());
+                reader.parse(is);
+                WorkBookContentHandler wbch = (WorkBookContentHandler) reader.getContentHandler();
 
                 int sheetCount = 0;
+                //look the contents of the XML sheet
                 for (WorkBookSheet s : wbch.sheets) {
-
-//                    System.out.println("WorkBookSheet  s " + s);
+                    //the state of the sheet, if null, not hidden, else s will equal 'hidden'
                     if (s.state == null) {
-//                        System.out.println("WorkBookSheet NULL");
                         //cannot use sheet is, cos that is its id not its index, they seem to be diffent things
                         visiableIndex = sheetCount;
                     }
-
                     sheetCount++;
-
                 }
-
-//                System.out.println("visiableIndex" + visiableIndex);
-                if (visiableIndex != null) {
-                    sheetIndex = visiableIndex;
-                } else {
-                    //if no sheet found, default back
-                    sheetIndex = findIndex;
-                }
-
-//                System.out.println("sheetIndex" + sheetIndex);
-            } else {
-
-                //if dont want to ignore hidden sheets, use index given or default
-                sheetIndex = findIndex;
-//                System.out.println("ELSE sheetIndex" + sheetIndex);
+            } catch (ParserConfigurationException | SAXException | IOException e) {
+                throw new PoijiException("Problem occurred while reading workbook data", e);
             }
-            processIndex = sheetIndex;
+
+            if (visiableIndex != null) {
+                sheetIndex = visiableIndex;
+            } else {
+                //if no sheet found, default back
+                sheetIndex = findIndex;
+            }
+
+        } else {
+            //if dont want to ignore hidden sheets, use index given or default
+            sheetIndex = findIndex;
         }
 
-//        System.out.println("processIndex" + processIndex);
-//        XSSFWorkbook wb = new XSSFWorkbook(open);
-//        Workbook workbook = new SXSSFWorkbook(wb);
-//        //work out which sheet must process
-//        int processIndex = PoijiOptions.getSheetIndexToProcess(workbook, options);
         ReadOnlySharedStringsTable readOnlySharedStringsTable = new ReadOnlySharedStringsTable(open);
         XSSFReader xssfReader = new XSSFReader(open);
         StylesTable styles = xssfReader.getStylesTable();
@@ -139,7 +102,7 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
 
         while (iter.hasNext()) {
             try (InputStream stream = iter.next()) {
-                if (index == processIndex) {
+                if (index == sheetIndex) {
                     processSheet(styles, readOnlySharedStringsTable, type, stream, consumer);
                     return;
                 }
