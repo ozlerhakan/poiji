@@ -24,6 +24,11 @@ public final class PoijiOptions {
     private boolean ignoreHiddenSheets;
     //if set to true will trim(remove leading and trailing) white spaces from cell value
     private boolean trimCellValue;
+    //ISSUE #57
+    //specify regex pattern for date converstion, if set and does not match date set to null
+    private String dateRegex;
+    //to set simple date format to Lenient if wanted
+    private boolean dateLenient;
 
     private PoijiOptions() {
         super();
@@ -109,6 +114,26 @@ public final class PoijiOptions {
         return this;
     }
 
+    //ISSUE #57
+    public String getDateRegex() {
+        return dateRegex;
+    }
+
+    public PoijiOptions setDateRegex(String dateRegex) {
+        this.dateRegex = dateRegex;
+        return this;
+    }
+
+    //ISSUE #57
+    public boolean getDateLenient() {
+        return dateLenient;
+    }
+
+    public PoijiOptions setDateLenient(boolean dateLenient) {
+        this.dateLenient = dateLenient;
+        return this;
+    }
+
     public static class PoijiOptionsBuilder {
 
         private int skip = 1;
@@ -120,6 +145,9 @@ public final class PoijiOptions {
         //ISSUE #55
         private boolean ignoreHiddenSheets = false;
         private boolean trimCellValue = false;
+        //ISSUE #57
+        private String dateRegex = null;
+        private boolean dateLenient = true;
 
         private PoijiOptionsBuilder() {
         }
@@ -137,7 +165,9 @@ public final class PoijiOptions {
                     .setDateTimeFormatter(dateTimeFormatter)
                     .setSheetIndex(sheetIndex)
                     .setIgnoreHiddenSheets(ignoreHiddenSheets)
-                    .setTrimCellValue(trimCellValue);
+                    .setTrimCellValue(trimCellValue)
+                    .setDateRegex(dateRegex)
+                    .setDateLenient(dateLenient);
         }
 
         public static PoijiOptionsBuilder settings() {
@@ -243,6 +273,33 @@ public final class PoijiOptions {
          */
         public PoijiOptionsBuilder trimCellValue(boolean trimCellValue) {
             this.trimCellValue = trimCellValue;
+            return this;
+        }
+
+        //ISSUE #57
+        /**
+         * Date regex, if would like to specify a regex patter the date must be
+         * in, e.g.\\d{2}/\\d{1}/\\d{4}.
+         *
+         * @param dateRegex date regex pattern
+         * @return this
+         */
+        public PoijiOptionsBuilder dateRegex(String dateRegex) {
+            this.dateRegex = dateRegex;
+            return this;
+        }
+
+        //ISSUE #57
+        /**
+         * If would like to set the simple date format is lenient option, use to
+         * set how strict the date formating must be, defaults to lenient true
+         * as that is the default for simple date format.
+         *
+         * @param dateLenient
+         * @return this
+         */
+        public PoijiOptionsBuilder dateLenient(boolean dateLenient) {
+            this.dateLenient = dateLenient;
             return this;
         }
 
