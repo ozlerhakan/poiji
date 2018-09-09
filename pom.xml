@@ -6,7 +6,7 @@
 
     <groupId>com.github.ozlerhakan</groupId>
     <artifactId>poiji</artifactId>
-    <version>1.16</version>
+    <version>1.17.0</version>
     <packaging>jar</packaging>
 
     <name>poiji</name>
@@ -93,6 +93,7 @@
                 <version>2.20.1</version>
                 <configuration>
                     <argLine>${add.opens}</argLine>
+                    <argLine>-Djava.awt.headless=true</argLine>
                 </configuration>
             </plugin>
 

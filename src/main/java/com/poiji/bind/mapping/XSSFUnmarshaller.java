@@ -22,9 +22,8 @@ import org.xml.sax.XMLReader;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.function.Consumer;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import static org.apache.poi.xssf.eventusermodel.XSSFReader.SheetIterator;
 
@@ -39,95 +38,59 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         this.options = options;
     }
 
-    <T> void unmarshal0(Class<T> type, Consumer<? super T> consumer, OPCPackage open) throws IOException, SAXException, OpenXML4JException {
-
-        int findIndex;
-        //if given sheet index to use, use that
-        if (options.sheetIndex() != null && options.sheetIndex() > -1) {
-            findIndex = options.sheetIndex();
-        } else {
-            //else default
-            findIndex = 0;
-        }
-
-        int sheetIndex;
-        //if set to hignore hidden find the visiable sheet that matches the index requested
-        if (options.ignoreHiddenSheets()) {
-            Integer visiableIndex = null;
-
-            try {
-                //open work book as XML
-                XSSFReader workbookReader = new XSSFReader(open);
-                SAXParserFactory spf = SAXParserFactory.newInstance();
-                SAXParser parser = spf.newSAXParser();
-                XMLReader reader = parser.getXMLReader();
-                //read with specific reader to find sheets and their attributes to see is hidden
-                reader.setContentHandler(new WorkBookContentHandler());
-                InputSource is = new InputSource(workbookReader.getWorkbookData());
-                reader.parse(is);
-                WorkBookContentHandler wbch = (WorkBookContentHandler) reader.getContentHandler();
-
-                int sheetCount = 0;
-                //look the contents of the XML sheet
-                for (WorkBookSheet s : wbch.sheets) {
-                    //the state of the sheet, if null, not hidden, else s will equal 'hidden'
-                    if (s.state == null) {
-                        //cannot use sheet is, cos that is its id not its index, they seem to be diffent things
-                        visiableIndex = sheetCount;
-                    }
-                    sheetCount++;
-                }
-            } catch (ParserConfigurationException | SAXException | IOException e) {
-                throw new PoijiException("Problem occurred while reading workbook data", e);
-            }
-
-            if (visiableIndex != null) {
-                sheetIndex = visiableIndex;
-            } else {
-                //if no sheet found, default back
-                sheetIndex = findIndex;
-            }
-
-        } else {
-            //if dont want to ignore hidden sheets, use index given or default
-            sheetIndex = findIndex;
-        }
+    <T> void unmarshal0(Class<T> type, Consumer<? super T> consumer, OPCPackage open)
+            throws ParserConfigurationException, IOException, SAXException, OpenXML4JException {
 
         ReadOnlySharedStringsTable readOnlySharedStringsTable = new ReadOnlySharedStringsTable(open);
-        XSSFReader xssfReader = new XSSFReader(open);
-        StylesTable styles = xssfReader.getStylesTable();
+        XSSFReader workbookReader = new XSSFReader(open);
+        StylesTable styles = workbookReader.getStylesTable();
+        XMLReader reader = SAXHelper.newXMLReader();
 
-        SheetIterator iter = (SheetIterator) xssfReader.getSheetsData();
-        int index = 0;
+        InputSource is = new InputSource(workbookReader.getWorkbookData());
 
+        reader.setContentHandler(new WorkBookContentHandler(options));
+        reader.parse(is);
+
+        WorkBookContentHandler wbch = (WorkBookContentHandler) reader.getContentHandler();
+        List<WorkBookSheet> sheets = wbch.getSheets();
+
+        int requestedIndex = options.sheetIndex();
+        int nonHiddenSheetIndex = 0;
+        int sheetCounter = 0;
+
+        SheetIterator iter = (SheetIterator) workbookReader.getSheetsData();
         while (iter.hasNext()) {
             try (InputStream stream = iter.next()) {
-                if (index == sheetIndex) {
-                    processSheet(styles, readOnlySharedStringsTable, type, stream, consumer);
-                    return;
+                WorkBookSheet wbs = sheets.get(sheetCounter);
+                if (wbs.getState().equals("visible")) {
+                    if (nonHiddenSheetIndex == requestedIndex) {
+                        processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
+                        return;
+                    }
+                    nonHiddenSheetIndex++;
                 }
             }
-            ++index;
+            sheetCounter++;
         }
     }
 
     @SuppressWarnings("unchecked")
     private <T> void processSheet(StylesTable styles,
-            ReadOnlySharedStringsTable readOnlySharedStringsTable,
-            Class<T> type,
-            InputStream sheetInputStream,
-            Consumer<? super T> consumer) {
+                                  XMLReader reader,
+                                  ReadOnlySharedStringsTable readOnlySharedStringsTable,
+                                  Class<T> type,
+                                  InputStream sheetInputStream,
+                                  Consumer<? super T> consumer) {
 
         DataFormatter formatter = new DataFormatter();
         InputSource sheetSource = new InputSource(sheetInputStream);
         try {
-            XMLReader sheetParser = SAXHelper.newXMLReader();
             PoijiHandler poijiHandler = new PoijiHandler(type, options, consumer);
             ContentHandler contentHandler
                     = new XSSFSheetXMLHandler(styles, null, readOnlySharedStringsTable, poijiHandler, formatter, false);
-            sheetParser.setContentHandler(contentHandler);
-            sheetParser.parse(sheetSource);
-        } catch (ParserConfigurationException | SAXException | IOException e) {
+            reader.setContentHandler(contentHandler);
+            reader.parse(sheetSource);
+        } catch (SAXException | IOException e) {
             throw new PoijiException("Problem occurred while reading data", e);
         }
     }
@@ -138,7 +101,7 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         try (OPCPackage open = OPCPackage.open(stream)) {
             unmarshal0(type, consumer, open);
 
-        } catch (SAXException | IOException | OpenXML4JException e) {
+        } catch (ParserConfigurationException | SAXException | IOException | OpenXML4JException e) {
             IOUtils.closeQuietly(fs);
             throw new PoijiException("Problem occurred while reading data", e);
         }

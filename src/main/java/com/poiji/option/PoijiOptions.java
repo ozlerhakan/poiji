@@ -1,10 +1,11 @@
 package com.poiji.option;
 
+import com.poiji.exception.PoijiException;
+
 import java.time.format.DateTimeFormatter;
 
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_PATTERN;
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_TIME_FORMATTER;
-import org.apache.poi.ss.usermodel.Workbook;
 
 /**
  * Created by hakan on 17/01/2017.
@@ -12,17 +13,12 @@ import org.apache.poi.ss.usermodel.Workbook;
 public final class PoijiOptions {
 
     private int skip;
-    //ISSUE #55 changed form int to integer, in order to check if null when trying to work out which sheet to process in getSheetIndexToProcess below
-    private Integer sheetIndex;
+    private int sheetIndex;
     private String password;
     private String datePattern;
     private boolean preferNullOverDefault;
     private DateTimeFormatter dateTimeFormatter;
-    //ISSUE #55
-    //whether or not to ignore any hidden sheets in the work book
-    //default to false so not to break existing, and so must be explicitly set to true
     private boolean ignoreHiddenSheets;
-    //if set to true will trim(remove leading and trailing) white spaces from cell value
     private boolean trimCellValue;
     //ISSUE #57
     //specify regex pattern for date converstion, if set and does not match date set to null
@@ -54,11 +50,6 @@ public final class PoijiOptions {
         return this;
     }
 
-    private PoijiOptions setSheetIndex(Integer sheetIndex) {
-        this.sheetIndex = sheetIndex;
-        return this;
-    }
-
     public String getPassword() {
         return password;
     }
@@ -66,10 +57,6 @@ public final class PoijiOptions {
     private PoijiOptions setPassword(String password) {
         this.password = password;
         return this;
-    }
-
-    public Integer sheetIndex() {
-        return sheetIndex;
     }
 
     public String datePattern() {
@@ -93,18 +80,15 @@ public final class PoijiOptions {
         return skip;
     }
 
-    //ISSUE #55
     public boolean ignoreHiddenSheets() {
         return ignoreHiddenSheets;
     }
 
-    //ISSUE #55
-    public PoijiOptions setIgnoreHiddenSheets(boolean ignoreHiddenSheets) {
+    private PoijiOptions setIgnoreHiddenSheets(boolean ignoreHiddenSheets) {
         this.ignoreHiddenSheets = ignoreHiddenSheets;
         return this;
     }
 
-    //ISSUE #55 : additional
     public boolean trimCellValue() {
         return trimCellValue;
     }
@@ -114,10 +98,39 @@ public final class PoijiOptions {
         return this;
     }
 
+    private PoijiOptions setSheetIndex(int sheetIndex) {
+        this.sheetIndex = sheetIndex;
+        return this;
+    }
+
+    public int sheetIndex() {
+        return sheetIndex;
+    }
+
+    //ISSUE #57
+    public String getDateRegex() {
+        return dateRegex;
+    }
+
+    public PoijiOptions setDateRegex(String dateRegex) {
+        this.dateRegex = dateRegex;
+        return this;
+    }
+
+    //ISSUE #57
+    public boolean getDateLenient() {
+        return dateLenient;
+    }
+
+    public PoijiOptions setDateLenient(boolean dateLenient) {
+        this.dateLenient = dateLenient;
+        return this;
+    }
+
     public static class PoijiOptionsBuilder {
 
         private int skip = 1;
-        private Integer sheetIndex;
+        private int sheetIndex;
         private String password;
         private boolean preferNullOverDefault = false;
         private String datePattern = DEFAULT_DATE_PATTERN;
@@ -125,6 +138,9 @@ public final class PoijiOptions {
         //ISSUE #55
         private boolean ignoreHiddenSheets = false;
         private boolean trimCellValue = false;
+        //ISSUE #57
+        private String dateRegex = null;
+        private boolean dateLenient = true;
 
         private PoijiOptionsBuilder() {
         }
@@ -142,7 +158,9 @@ public final class PoijiOptions {
                     .setDateTimeFormatter(dateTimeFormatter)
                     .setSheetIndex(sheetIndex)
                     .setIgnoreHiddenSheets(ignoreHiddenSheets)
-                    .setTrimCellValue(trimCellValue);
+                    .setTrimCellValue(trimCellValue)
+                    .setDateRegex(dateRegex)
+                    .setDateLenient(dateLenient);
         }
 
         public static PoijiOptionsBuilder settings() {
@@ -202,7 +220,10 @@ public final class PoijiOptions {
          * @param sheetIndex number
          * @return this
          */
-        public PoijiOptionsBuilder sheetIndex(Integer sheetIndex) {
+        public PoijiOptionsBuilder sheetIndex(int sheetIndex) {
+            if (sheetIndex < 0) {
+                throw new PoijiException("Sheet index must be greater than or equal to 0");
+            }
             this.sheetIndex = sheetIndex;
             return this;
         }
@@ -250,57 +271,33 @@ public final class PoijiOptions {
             this.trimCellValue = trimCellValue;
             return this;
         }
-    }
 
-    //ISSUE #55
-    //loop througth all sheets and check if visiable
-    //if visiable return sheet index, else null so can fall back to default
-    private static Integer findVisiableSheetAtIndex(Workbook workbook, int findIndex) {
-
-        int visiableIndex = 0;
-
-        for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
-            if (!workbook.isSheetHidden(i) && !workbook.isSheetVeryHidden(i)) {
-
-                if (visiableIndex == findIndex) {
-                    return i;
-                } else {
-                    visiableIndex++;
-                }
-            }
-        }
-        return null;
-    }
-
-    //ISSUE #55
-    //from the given work book, using the oprions set work out which sheet to process
-    //if given an sheet number, process that
-    //else set to use the default first sheet
-    //if ignore hidden sheets is true, then loop the nuber of hidden sheets and match requested index
-    public static final int getSheetIndexToProcess(Workbook workbook, PoijiOptions options) {
-        int findIndex;
-        //if given sheet index to use, use that
-        if (options.sheetIndex() != null && options.sheetIndex() > -1) {
-            findIndex = options.sheetIndex();
-        } else {
-            //else default
-            findIndex = 0;
+        //ISSUE #57
+        /**
+         * Date regex, if would like to specify a regex patter the date must be
+         * in, e.g.\\d{2}/\\d{1}/\\d{4}.
+         *
+         * @param dateRegex date regex pattern
+         * @return this
+         */
+        public PoijiOptionsBuilder dateRegex(String dateRegex) {
+            this.dateRegex = dateRegex;
+            return this;
         }
 
-        int sheetIndex;
-        //if set to hignore hidden find the visiable sheet that matches the index requested
-        if (options.ignoreHiddenSheets()) {
-            Integer visiableSheetIndex = findVisiableSheetAtIndex(workbook, findIndex);
-            if (visiableSheetIndex != null) {
-                sheetIndex = visiableSheetIndex;
-            } else {
-                //if no sheet found, default back
-                sheetIndex = findIndex;
-            }
-        } else {
-            //if dont want to ignore hidden sheets, use index given or default
-            sheetIndex = findIndex;
+        //ISSUE #57
+        /**
+         * If would like to set the simple date format is lenient option, use to
+         * set how strict the date formating must be, defaults to lenient true
+         * as that is the default for simple date format.
+         *
+         * @param dateLenient
+         * @return this
+         */
+        public PoijiOptionsBuilder dateLenient(boolean dateLenient) {
+            this.dateLenient = dateLenient;
+            return this;
         }
-        return sheetIndex;
+
     }
 }
