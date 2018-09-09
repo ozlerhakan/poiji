@@ -123,55 +123,54 @@ public final class Casting {
 
     private Date dateValue(String value, PoijiOptions options) {
 
-        //ISSUE #57
-        //if a date regex has been speficied then it wont be null
-        //so then make sure the string matches the pattern
-        //if it doenst, fall back to default
-        //else continue to turn string into java date
-        //the reason for this is sometime java will manage to parse a string to a date object
-        //without any exceptions but since the string was not an exact match you get a very strange date
-        if (options.getDateRegex() != null && !value.matches(options.getDateRegex())) {
+//        //ISSUE #57
+//        //if a date regex has been speficied then it wont be null
+//        //so then make sure the string matches the pattern
+//        //if it doenst, fall back to default
+//        //else continue to turn string into java date
+//        //the reason for this is sometime java will manage to parse a string to a date object
+//        //without any exceptions but since the string was not an exact match you get a very strange date
+//        if (options.getDateRegex() != null && !value.matches(options.getDateRegex())) {
+//            return defaultDate(options);
+//        } else {
+        try {
+            final SimpleDateFormat sdf = new SimpleDateFormat(options.datePattern());
+//                sdf.setLenient(options.getDateLenient());
+            return sdf.parse(value);
+        } catch (ParseException e) {
             return defaultDate(options);
-        } else {
-            try {
-                final SimpleDateFormat sdf = new SimpleDateFormat(options.datePattern());
-                sdf.setLenient(options.getDateLenient());
-                return sdf.parse(value);
-            } catch (ParseException e) {
-                return defaultDate(options);
 //                if (Boolean.TRUE.equals(options.preferNullOverDefault())) {
 //                    return null;
 //                } else {
 //                    Calendar calendar = Calendar.getInstance();
 //                    return calendar.getTime();
 //                }
-            }
         }
+//        }
     }
 
     private LocalDate localDateValue(String value, PoijiOptions options) {
 
-        //ISSUE #57
-        //if a date regex has been speficied then it wont be null
-        //so then make sure the string matches the pattern
-        //if it doenst, fall back to default
-        //else continue to turn string into java date
-        //the reason for this is sometime java will manage to parse a string to a date object
-        //without any exceptions but since the string was not an exact match you get a very strange date
-        if (options.getDateRegex() != null && !value.matches(options.getDateRegex())) {
+//        //ISSUE #57
+//        //if a date regex has been speficied then it wont be null
+//        //so then make sure the string matches the pattern
+//        //if it doenst, fall back to default
+//        //else continue to turn string into java date
+//        //the reason for this is sometime java will manage to parse a string to a date object
+//        //without any exceptions but since the string was not an exact match you get a very strange date
+//        if (options.getDateRegex() != null && !value.matches(options.getDateRegex())) {
+//            return defaultLocalDate(options);
+//        } else {
+        try {
+            return LocalDate.parse(value, options.dateTimeFormatter());
+        } catch (DateTimeParseException e) {
+            //ISSUE #57
+            //originally returned null, and did not take into consideration 'preferNullOverDefault' setting
+            //updated to honour options setting
             return defaultLocalDate(options);
-        } else {
-
-            try {
-                return LocalDate.parse(value, options.dateTimeFormatter());
-            } catch (DateTimeParseException e) {
-                //ISSUE #57
-                //originally returned null, and did not take into consideration 'preferNullOverDefault' setting
-                //updated to honour options setting
-                return defaultLocalDate(options);
 //                return null;
-            }
         }
+//        }
     }
 
     private Object enumValue(String value, Class type) {
