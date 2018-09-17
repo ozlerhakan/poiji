@@ -15,16 +15,13 @@ public final class PoijiOptions {
     private int skip;
     private int sheetIndex;
     private String password;
+    private String dateRegex;
     private String datePattern;
+    private boolean dateLenient;
+    private boolean trimCellValue;
+    private boolean ignoreHiddenSheets;
     private boolean preferNullOverDefault;
     private DateTimeFormatter dateTimeFormatter;
-    private boolean ignoreHiddenSheets;
-    private boolean trimCellValue;
-    //ISSUE #57
-    //specify regex pattern for date converstion, if set and does not match date set to null
-    private String dateRegex;
-    //to set simple date format to Lenient if wanted
-    private boolean dateLenient;
 
     private PoijiOptions() {
         super();
@@ -107,22 +104,20 @@ public final class PoijiOptions {
         return sheetIndex;
     }
 
-    //ISSUE #57
     public String getDateRegex() {
         return dateRegex;
     }
 
-    public PoijiOptions setDateRegex(String dateRegex) {
+    private PoijiOptions setDateRegex(String dateRegex) {
         this.dateRegex = dateRegex;
         return this;
     }
 
-    //ISSUE #57
     public boolean getDateLenient() {
         return dateLenient;
     }
 
-    public PoijiOptions setDateLenient(boolean dateLenient) {
+    private PoijiOptions setDateLenient(boolean dateLenient) {
         this.dateLenient = dateLenient;
         return this;
     }
@@ -132,15 +127,13 @@ public final class PoijiOptions {
         private int skip = 1;
         private int sheetIndex;
         private String password;
-        private boolean preferNullOverDefault = false;
+        private String dateRegex;
+        private boolean dateLenient;
+        private boolean trimCellValue;
+        private boolean ignoreHiddenSheets;
+        private boolean preferNullOverDefault;
         private String datePattern = DEFAULT_DATE_PATTERN;
         private DateTimeFormatter dateTimeFormatter = DEFAULT_DATE_TIME_FORMATTER;
-        //ISSUE #55
-        private boolean ignoreHiddenSheets = false;
-        private boolean trimCellValue = false;
-        //ISSUE #57
-        private String dateRegex = null;
-        private boolean dateLenient = true;
 
         private PoijiOptionsBuilder() {
         }
@@ -272,7 +265,6 @@ public final class PoijiOptions {
             return this;
         }
 
-        //ISSUE #57
         /**
          * Date regex, if would like to specify a regex patter the date must be
          * in, e.g.\\d{2}/\\d{1}/\\d{4}.
@@ -285,13 +277,12 @@ public final class PoijiOptions {
             return this;
         }
 
-        //ISSUE #57
         /**
-         * If would like to set the simple date format is lenient option, use to
-         * set how strict the date formating must be, defaults to lenient true
-         * as that is the default for simple date format.
+         * If the simple date format is lenient, use to
+         * set how strict the date formatting must be, defaults to lenient false.
+         * It works only for java.util.Date.
          *
-         * @param dateLenient
+         * @param dateLenient true or false
          * @return this
          */
         public PoijiOptionsBuilder dateLenient(boolean dateLenient) {

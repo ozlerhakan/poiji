@@ -38,7 +38,7 @@ public class DeserializersDateLenientTest {
     public static Iterable<Object[]> queries() throws Exception {
         return Arrays.asList(new Object[][]{
             {"src/test/resources/date_lenient.xlsx", unmarshalling(), null},
-            {"src/test/resources/date_lenient.xls", unmarshalling(), null},});
+            {"src/test/resources/date_lenient.xls", unmarshalling(), null}});
     }
 
     @Test
@@ -97,39 +97,6 @@ public class DeserializersDateLenientTest {
             assertThat(actualEmployee1, not(expectedEmployee1));
             assertThat(actualEmployee2, not(expectedEmployee2));
             assertThat(actualEmployee3, not(expectedEmployee3));
-
-        } catch (Exception e) {
-            if (expectedException == null) {
-                fail(e.getMessage());
-            } else {
-                assertThat(e, instanceOf(expectedException));
-            }
-        }
-    }
-
-    @Test
-    public void lenientNotSet() {
-
-        try {
-            PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().datePattern("yyyy-MM-dd").build();
-
-            List<EmployeeExtended> actualEmployees = Poiji.fromExcel(new File(path), EmployeeExtended.class, options);
-
-            assertThat(actualEmployees, notNullValue());
-            assertThat(actualEmployees.size(), not(0));
-            assertThat(actualEmployees.size(), is(expectedEmployess.size()));
-
-            EmployeeExtended actualEmployee1 = actualEmployees.get(0);
-            EmployeeExtended actualEmployee2 = actualEmployees.get(1);
-            EmployeeExtended actualEmployee3 = actualEmployees.get(2);
-
-            EmployeeExtended expectedEmployee1 = expectedEmployess.get(0);
-            EmployeeExtended expectedEmployee2 = expectedEmployess.get(1);
-            EmployeeExtended expectedEmployee3 = expectedEmployess.get(2);
-
-            assertThat(actualEmployee1, is(expectedEmployee1));
-            assertThat(actualEmployee2, is(expectedEmployee2));
-            assertThat(actualEmployee3, is(expectedEmployee3));
 
         } catch (Exception e) {
             if (expectedException == null) {

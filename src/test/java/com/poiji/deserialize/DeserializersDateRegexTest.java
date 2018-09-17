@@ -28,9 +28,9 @@ public class DeserializersDateRegexTest {
     private final List<EmployeeExtended> expectedEmployess;
     private final Class<?> expectedException;
 
-    public DeserializersDateRegexTest(String path, List<EmployeeExtended> expectedEmployess, Class<?> expectedException) {
+    public DeserializersDateRegexTest(String path, List<EmployeeExtended> expectedEmployees, Class<?> expectedException) {
         this.path = path;
-        this.expectedEmployess = expectedEmployess;
+        this.expectedEmployess = expectedEmployees;
         this.expectedException = expectedException;
     }
 
@@ -38,7 +38,7 @@ public class DeserializersDateRegexTest {
     public static Iterable<Object[]> queries() throws Exception {
         return Arrays.asList(new Object[][]{
             {"src/test/resources/date_regex.xlsx", unmarshalling(), null},
-            {"src/test/resources/date_regex.xls", unmarshalling(), null},});
+            {"src/test/resources/date_regex.xls", unmarshalling(), null}});
     }
 
     @Test
