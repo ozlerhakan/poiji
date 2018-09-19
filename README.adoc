@@ -366,7 +366,7 @@ private void dbInsertion(Calculation siCalculation) {
 }
 ----
 
-=== Try with JShell
+== Try with JShell
 
 Since we have a new pedagogic tool, Java 9 REPL, you can try Poiji in JShell. Clone the repo and follow the steps below. JShell should open up a new jshell session once loading the startup scripts and the specified jars that must be in the classpath. You must first import and create related packages and classes before using Poiji. We are able to use directly Poiji and Employee classes because they are already imported from `jshell/snippets` with `try-with-jshell.sh`.
 
@@ -385,6 +385,11 @@ Employee{employeeId=123123, name='Sophie', surname='Derue', age=20, single=false
 Employee{employeeId=135923, name='Paul', surname='Raul', age=31, single=false, birthday='4/9/1986'}
 ----
 
+== Stargazers over time
+
+image:https://starcharts.herokuapp.com/ozlerhakan/poiji.svg["Stargazers over time", link="https://starcharts.herokuapp.com/ozlerhakan/poiji"]
+      
+      
 == License
 
 MIT
