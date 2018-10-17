@@ -2,6 +2,7 @@ package com.poiji.util;
 
 import com.poiji.option.PoijiOptions;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -115,6 +116,18 @@ public final class Casting {
         return LocalDate.now();
     }
 
+    private BigDecimal bigDecimalValue(String value, PoijiOptions options) {
+        try {
+            String clean = value != null ? value.replace(",", ".") : "";
+            return new BigDecimal(clean);
+        } catch (NumberFormatException nfe) {
+            if (Boolean.TRUE.equals(options.preferNullOverDefault())) {
+                return null;
+            }
+            return BigDecimal.ZERO;
+        }
+    }
+
     private Date dateValue(String value, PoijiOptions options) {
 
         //ISSUE #57
@@ -179,6 +192,9 @@ public final class Casting {
 
         } else if (fieldType.getName().equals("java.lang.Integer")) {
             o = integerValue(value, options);
+
+        } else if (fieldType.getName().equals("java.math.BigDecimal")) {
+            o = bigDecimalValue(value, options);
 
         } else if (fieldType.getName().equals("long")) {
             o = primitiveLongValue(value);
