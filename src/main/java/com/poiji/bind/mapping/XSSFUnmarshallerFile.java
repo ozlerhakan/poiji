@@ -6,7 +6,7 @@ import com.poiji.option.PoijiOptions;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
-import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -49,7 +49,7 @@ final class XSSFUnmarshallerFile extends XSSFUnmarshaller {
 
     public <T> void returnFromEncryptedFile(Class<T> type, Consumer<? super T> consumer) {
 
-        try (NPOIFSFileSystem fs = new NPOIFSFileSystem(poijiFile.file(), true)) {
+        try (POIFSFileSystem fs = new POIFSFileSystem(poijiFile.file(), true)) {
 
             listOfEncryptedItems(type, consumer, fs);
 

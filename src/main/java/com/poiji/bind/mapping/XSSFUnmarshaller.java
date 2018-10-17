@@ -3,13 +3,13 @@ package com.poiji.bind.mapping;
 import com.poiji.bind.Unmarshaller;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
+import org.apache.poi.ooxml.util.SAXHelper;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
-import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.util.IOUtils;
-import org.apache.poi.util.SAXHelper;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
@@ -95,7 +95,7 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         }
     }
 
-    <T> void listOfEncryptedItems(Class<T> type, Consumer<? super T> consumer, NPOIFSFileSystem fs) throws IOException {
+    <T> void listOfEncryptedItems(Class<T> type, Consumer<? super T> consumer, POIFSFileSystem fs) throws IOException {
         InputStream stream = DocumentFactoryHelper.getDecryptedStream(fs, options.getPassword());
 
         try (OPCPackage open = OPCPackage.open(stream)) {
