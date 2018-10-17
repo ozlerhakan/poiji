@@ -37,7 +37,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     HSSFUnmarshaller(PoijiOptions options) {
         this.options = options;
         dataFormatter = new DataFormatter();
-        titles = new HashMap<String, Integer>();
+        titles = new HashMap<>();
         casting = Casting.getInstance();
     }
 
@@ -157,7 +157,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     private boolean isRowEmpty(Row row) {
         for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
             Cell cell = row.getCell(c, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-            if (cell != null && cell.getCellTypeEnum() != CellType.BLANK) {
+            if (cell != null && cell.getCellType() != CellType.BLANK) {
                 return false;
             }
         }
