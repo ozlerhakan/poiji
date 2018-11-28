@@ -149,13 +149,6 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
 			ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
 			if (excelCellName != null) {
 				Integer titleColumn = titles.get(excelCellName.value() + column);
-				/*Integer titleColumn = null;
-				for (int jIndex : titlesWithName ) {
-					if (jIndex >= begin && jIndex <= end) {
-						titleColumn = jIndex;
-						break;
-					}
-				}*/
 				if (titleColumn != null) {
 					constructTypeValue(currentRow, instance, field, titleColumn);
 				}
