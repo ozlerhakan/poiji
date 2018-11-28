@@ -22,6 +22,7 @@ public final class PoijiOptions {
     private boolean ignoreHiddenSheets;
     private boolean preferNullOverDefault;
     private DateTimeFormatter dateTimeFormatter;
+    private int rowStart;
 
     private PoijiOptions() {
         super();
@@ -121,6 +122,15 @@ public final class PoijiOptions {
         this.dateLenient = dateLenient;
         return this;
     }
+    
+	public int getRowStart() {
+		return rowStart;
+	}
+
+	private PoijiOptions setRowStart(int rowStart) {
+		this.rowStart = rowStart;
+		return this;
+	}
 
     public static class PoijiOptionsBuilder {
 
@@ -134,6 +144,7 @@ public final class PoijiOptions {
         private boolean preferNullOverDefault;
         private String datePattern = DEFAULT_DATE_PATTERN;
         private DateTimeFormatter dateTimeFormatter = DEFAULT_DATE_TIME_FORMATTER;
+        private int rowStart = 0;
 
         private PoijiOptionsBuilder() {
         }
@@ -153,7 +164,8 @@ public final class PoijiOptions {
                     .setIgnoreHiddenSheets(ignoreHiddenSheets)
                     .setTrimCellValue(trimCellValue)
                     .setDateRegex(dateRegex)
-                    .setDateLenient(dateLenient);
+                    .setDateLenient(dateLenient)
+                    .setRowStart(rowStart);
         }
 
         public static PoijiOptionsBuilder settings() {
@@ -289,6 +301,20 @@ public final class PoijiOptions {
             this.dateLenient = dateLenient;
             return this;
         }
+          
+        /**
+         * This is to set the row which the unmarshall will
+         * use to start reading header titles, incase the 
+         * header is not in row 0
+         *
+         * @param int
+         * @return this
+         */
+        public PoijiOptionsBuilder rowStart(int rowStart) {
+    		this.rowStart = rowStart;
+    		return this;
+    	}
 
     }
+
 }
