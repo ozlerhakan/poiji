@@ -50,7 +50,7 @@ public class DeserializersEmptyCellTest {
     @Test
     public void shouldMapEmptyCellsAndSkipTwoRows() {
 
-        PoijiOptions options = PoijiOptionsBuilder.settings(2).build();
+        PoijiOptions options = PoijiOptionsBuilder.settings(1).build();
         List<Employee> actualEmployees;
 
         if (fromStream) {

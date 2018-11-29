@@ -22,7 +22,7 @@ public final class PoijiOptions {
     private boolean ignoreHiddenSheets;
     private boolean preferNullOverDefault;
     private DateTimeFormatter dateTimeFormatter;
-    private int rowStart;
+    private int headerStart;
 
     private PoijiOptions() {
         super();
@@ -123,18 +123,17 @@ public final class PoijiOptions {
         return this;
     }
 
-    public int getRowStart() {
-        return rowStart;
+    public int getHeaderStart() {
+        return headerStart;
     }
 
-    private PoijiOptions setRowStart(int rowStart) {
-        this.rowStart = rowStart;
+    private PoijiOptions setHeaderStart(int headerStart) {
+        this.headerStart = headerStart;
         return this;
     }
 
     public static class PoijiOptionsBuilder {
 
-        private int skip = 1;
         private int sheetIndex;
         private String password;
         private String dateRegex;
@@ -144,7 +143,8 @@ public final class PoijiOptions {
         private boolean preferNullOverDefault;
         private String datePattern = DEFAULT_DATE_PATTERN;
         private DateTimeFormatter dateTimeFormatter = DEFAULT_DATE_TIME_FORMATTER;
-        private int rowStart = 0;
+        private int headerStart = 0;
+        private int skip = 0;
 
         private PoijiOptionsBuilder() {
         }
@@ -153,19 +153,17 @@ public final class PoijiOptions {
             this.skip = skip;
         }
 
-        public PoijiOptions build() {
-            return new PoijiOptions()
-                    .setSkip(skip)
-                    .setPassword(password)
-                    .setPreferNullOverDefault(preferNullOverDefault)
-                    .setDatePattern(datePattern)
-                    .setDateTimeFormatter(dateTimeFormatter)
-                    .setSheetIndex(sheetIndex)
-                    .setIgnoreHiddenSheets(ignoreHiddenSheets)
-                    .setTrimCellValue(trimCellValue)
-                    .setDateRegex(dateRegex)
-                    .setDateLenient(dateLenient)
-                    .setRowStart(rowStart);
+        /**
+         * Skip a number of rows after the header row. The header row is not counted.
+         *
+         * @param skip ignored row number after the header row
+         * @return builder itself
+         */
+        public static PoijiOptionsBuilder settings(int skip) {
+            if (skip < 0) {
+                throw new PoijiException("Skip index must be greater than or equal to 0");
+            }
+            return new PoijiOptionsBuilder(skip);
         }
 
         public static PoijiOptionsBuilder settings() {
@@ -208,15 +206,19 @@ public final class PoijiOptions {
             return this;
         }
 
-        /**
-         * skip number of row
-         *
-         * @param skip number
-         * @return this
-         */
-        public PoijiOptionsBuilder skip(int skip) {
-            this.skip = skip;
-            return this;
+        public PoijiOptions build() {
+            return new PoijiOptions()
+                    .setSkip(skip + headerStart + 1)
+                    .setPassword(password)
+                    .setPreferNullOverDefault(preferNullOverDefault)
+                    .setDatePattern(datePattern)
+                    .setDateTimeFormatter(dateTimeFormatter)
+                    .setSheetIndex(sheetIndex)
+                    .setIgnoreHiddenSheets(ignoreHiddenSheets)
+                    .setTrimCellValue(trimCellValue)
+                    .setDateRegex(dateRegex)
+                    .setDateLenient(dateLenient)
+                    .setHeaderStart(headerStart);
         }
 
         /**
@@ -234,13 +236,17 @@ public final class PoijiOptions {
         }
 
         /**
-         * Skip the n rows of the excel data. Default is 1
+         * skip a number of rows after the header row. The header row is not counted.
          *
-         * @param skip ignored row number
-         * @return builder itself
+         * @param skip number
+         * @return this
          */
-        public static PoijiOptionsBuilder settings(int skip) {
-            return new PoijiOptionsBuilder(skip);
+        public PoijiOptionsBuilder skip(int skip) {
+            if (skip < 0) {
+                throw new PoijiException("Skip index must be greater than or equal to 0");
+            }
+            this.skip = skip;
+            return this;
         }
 
         /**
@@ -305,13 +311,16 @@ public final class PoijiOptions {
         /**
          * This is to set the row which the unmarshall will
          * use to start reading header titles, incase the
-         * header is not in row 0
+         * header is not in row 0.
          *
-         * @param int a row index
+         * @param headerStart an index number of the excel header to start reading header
          * @return this
          */
-        public PoijiOptionsBuilder rowStart(int rowStart) {
-            this.rowStart = rowStart;
+        public PoijiOptionsBuilder headerStart(int headerStart) {
+            if (headerStart < 0) {
+                throw new PoijiException("Header index must be greater than or equal to 0");
+            }
+            this.headerStart = headerStart;
             return this;
         }
 

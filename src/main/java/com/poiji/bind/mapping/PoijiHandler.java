@@ -212,7 +212,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
         internalCount = row;
         int column = cellAddress.getColumn();
-        int headers = options.getRowStart();
+        int headers = options.getHeaderStart();
 
         if (row <= headers) {
             titles.put(formattedValue + column, column);

@@ -1,7 +1,6 @@
 package com.poiji.bind.mapping;
 
 /**
- *
  * @author Matthew 2018/09/01
  */
 final class WorkBookSheet {
@@ -32,11 +31,6 @@ final class WorkBookSheet {
 
     public void setState(String state) {
         this.state = state;
-    }
-
-    @Override
-    public String toString() {
-        return "WorkBookSheet{" + "name=" + name + ", sheetId=" + sheetId + ", state=" + state + '}';
     }
 
 }

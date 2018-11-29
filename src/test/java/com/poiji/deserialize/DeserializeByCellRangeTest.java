@@ -39,12 +39,12 @@ public class DeserializeByCellRangeTest {
     @Test
     public void shouldMapExcelToJavaMulti() {
         try {
-            PoijiOptions options = PoijiOptionsBuilder.settings(2).rowStart(1).build();
+            PoijiOptions options = PoijiOptionsBuilder.settings(1).headerStart(1).build();
             List<Classes> actualClasses = Poiji.fromExcel(new File(path), Classes.class, options);
 
             assertThat(actualClasses, notNullValue());
             assertThat(actualClasses.size(), not(0));
-            assertThat(actualClasses.size(), is(4));
+            assertThat(actualClasses.size(), is(3));
 
             Classes actualClasses1 = actualClasses.get(0);
             Classes actualClasses2 = actualClasses.get(1);
@@ -54,10 +54,10 @@ public class DeserializeByCellRangeTest {
             PersonTest expectedPerson3 = actualClasses2.getClassA();
             PersonTest expectedPerson4 = actualClasses2.getClassB();
 
-            assertThat(expectedPerson1.getAge(), is(21));
-            assertThat(expectedPerson2.getCity(), is("McLean"));
-            assertThat(expectedPerson3.getName(), is("Jane Doe"));
-            assertThat(expectedPerson4.getState(), is("California"));
+            assertThat(expectedPerson1.getAge(), is(28));
+            assertThat(expectedPerson2.getCity(), is("Los Angeles"));
+            assertThat(expectedPerson3.getName(), is("Paul Ryan"));
+            assertThat(expectedPerson4.getState(), is("Virginia"));
         } catch (Exception e) {
             fail(e.getMessage());
         }

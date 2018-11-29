@@ -81,7 +81,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
 
     private void loadColumnTitles(Sheet sheet, int maxPhysicalNumberOfRows) {
         if (maxPhysicalNumberOfRows > 0) {
-            int row = options.getRowStart();
+            int row = options.getHeaderStart();
             Row firstRow = sheet.getRow(row);
             for (Cell cell : firstRow) {
                 titles.put(cell.getStringCellValue() + cell.getColumnIndex(), cell.getColumnIndex());
