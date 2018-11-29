@@ -81,10 +81,10 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
 
     private void loadColumnTitles(Sheet sheet, int maxPhysicalNumberOfRows) {
         if (maxPhysicalNumberOfRows > 0) {
-        	int row = options.getRowStart();
+            int row = options.getRowStart();
             Row firstRow = sheet.getRow(row);
             for (Cell cell : firstRow) {
-            	titles.put(cell.getStringCellValue() + cell.getColumnIndex() , cell.getColumnIndex());
+                titles.put(cell.getStringCellValue() + cell.getColumnIndex(), cell.getColumnIndex());
             }
         }
     }
@@ -100,57 +100,56 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
         return setFieldValue(currentRow, type, instance);
     }
 
-	private <T> T tailSetFieldValue(Row currentRow, Class<? super T> type, T instance) {
-		int column = 0;
+    private <T> T tailSetFieldValue(Row currentRow, Class<? super T> type, T instance) {
+        int column = 0;
         for (Field field : type.getDeclaredFields()) {
-        	ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
-    		if (excelRow != null) {
-    			Object o;
-    			o = casting.castValue(field.getType(), valueOf(currentRow.getRowNum()), options);
-    			setFieldData(instance, field, o);
-    		}
-        	ExcelCellRange excelCellRange = field.getAnnotation(ExcelCellRange.class);
-        	if (excelCellRange != null) {
-        		if (column < excelCellRange.begin() || column > excelCellRange.end()) {
-            		continue;
-            	}
-        		Class<?> o = field.getType();
-        		Object ins;
+            ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
+            if (excelRow != null) {
+                Object o;
+                o = casting.castValue(field.getType(), valueOf(currentRow.getRowNum()), options);
+                setFieldData(instance, field, o);
+            }
+            ExcelCellRange excelCellRange = field.getAnnotation(ExcelCellRange.class);
+            if (excelCellRange != null) {
+                if (column < excelCellRange.begin() || column > excelCellRange.end()) {
+                    continue;
+                }
+                Class<?> o = field.getType();
+                Object ins;
                 try {
                     ins = o.getDeclaredConstructor().newInstance();
                 } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
                     throw new PoijiInstantiationException("Cannot create a new instance of " + o.getName());
                 }
-        		for(Field f: o.getDeclaredFields()) {
-        			tailSetFieldValue(currentRow, ins, f, column++);
-        		}
-        		try {
-        			field.setAccessible(true);
-					field.set(instance, ins);
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					throw new PoijiInstantiationException("Cannot access field " + field.getName());
-				}
-        	} else {
-        		tailSetFieldValue(currentRow, instance, field, column++);
-        	}
+                for (Field f : o.getDeclaredFields()) {
+                    tailSetFieldValue(currentRow, ins, f, column++);
+                }
+                try {
+                    field.setAccessible(true);
+                    field.set(instance, ins);
+                } catch (IllegalArgumentException | IllegalAccessException e) {
+                    throw new PoijiInstantiationException("Cannot access field " + field.getName());
+                }
+            } else {
+                tailSetFieldValue(currentRow, instance, field, column++);
+            }
         }
         return instance;
     }
 
-    private <T> void tailSetFieldValue(Row currentRow, T instance,
-    		Field field, int column) {
-		ExcelCell index = field.getAnnotation(ExcelCell.class);
-		if (index != null) {
-			constructTypeValue(currentRow, instance, field, index.value());
-		} else {
-			ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
-			if (excelCellName != null) {
-				Integer titleColumn = titles.get(excelCellName.value() + column);
-				if (titleColumn != null) {
-					constructTypeValue(currentRow, instance, field, titleColumn);
-				}
-			}
-		}
+    private <T> void tailSetFieldValue(Row currentRow, T instance, Field field, int column) {
+        ExcelCell index = field.getAnnotation(ExcelCell.class);
+        if (index != null) {
+            constructTypeValue(currentRow, instance, field, index.value());
+        } else {
+            ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
+            if (excelCellName != null) {
+                Integer titleColumn = titles.get(excelCellName.value() + column);
+                if (titleColumn != null) {
+                    constructTypeValue(currentRow, instance, field, titleColumn);
+                }
+            }
+        }
     }
 
     private <T> void constructTypeValue(Row currentRow, T instance, Field field, int column) {

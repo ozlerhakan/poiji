@@ -20,11 +20,11 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 @RunWith(Parameterized.class)
-public class DeserializeByCellRange {
+public class DeserializeByCellRangeTest {
 
     private String path;
 
-    public DeserializeByCellRange(String path) {
+    public DeserializeByCellRangeTest(String path) {
         this.path = path;
     }
 
