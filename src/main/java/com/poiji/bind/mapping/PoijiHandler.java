@@ -1,17 +1,5 @@
 package com.poiji.bind.mapping;
 
-import static java.lang.String.valueOf;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Consumer;
-
-import org.apache.poi.ss.util.CellAddress;
-import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
-import org.apache.poi.xssf.usermodel.XSSFComment;
-
 import com.poiji.annotation.ExcelCell;
 import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelCellRange;
@@ -20,6 +8,17 @@ import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.PoijiInstantiationException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.Casting;
+import org.apache.poi.ss.util.CellAddress;
+import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
+import org.apache.poi.xssf.usermodel.XSSFComment;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
+
+import static java.lang.String.valueOf;
 
 /**
  * This class handles the processing of a .xlsx file,
@@ -79,25 +78,25 @@ final class PoijiHandler<T> implements SheetContentsHandler {
      * **/
     private Object getInstance(Field field) {
     	Object ins = null;
-    	try {   
+    	try {
 			if (fieldInstances.containsKey(field.getName())) {
 				ins = fieldInstances.get(field.getName());
-			} else {						
+			} else {
 				ins = field.getType().getDeclaredConstructor().newInstance();
 				fieldInstances.put(field.getName(), ins);
-			}    			
+			}
 		} catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException
 				| InstantiationException e) {
 			throw new PoijiInstantiationException("Cannot create a new instance of " + type.getName());
 		}
     	return ins;
     }
-    
+
     /***
      * 	Modified this method so that for each time it reads a cell
      * 	it doesn't need to check all fields even after it as found
      * 	the matching field
-     * 
+     *
      * */
     private boolean setValue(String content, Class<? super T> type, int column) {
     	// For ExcelRow annotation
@@ -121,7 +120,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     		return setValue(field, column, content, instance);
     	}
         for (Field field : type.getDeclaredFields()) {
-        	
+
             ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
             if (excelRow != null) {
                 Object o = casting.castValue(field.getType(), valueOf(internalCount), options);
@@ -148,11 +147,11 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             		columnToField.put(column, field);
                     return true;
             	}
-            }           
+            }
         }
         return false;
     }
-    
+
     private boolean setValue(Field field, int column, String content, Object ins) {
     	   ExcelCell index = field.getAnnotation(ExcelCell.class);
            if (index != null) {
@@ -214,7 +213,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         internalCount = row;
         int column = cellAddress.getColumn();
         int headers = options.getRowStart();
-        
+
         if (row <= headers) {
             titles.put(formattedValue + column, column);
         }

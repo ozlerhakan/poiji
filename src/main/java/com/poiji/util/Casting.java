@@ -181,7 +181,7 @@ public final class Casting {
     }
 
     public Object castValue(Class<?> fieldType, String value, PoijiOptions options) {
-        Object o;
+        Object o = null;
 
         if (options.trimCellValue()) {
             value = value.trim();

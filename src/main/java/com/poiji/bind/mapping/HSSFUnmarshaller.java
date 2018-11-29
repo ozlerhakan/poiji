@@ -1,22 +1,5 @@
 package com.poiji.bind.mapping;
 
-import static java.lang.String.valueOf;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-
 import com.poiji.annotation.ExcelCell;
 import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelCellRange;
@@ -26,6 +9,20 @@ import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.PoijiInstantiationException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.Casting;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
+
+import static java.lang.String.valueOf;
 
 /**
  * This is the main class that converts the excel sheet fromExcel Java object
@@ -87,7 +84,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
         	int row = options.getRowStart();
             Row firstRow = sheet.getRow(row);
             for (Cell cell : firstRow) {
-            	titles.put(cell.getStringCellValue() + cell.getColumnIndex() , cell.getColumnIndex());   
+            	titles.put(cell.getStringCellValue() + cell.getColumnIndex() , cell.getColumnIndex());
             }
         }
     }
@@ -112,7 +109,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     			o = casting.castValue(field.getType(), valueOf(currentRow.getRowNum()), options);
     			setFieldData(instance, field, o);
     		}
-        	ExcelCellRange excelCellRange = field.getAnnotation(ExcelCellRange.class);    	
+        	ExcelCellRange excelCellRange = field.getAnnotation(ExcelCellRange.class);
         	if (excelCellRange != null) {
         		if (column < excelCellRange.begin() || column > excelCellRange.end()) {
             		continue;
@@ -125,7 +122,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
                     throw new PoijiInstantiationException("Cannot create a new instance of " + o.getName());
                 }
         		for(Field f: o.getDeclaredFields()) {
-        			tailSetFieldValue(currentRow, ins, f, column++);       			        			
+        			tailSetFieldValue(currentRow, ins, f, column++);
         		}
         		try {
         			field.setAccessible(true);
@@ -139,9 +136,9 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
         }
         return instance;
     }
-    
-    private <T> void tailSetFieldValue(Row currentRow, T instance, 
-    		Field field, int column) { 	
+
+    private <T> void tailSetFieldValue(Row currentRow, T instance,
+    		Field field, int column) {
 		ExcelCell index = field.getAnnotation(ExcelCell.class);
 		if (index != null) {
 			constructTypeValue(currentRow, instance, field, index.value());

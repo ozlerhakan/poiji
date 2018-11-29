@@ -91,18 +91,22 @@ final class WorkBookContentHandler implements ContentHandler {
 
     @Override
     public void characters(char[] ch, int start, int length) {
+        //no-op
     }
 
     @Override
     public void ignorableWhitespace(char[] ch, int start, int length) {
+        //no-op
     }
 
     @Override
     public void processingInstruction(String target, String data) {
+        //no-op
     }
 
     @Override
     public void skippedEntity(String name) {
+        //no-op
     }
 
 }

@@ -63,7 +63,7 @@ public class DeserializersHiddenSheetIndexTest {
     public void testProcessHiddenSheets() {
         try {
             PoijiOptions poijiOptions = PoijiOptions.PoijiOptionsBuilder.settings().sheetIndex(2).ignoreHiddenSheets(false).build();
-            List<Person> people = Poiji.fromExcel(new File(path), Person.class, poijiOptions);
+            Poiji.fromExcel(new File(path), Person.class, poijiOptions);
         } catch (Exception e) {
             if (expectedException == null) {
                 fail(e.getMessage());
