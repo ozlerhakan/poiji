@@ -27,23 +27,27 @@ final class WorkBookContentHandler implements ContentHandler {
 
     @Override
     public void setDocumentLocator(Locator locator) {
-        //empty method
+        //no-op
     }
 
     @Override
     public void startDocument() {
+        //no-op
     }
 
     @Override
     public void endDocument() {
+        //no-op
     }
 
     @Override
     public void startPrefixMapping(String prefix, String uri) {
+        //no-op
     }
 
     @Override
     public void endPrefixMapping(String prefix) {
+        //no-op
     }
 
     @Override
@@ -51,7 +55,7 @@ final class WorkBookContentHandler implements ContentHandler {
 
         //there are multipel elements to an excel xml layout
         //we only care about the sheet infor
-        if (qName.equals("sheet")) {
+        if ("sheet".equals(qName)) {
             individualSheet = new WorkBookSheet();
 
             //loop throught all the attributes and add to the new sheet
@@ -82,7 +86,7 @@ final class WorkBookContentHandler implements ContentHandler {
 
         //onces finished reading the element, if end of sheet, add to array of work books sheets so can loop them later
         //set this sheet to null as its not needed any more
-        if (qName.equals("sheet")) {
+        if ("sheet".equals(qName)) {
             sheets.add(individualSheet);
             individualSheet = null;
         }
