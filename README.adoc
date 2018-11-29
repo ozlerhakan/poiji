@@ -316,7 +316,7 @@ Car car = cars.get(0);
 
 === Example 4
 
-Consider you have the table like below:
+Consider you have a table like below:
 
 |===
 5+|Class A 5+| Class B
@@ -409,7 +409,8 @@ Using the conventional way, we can retrieve the data using `Poiji.fromExcel`:
 
 [source,java]
 ----
-List<Classes> classes = Poiji.fromExcel(new File(excel), Classes.class);
+PoijiOptions options = PoijiOptionsBuilder.settings().headerStart(1).build(); // header starts at 1 (zero-based).
+List<Classes> classes = Poiji.fromExcel(new File(excel), Classes.class, options);
 
 Classes firstRowClasses = actualClasses.get(0);
 
