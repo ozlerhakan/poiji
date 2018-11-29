@@ -122,15 +122,15 @@ public final class PoijiOptions {
         this.dateLenient = dateLenient;
         return this;
     }
-    
-	public int getRowStart() {
-		return rowStart;
-	}
 
-	private PoijiOptions setRowStart(int rowStart) {
-		this.rowStart = rowStart;
-		return this;
-	}
+    public int getRowStart() {
+        return rowStart;
+    }
+
+    private PoijiOptions setRowStart(int rowStart) {
+        this.rowStart = rowStart;
+        return this;
+    }
 
     public static class PoijiOptionsBuilder {
 
@@ -258,7 +258,7 @@ public final class PoijiOptions {
          * Ignore hidden sheets
          *
          * @param ignoreHiddenSheets whether or not to ignore any hidden sheets
-         * in the work book.
+         *                           in the work book.
          * @return this
          */
         public PoijiOptionsBuilder ignoreHiddenSheets(boolean ignoreHiddenSheets) {
@@ -301,19 +301,19 @@ public final class PoijiOptions {
             this.dateLenient = dateLenient;
             return this;
         }
-          
+
         /**
          * This is to set the row which the unmarshall will
-         * use to start reading header titles, incase the 
+         * use to start reading header titles, incase the
          * header is not in row 0
          *
-         * @param int
+         * @param int a row index
          * @return this
          */
         public PoijiOptionsBuilder rowStart(int rowStart) {
-    		this.rowStart = rowStart;
-    		return this;
-    	}
+            this.rowStart = rowStart;
+            return this;
+        }
 
     }
 

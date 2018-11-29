@@ -17,18 +17,18 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 @RunWith(Parameterized.class)
 public class DeserializeByCellRange {
 
-	private String path;
+    private String path;
 
-	public DeserializeByCellRange(String path) {
+    public DeserializeByCellRange(String path) {
         this.path = path;
-
     }
 
-	@Parameterized.Parameters(name = "{index}: ({0})={1}")
+    @Parameterized.Parameters(name = "{index}: ({0})={1}")
     public static Iterable<Object[]> queries() {
         return Arrays.asList(new Object[][]{
                 {"src/test/resources/test_multi.xlsx"},
@@ -36,32 +36,31 @@ public class DeserializeByCellRange {
         });
     }
 
-	 @Test
-	    public void shouldMapExcelToJavaMulti() {
-	        try {
-	        	PoijiOptions options = PoijiOptionsBuilder.settings(2).rowStart(1).build();
-	            List<Classes> actualClasses = Poiji.fromExcel(new File(path), Classes.class, options);
+    @Test
+    public void shouldMapExcelToJavaMulti() {
+        try {
+            PoijiOptions options = PoijiOptionsBuilder.settings(2).rowStart(1).build();
+            List<Classes> actualClasses = Poiji.fromExcel(new File(path), Classes.class, options);
 
-	            assertThat(actualClasses, notNullValue());
-	            assertThat(actualClasses.size(), not(0));
-	            assertThat(actualClasses.size(), is(4));
+            assertThat(actualClasses, notNullValue());
+            assertThat(actualClasses.size(), not(0));
+            assertThat(actualClasses.size(), is(4));
 
-	            Classes actualClasses1 = actualClasses.get(0);
-	            Classes actualClasses2 = actualClasses.get(1);
+            Classes actualClasses1 = actualClasses.get(0);
+            Classes actualClasses2 = actualClasses.get(1);
 
-	            PersonTest expectedPerson1 = actualClasses1.getClassA();
-	            PersonTest expectedPerson2 = actualClasses1.getClassB();
-	            PersonTest expectedPerson3 = actualClasses2.getClassA();
-	            PersonTest expectedPerson4 = actualClasses2.getClassB();
+            PersonTest expectedPerson1 = actualClasses1.getClassA();
+            PersonTest expectedPerson2 = actualClasses1.getClassB();
+            PersonTest expectedPerson3 = actualClasses2.getClassA();
+            PersonTest expectedPerson4 = actualClasses2.getClassB();
 
-	            assertThat(expectedPerson1.getAge(), is(21));
-	            assertThat(expectedPerson2.getCity(), is("McLean"));
-	            assertThat(expectedPerson3.getName(), is("Jane Doe"));
-	            assertThat(expectedPerson4.getState(), is("California"));
-	        } catch (Exception e) {
-	        	System.err.println(e.getMessage());
-
-	        }
-	    }
+            assertThat(expectedPerson1.getAge(), is(21));
+            assertThat(expectedPerson2.getCity(), is("McLean"));
+            assertThat(expectedPerson3.getName(), is("Jane Doe"));
+            assertThat(expectedPerson4.getState(), is("California"));
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
 
 }

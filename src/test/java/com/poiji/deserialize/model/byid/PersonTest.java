@@ -4,55 +4,38 @@ import com.poiji.annotation.ExcelCellName;
 
 public class PersonTest {
 
-	@ExcelCellName("Name")
-	private String name;
-	@ExcelCellName("Age")
-	private Integer age;
-	@ExcelCellName("City")
-	private String city;
-	@ExcelCellName("State")
-	private String state;
-	@ExcelCellName("Zip Code")
-	private Integer zip;
+    @ExcelCellName("Name")
+    private String name;
 
-	public String getName() {
-		return name;
-	}
+    @ExcelCellName("Age")
+    private Integer age;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    @ExcelCellName("City")
+    private String city;
 
-	public Integer getAge() {
-		return age;
-	}
+    @ExcelCellName("State")
+    private String state;
 
-	public void setAge(Integer age) {
-		this.age = age;
-	}
+    @ExcelCellName("Zip Code")
+    private Integer zip;
 
-	public String getCity() {
-		return city;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setCity(String city) {
-		this.city = city;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public String getState() {
-		return state;
-	}
+    public Integer getAge() {
+        return age;
+    }
 
-	public void setState(String state) {
-		this.state = state;
-	}
+    public String getCity() {
+        return city;
+    }
 
-	public Integer getZip() {
-		return zip;
-	}
-
-	public void setZip(Integer zip) {
-		this.zip = zip;
-	}
-
+    public String getState() {
+        return state;
+    }
 }
