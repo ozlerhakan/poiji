@@ -28,10 +28,6 @@ public class PersonByName {
         return row;
     }
 
-    public void setRow(int row) {
-        this.row = row;
-    }
-
     public String getName() {
         return name;
     }
@@ -40,27 +36,8 @@ public class PersonByName {
         this.name = name;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
     public void setAddress(String address) {
         this.address = address;
     }
 
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 }

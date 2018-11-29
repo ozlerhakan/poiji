@@ -38,7 +38,7 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         this.options = options;
     }
 
-    <T> void unmarshal0(Class<T> type, Consumer<? super T> consumer, OPCPackage open)
+    protected <T> void unmarshal0(Class<T> type, Consumer<? super T> consumer, OPCPackage open)
             throws ParserConfigurationException, IOException, SAXException, OpenXML4JException {
 
         ReadOnlySharedStringsTable readOnlySharedStringsTable = new ReadOnlySharedStringsTable(open);
@@ -95,7 +95,7 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         }
     }
 
-    <T> void listOfEncryptedItems(Class<T> type, Consumer<? super T> consumer, POIFSFileSystem fs) throws IOException {
+    protected <T> void listOfEncryptedItems(Class<T> type, Consumer<? super T> consumer, POIFSFileSystem fs) throws IOException {
         InputStream stream = DocumentFactoryHelper.getDecryptedStream(fs, options.getPassword());
 
         try (OPCPackage open = OPCPackage.open(stream)) {
@@ -107,7 +107,7 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         }
     }
 
-    abstract <T> void returnFromExcelFile(Class<T> type, Consumer<? super T> consumer);
+    protected abstract <T> void returnFromExcelFile(Class<T> type, Consumer<? super T> consumer);
 
-    abstract <T> void returnFromEncryptedFile(Class<T> type, Consumer<? super T> consumer);
+    protected abstract <T> void returnFromEncryptedFile(Class<T> type, Consumer<? super T> consumer);
 }

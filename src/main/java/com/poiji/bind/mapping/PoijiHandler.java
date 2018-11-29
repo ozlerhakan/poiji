@@ -2,11 +2,14 @@ package com.poiji.bind.mapping;
 
 import com.poiji.annotation.ExcelCell;
 import com.poiji.annotation.ExcelCellName;
+import com.poiji.annotation.ExcelCellRange;
 import com.poiji.annotation.ExcelRow;
 import com.poiji.exception.IllegalCastException;
+import com.poiji.exception.PoijiInstantiationException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.Casting;
 import org.apache.poi.ss.util.CellAddress;
+import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.usermodel.XSSFComment;
 
 import java.lang.reflect.Field;
@@ -16,7 +19,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import static java.lang.String.valueOf;
-import static org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 
 /**
  * This class handles the processing of a .xlsx file,
@@ -35,6 +37,10 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
 	private final Casting casting;
     private Map<String, Integer> titles;
+    // New maps used to speed up computing and handle inner objects
+    private Map<String, Object> fieldInstances;
+    private Map<Integer, Field> columnToField;
+    private Map<Integer, Field> columnToSuperClassField;
 
     PoijiHandler(Class<T> type, PoijiOptions options, Consumer<T> consumer) {
         this.type = type;
@@ -43,6 +49,8 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
 		casting = options.getCasting();
         titles = new HashMap<String, Integer>();
+        columnToField = new HashMap<>();
+        columnToSuperClassField = new HashMap<>();
     }
 
     private <T> T newInstanceOf(Class<T> type) {
@@ -58,47 +66,117 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     private void setFieldValue(String content, Class<? super T> subclass, int column) {
         if (subclass != Object.class) {
-            setValue(content, subclass, column);
+            if(setValue(content, subclass, column)) {
+                return;
+            }
 
             setFieldValue(content, subclass.getSuperclass(), column);
         }
     }
+    /**
+     *  Using this to hold inner objects that will be mapped to the main object
+     * **/
+    private Object getInstance(Field field) {
+        Object ins = null;
+        try {
+            if (fieldInstances.containsKey(field.getName())) {
+                ins = fieldInstances.get(field.getName());
+            } else {
+                ins = field.getType().getDeclaredConstructor().newInstance();
+                fieldInstances.put(field.getName(), ins);
+            }
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException
+                | InstantiationException e) {
+            throw new PoijiInstantiationException("Cannot create a new instance of " + type.getName());
+        }
+        return ins;
+    }
 
-    private void setValue(String content, Class<? super T> type, int column) {
+    /***
+     * 	Modified this method so that for each time it reads a cell
+     * 	it doesn't need to check all fields even after it as found
+     * 	the matching field
+     *
+     * */
+    private boolean setValue(String content, Class<? super T> type, int column) {
+        // For ExcelRow annotation
+        if(columnToField.containsKey(-1)) {
+            Field field = columnToField.get(-1);
+            Object o = casting.castValue(field.getType(), valueOf(internalCount), options);
+            setFieldData(field, o, instance);
+        }
+        if(columnToField.containsKey(column)) {
+            Field field = columnToField.get(column);
+            if (columnToSuperClassField.containsKey(column)) {
+                Object ins = null;
+                ins = getInstance(columnToSuperClassField.get(column));
+                if (setValue(field, column, content, ins)) {
+                    setFieldData(columnToSuperClassField.get(column), ins, instance);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            return setValue(field, column, content, instance);
+        }
         for (Field field : type.getDeclaredFields()) {
+
             ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
             if (excelRow != null) {
                 Object o = casting.castValue(field.getType(), valueOf(internalCount), options);
-                setFieldData(field, o);
+                setFieldData(field, o, instance);
+                columnToField.put(-1, field);
             }
-            ExcelCell index = field.getAnnotation(ExcelCell.class);
-            if (index != null) {
-                Class<?> fieldType = field.getType();
-
-                if (column == index.value()) {
-                    Object o = casting.castValue(fieldType, content, options);
-
-                    setFieldData(field, o);
+            ExcelCellRange range = field.getAnnotation(ExcelCellRange.class);
+            if (range != null) {
+                if (column < range.begin() || column > range.end()) {
+                    continue;
                 }
-
-            } else {
-
-                ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
-                if (excelCellName != null) {
-                    Class<?> fieldType = field.getType();
-                    Integer titleColumn = titles.get(excelCellName.value());
-                    if (titleColumn != null && column == titleColumn) {
-
-                        Object o = casting.castValue(fieldType, content, options);
-
-                        setFieldData(field, o);
+                Object ins = null;
+                ins = getInstance(field);
+                for (Field f : field.getType().getDeclaredFields()) {
+                    if (setValue(f, column, content, ins)) {
+                        setFieldData(field, ins, instance);
+                        columnToField.put(column, f);
+                        columnToSuperClassField.put(column, field);
+                        return true;
                     }
+                }
+            } else {
+                if(setValue(field, column, content, instance)) {
+                    columnToField.put(column, field);
+                    return true;
                 }
             }
         }
+        return false;
     }
 
-    private void setFieldData(Field field, Object o) {
+    private boolean setValue(Field field, int column, String content, Object ins) {
+           ExcelCell index = field.getAnnotation(ExcelCell.class);
+           if (index != null) {
+               Class<?> fieldType = field.getType();
+               if (column == index.value()) {
+                   Object o = casting.castValue(fieldType, content, options);
+                   setFieldData(field, o, ins);
+               }
+           } else {
+               ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
+               if (excelCellName != null) {
+                   Class<?> fieldType = field.getType();
+                   Integer titleColumn = titles.get(excelCellName.value() + column);
+                   //Fix both columns mapped to name passing this condition below
+                   if (titleColumn != null && titleColumn == column) {
+                       Object o = casting.castValue(fieldType, content, options);
+                       setFieldData(field, o, ins);
+                       return true;
+                   }
+               }
+           }
+           return false;
+    }
+
+    private void setFieldData(Field field, Object o, Object instance) {
         try {
             field.setAccessible(true);
             field.set(instance, o);
@@ -111,6 +189,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     public void startRow(int rowNum) {
         if (rowNum + 1 > options.skip()) {
             instance = newInstanceOf(type);
+            fieldInstances = new HashMap<>();
         }
     }
 
@@ -133,9 +212,10 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
         internalCount = row;
         int column = cellAddress.getColumn();
+        int headers = options.getHeaderStart();
 
-        if (row == 0) {
-            titles.put(formattedValue, column);
+        if (row <= headers) {
+            titles.put(formattedValue + column, column);
         }
 
         if (row + 1 <= options.skip()) {

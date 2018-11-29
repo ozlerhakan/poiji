@@ -1,5 +1,5 @@
 = Poiji
-:version: v1.18.1
+:version: v1.19.0
 
 image:https://travis-ci.org/ozlerhakan/poiji.svg?branch=master["Build Status", link="https://travis-ci.org/ozlerhakan/poiji"] image:https://api.codacy.com/project/badge/Grade/6587e90886184da29a1b7c5634695c9d["Codacy code quality", link="https://www.codacy.com/app/ozlerhakan/poiji?utm_source=github.com&utm_medium=referral&utm_content=ozlerhakan/poiji&utm_campaign=Badge_Grade"] image:https://coveralls.io/repos/github/ozlerhakan/poiji/badge.svg?branch=master["Coverage Status", link="https://coveralls.io/github/ozlerhakan/poiji?branch=master"] image:https://img.shields.io/badge/apache.poi-4.0.0-brightgreen.svg[] image:https://img.shields.io/badge/gitter-join%20chat-blue.svg["Gitter", link="https://gitter.im/poiji/Lobby"] image:https://img.shields.io/badge/license-MIT-blue.svg[]
 
@@ -15,7 +15,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 <dependency>
   <groupId>com.github.ozlerhakan</groupId>
   <artifactId>poiji</artifactId>
-  <version>1.18.1</version>
+  <version>1.19.0</version>
 </dependency>
 ----
 
@@ -23,7 +23,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    compile 'com.github.ozlerhakan:poiji:1.18.1'
+    compile 'com.github.ozlerhakan:poiji:1.19.0'
 }
 ----
 
@@ -56,6 +56,7 @@ com.poiji.option.PoijiOptions.PoijiOptionsBuilder#settings(int)
 com.poiji.option.PoijiOptions.PoijiOptionsBuilder#sheetIndex(int)
 com.poiji.option.PoijiOptions.PoijiOptionsBuilder#skip(int)
 com.poiji.option.PoijiOptions.PoijiOptionsBuilder#trimCellValue(boolean)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#headerStart(int)
 ----
 
 === Example 1
@@ -149,11 +150,11 @@ Employee firstEmployee = employees.get(0);
 // Employee{rowIndex=1, employeeId=123923, name='Joe', surname='Doe', age=30, single=true, birthday='4/9/1987'}
 ----
 
-By default, Poiji ignores the first row of the excel data. You can override this behaviour by setting a `PoijiOptions`.
+By default, Poiji ignores the header row of the excel data. If you want to ignore the first row of data, you need to use `PoijiOptions`.
 
 [source,java]
 ----
-PoijiOptions options = PoijiOptionsBuilder.settings(2).build();
+PoijiOptions options = PoijiOptionsBuilder.settings(1).build(); // we eliminate Joe Doe.
 List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class, options);
 Employee firstEmployee = employees.get(0);
 // Employee{rowIndex=2, employeeId=123123, name='Sophie', surname='Derue', age=20, single=true, birthday='5/3/1997'}
@@ -315,6 +316,110 @@ Car car = cars.get(0);
 
 === Example 4
 
+Consider you have a table like below:
+
+|===
+5+|Class A 5+| Class B
+|Name | Age | City | State | Zip Code | Name | Age | City | State | Zip Code
+
+|John Doe
+|21
+|Vienna
+|Virginia
+|22349
+|Smith Michael
+|32
+|McLean
+|Virginia
+|22309
+
+|Jane Doe
+|28
+|Greenbelt
+|Maryland
+|20993
+|Sean Paul
+|25
+|Los Angeles
+|California
+|92384
+
+|Paul Ryan
+|19
+|Alexandria
+|Virginia
+|22312
+|John Peter
+|25
+|Vienna
+|Virginia
+|22347
+
+|Peter Pan
+|23
+|Alexandria
+|Virginia
+|22314
+|Arnold Regan
+|35
+|Seattle
+|Washington
+|90384
+
+|===
+
+The new `ExcelCellRange` annotation (as of 1.19) lets us aggregate a range of information in one object model. In this case, we collect the details of the first person in `classA` and for second person in `classB`:
+
+[source,java]
+----
+public class Classes {
+
+  @ExcelCellRange(begin = 0, end = 4)
+  private Person classA;
+
+  @ExcelCellRange(begin = 5, end = 9)
+  private Person classB;
+
+}
+----
+
+[source, java]
+----
+public class Person {
+
+    @ExcelCellName("Name")
+    private String name;
+
+    @ExcelCellName("Age")
+    private Integer age;
+
+    @ExcelCellName("City")
+    private String city;
+
+    @ExcelCellName("State")
+    private String state;
+
+    @ExcelCellName("Zip Code")
+    private Integer zip;
+
+}
+----
+
+Using the conventional way, we can retrieve the data using `Poiji.fromExcel`:
+
+[source,java]
+----
+PoijiOptions options = PoijiOptionsBuilder.settings().headerStart(1).build(); // header starts at 1 (zero-based).
+List<Classes> classes = Poiji.fromExcel(new File(excel), Classes.class, options);
+
+Classes firstRowClasses = actualClasses.get(0);
+
+Person firstRowPerson1 = firstRowClasses.getClassA();
+Person secondRowPerson2 = firstRowClasses.getClassB();
+----
+
+=== Example 5
+
 As of 1.14, Poiji supports Consumer Interface. As https://github.com/ozlerhakan/poiji/pull/39#issuecomment-409521808[@fmarazita] explained the usage, there are several benefits of having a Consumer:
 
 1. Huge excel file ( without you have all in memory)
@@ -355,7 +460,7 @@ class Calculation {
 ----
 File fileCalculation = new File(example.xlsx);
 
-PoijiOptions options = PoijiOptionsBuilder.settings(1).sheetIndex(1).build();
+PoijiOptions options = PoijiOptionsBuilder.settings().sheetIndex(1).build();
 
 Poiji.fromExcel(fileCalculation, Calculation.class, options, this::dbInsertion);
 
@@ -388,8 +493,8 @@ Employee{employeeId=135923, name='Paul', surname='Raul', age=31, single=false, b
 == Stargazers over time
 
 image:https://starcharts.herokuapp.com/ozlerhakan/poiji.svg["Stargazers over time", link="https://starcharts.herokuapp.com/ozlerhakan/poiji"]
-      
-      
+
+
 == License
 
 MIT

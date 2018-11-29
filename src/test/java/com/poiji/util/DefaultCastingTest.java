@@ -96,14 +96,6 @@ public class DefaultCastingTest {
         assertEquals(new Float(81.56891), testVal);
     }
 
-    @Test(expected = ClassCastException.class)
-    public void castLongWrongFormat() {
-
-        PoijiOptions options = PoijiOptionsBuilder.settings().build();
-
-        Long testVal = (Long) casting.castValue(int.class, "9223372036854775808", options);
-    }
-
     @Test
     public void castLong() {
 
@@ -135,7 +127,7 @@ public class DefaultCastingTest {
     }
 
     private enum TestEnum {
-        ITEM1, ITEM2;
+        ITEM1, ITEM2
     }
 
     @Test

@@ -52,7 +52,7 @@ public class DeserializersExtendedTest {
     public void shouldMapExcelToJava() {
 
         try {
-            PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().skip(1).datePattern("dd/mm/yyyy").build();
+            PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().skip(0).datePattern("dd/mm/yyyy").build();
             List<EmployeeExtended> actualEmployees = Poiji.fromExcel(new File(path), EmployeeExtended.class, options);
 
             assertThat(actualEmployees, notNullValue());
@@ -88,7 +88,7 @@ public class DeserializersExtendedTest {
                 new File(this.getClass().getResource("/employees_extended.xls").getPath());
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .skip(1)
+                .skip(0)
                 .datePattern("dd/MM/yyyy")
                 .build();
 
