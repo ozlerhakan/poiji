@@ -31,14 +31,14 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
 
     private final DataFormatter dataFormatter;
     protected final PoijiOptions options;
-    private final Casting casting;
+	private final Casting casting;
     private Map<String, Integer> titles;
 
     HSSFUnmarshaller(PoijiOptions options) {
         this.options = options;
         dataFormatter = new DataFormatter();
         titles = new HashMap<>();
-        casting = Casting.getInstance();
+		casting = options.getCasting();
     }
 
     @Override

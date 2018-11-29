@@ -1,7 +1,8 @@
 package com.poiji.option;
 
 import com.poiji.exception.PoijiException;
-
+import com.poiji.util.Casting;
+import com.poiji.util.DefaultCasting;
 import java.time.format.DateTimeFormatter;
 
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_PATTERN;
@@ -22,6 +23,7 @@ public final class PoijiOptions {
     private boolean ignoreHiddenSheets;
     private boolean preferNullOverDefault;
     private DateTimeFormatter dateTimeFormatter;
+	private Casting casting = new DefaultCasting();
 
     private PoijiOptions() {
         super();
@@ -95,6 +97,15 @@ public final class PoijiOptions {
         return this;
     }
 
+	public PoijiOptions setCasting(Casting casting) {
+		this.casting = casting;
+		return this;
+	}
+
+	public Casting getCasting() {
+		return casting;
+	}
+
     private PoijiOptions setSheetIndex(int sheetIndex) {
         this.sheetIndex = sheetIndex;
         return this;
@@ -134,6 +145,7 @@ public final class PoijiOptions {
         private boolean preferNullOverDefault;
         private String datePattern = DEFAULT_DATE_PATTERN;
         private DateTimeFormatter dateTimeFormatter = DEFAULT_DATE_TIME_FORMATTER;
+		private Casting casting = new DefaultCasting();
 
         private PoijiOptionsBuilder() {
         }
@@ -153,7 +165,7 @@ public final class PoijiOptions {
                     .setIgnoreHiddenSheets(ignoreHiddenSheets)
                     .setTrimCellValue(trimCellValue)
                     .setDateRegex(dateRegex)
-                    .setDateLenient(dateLenient);
+					.setDateLenient(dateLenient).setCasting(casting);
         }
 
         public static PoijiOptionsBuilder settings() {
@@ -289,6 +301,17 @@ public final class PoijiOptions {
             this.dateLenient = dateLenient;
             return this;
         }
+
+		/**
+		 * Use a custom casting implementation
+		 *
+		 * @param casting custom casting implementation
+		 * @return this
+		 */
+		public PoijiOptionsBuilder withCasting(Casting casting) {
+			this.casting = casting;
+			return this;
+		}
 
     }
 }

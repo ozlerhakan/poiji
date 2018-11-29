@@ -33,7 +33,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     private Class<T> type;
     private PoijiOptions options;
 
-    private final Casting casting;
+	private final Casting casting;
     private Map<String, Integer> titles;
 
     PoijiHandler(Class<T> type, PoijiOptions options, Consumer<T> consumer) {
@@ -41,7 +41,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         this.options = options;
         this.consumer = consumer;
 
-        casting = Casting.getInstance();
+		casting = options.getCasting();
         titles = new HashMap<String, Integer>();
     }
 
@@ -118,7 +118,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     public void endRow(int rowNum) {
 
         if (internalCount != rowNum)
-            return;
+			return;
 
         if (rowNum + 1 > options.skip()) {
             consumer.accept(instance);
