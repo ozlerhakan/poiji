@@ -39,7 +39,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
         this.options = options;
         dataFormatter = new DataFormatter();
         titles = new HashMap<>();
-        casting = Casting.getInstance();
+		casting = options.getCasting();
     }
 
     @Override

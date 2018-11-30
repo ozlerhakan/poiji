@@ -47,7 +47,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         this.options = options;
         this.consumer = consumer;
 
-        casting = Casting.getInstance();
+        casting = options.getCasting();
         titles = new HashMap<String, Integer>();
         columnToField = new HashMap<>();
         columnToSuperClassField = new HashMap<>();
@@ -197,7 +197,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     public void endRow(int rowNum) {
 
         if (internalCount != rowNum)
-            return;
+			return;
 
         if (rowNum + 1 > options.skip()) {
             consumer.accept(instance);

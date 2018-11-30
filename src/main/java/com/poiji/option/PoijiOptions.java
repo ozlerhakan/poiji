@@ -1,8 +1,11 @@
 package com.poiji.option;
 
 import com.poiji.exception.PoijiException;
+import com.poiji.util.Casting;
+import com.poiji.util.DefaultCasting;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_PATTERN;
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_TIME_FORMATTER;
@@ -22,6 +25,7 @@ public final class PoijiOptions {
     private boolean ignoreHiddenSheets;
     private boolean preferNullOverDefault;
     private DateTimeFormatter dateTimeFormatter;
+    private Casting casting;
     private int headerStart;
 
     private PoijiOptions() {
@@ -96,6 +100,15 @@ public final class PoijiOptions {
         return this;
     }
 
+    public Casting getCasting() {
+        return casting;
+    }
+
+    public PoijiOptions setCasting(Casting casting) {
+        this.casting = casting;
+        return this;
+    }
+
     private PoijiOptions setSheetIndex(int sheetIndex) {
         this.sheetIndex = sheetIndex;
         return this;
@@ -143,6 +156,7 @@ public final class PoijiOptions {
         private boolean preferNullOverDefault;
         private String datePattern = DEFAULT_DATE_PATTERN;
         private DateTimeFormatter dateTimeFormatter = DEFAULT_DATE_TIME_FORMATTER;
+        private Casting casting = new DefaultCasting();
         private int headerStart = 0;
         private int skip = 0;
 
@@ -218,7 +232,8 @@ public final class PoijiOptions {
                     .setTrimCellValue(trimCellValue)
                     .setDateRegex(dateRegex)
                     .setDateLenient(dateLenient)
-                    .setHeaderStart(headerStart);
+                    .setHeaderStart(headerStart)
+                    .setCasting(casting);
         }
 
         /**
@@ -309,6 +324,19 @@ public final class PoijiOptions {
         }
 
         /**
+         * Use a custom casting implementation
+         *
+         * @param casting custom casting implementation
+         * @return this
+         */
+        public PoijiOptionsBuilder withCasting(Casting casting) {
+            Objects.requireNonNull(casting);
+
+            this.casting = casting;
+            return this;
+        }
+
+        /**
          * This is to set the row which the unmarshall will
          * use to start reading header titles, incase the
          * header is not in row 0.
@@ -323,7 +351,6 @@ public final class PoijiOptions {
             this.headerStart = headerStart;
             return this;
         }
-
     }
 
 }

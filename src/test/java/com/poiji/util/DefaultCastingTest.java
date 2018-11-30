@@ -14,14 +14,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-public class CastingTest {
+public class DefaultCastingTest {
 
-    private Casting casting;
+    private DefaultCasting casting;
 
     @Before
     public void setUp() {
 
-        casting = Casting.getInstance();
+		casting = new DefaultCasting();
     }
 
     @Test
