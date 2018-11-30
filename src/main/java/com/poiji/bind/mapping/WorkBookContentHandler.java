@@ -21,7 +21,7 @@ final class WorkBookContentHandler implements ContentHandler {
         this.options = options;
     }
 
-    List<WorkBookSheet> getSheets() {
+    protected List<WorkBookSheet> getSheets() {
         return sheets;
     }
 

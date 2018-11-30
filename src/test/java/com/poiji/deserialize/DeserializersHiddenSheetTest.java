@@ -19,21 +19,19 @@ public class DeserializersHiddenSheetTest {
 
     private final String path;
     private final List<Person> expectedPersonList;
-    private final Class<?> expectedException;
 
-    public DeserializersHiddenSheetTest(String path, List<Person> expectedPersonList, Class<?> expectedException) {
+    public DeserializersHiddenSheetTest(String path, List<Person> expectedPersonList) {
         this.path = path;
         this.expectedPersonList = expectedPersonList;
-        this.expectedException = expectedException;
     }
 
     @Parameterized.Parameters(name = "{index}: ({0})={1}")
     public static Iterable<Object[]> queries() {
         return Arrays.asList(new Object[][]{
-                {"src/test/resources/hidden.xlsx", unmarshallingPersons(), null},
-                {"src/test/resources/hidden.xls", unmarshallingPersons(), null},
-                {"src/test/resources/hidden_very_large.xlsx", unmarshallingPersons(), null},
-                {"src/test/resources/hidden_very_large.xls", unmarshallingPersons(), null}
+                {"src/test/resources/hidden.xlsx", unmarshallingPersons()},
+                {"src/test/resources/hidden.xls", unmarshallingPersons()},
+                {"src/test/resources/hidden_very_large.xlsx", unmarshallingPersons()},
+                {"src/test/resources/hidden_very_large.xls", unmarshallingPersons()}
         });
     }
 

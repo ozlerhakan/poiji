@@ -38,4 +38,8 @@ public class PersonTest {
     public String getState() {
         return state;
     }
+
+    public Integer getZip() {
+        return zip;
+    }
 }

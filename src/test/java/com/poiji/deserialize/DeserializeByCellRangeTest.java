@@ -58,6 +58,7 @@ public class DeserializeByCellRangeTest {
             assertThat(expectedPerson2.getCity(), is("Los Angeles"));
             assertThat(expectedPerson3.getName(), is("Paul Ryan"));
             assertThat(expectedPerson4.getState(), is("Virginia"));
+            assertThat(expectedPerson4.getZip(), is(22347));
         } catch (Exception e) {
             fail(e.getMessage());
         }
