@@ -474,7 +474,7 @@ private void dbInsertion(Calculation siCalculation) {
 
 === Example 6
 
-Since 1.19.1, you can create your own casting implementation without relying on the default Poiji casting configuration using the `Casting` interface.
+Since Poiji 1.19.1, you can create your own casting implementation without relying on the default Poiji casting configuration using the `Casting` interface.
 
 [source,java]
 ----
