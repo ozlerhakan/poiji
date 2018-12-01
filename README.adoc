@@ -1,5 +1,5 @@
 = Poiji
-:version: v1.19.0
+:version: v1.19.1
 
 image:https://travis-ci.org/ozlerhakan/poiji.svg?branch=master["Build Status", link="https://travis-ci.org/ozlerhakan/poiji"] image:https://api.codacy.com/project/badge/Grade/6587e90886184da29a1b7c5634695c9d["Codacy code quality", link="https://www.codacy.com/app/ozlerhakan/poiji?utm_source=github.com&utm_medium=referral&utm_content=ozlerhakan/poiji&utm_campaign=Badge_Grade"] image:https://coveralls.io/repos/github/ozlerhakan/poiji/badge.svg?branch=master["Coverage Status", link="https://coveralls.io/github/ozlerhakan/poiji?branch=master"] image:https://img.shields.io/badge/apache.poi-4.0.0-brightgreen.svg[] image:https://img.shields.io/badge/gitter-join%20chat-blue.svg["Gitter", link="https://gitter.im/poiji/Lobby"] image:https://img.shields.io/badge/license-MIT-blue.svg[]
 
@@ -15,7 +15,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 <dependency>
   <groupId>com.github.ozlerhakan</groupId>
   <artifactId>poiji</artifactId>
-  <version>1.19.0</version>
+  <version>1.19.1</version>
 </dependency>
 ----
 
@@ -23,7 +23,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    compile 'com.github.ozlerhakan:poiji:1.19.0'
+    compile 'com.github.ozlerhakan:poiji:1.19.1'
 }
 ----
 
@@ -57,6 +57,7 @@ com.poiji.option.PoijiOptions.PoijiOptionsBuilder#sheetIndex(int)
 com.poiji.option.PoijiOptions.PoijiOptionsBuilder#skip(int)
 com.poiji.option.PoijiOptions.PoijiOptionsBuilder#trimCellValue(boolean)
 com.poiji.option.PoijiOptions.PoijiOptionsBuilder#headerStart(int)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#withCasting(Casting)
 ----
 
 === Example 1
@@ -469,6 +470,44 @@ private void dbInsertion(Calculation siCalculation) {
   String name = siCalculation.getName();
   insertDB(name , value);
 }
+----
+
+=== Example 6
+
+Since 1.19.1, you can create your own casting implementation without relying on the default Poiji casting configuration using the `Casting` interface.
+
+[source,java]
+----
+public class MyCasting implements Casting {
+    @Override
+    public Object castValue(Class<?> fieldType, String value, PoijiOptions options) {
+       return value.trim();
+    }
+}
+
+public class Person {
+
+    @ExcelCell(0)
+    protected String employeeId;
+
+    @ExcelCell(1)
+    protected String name;
+
+    @ExcelCell(2)
+    protected String surname;
+
+}
+----
+
+Then you can add your custom implementation with the `withCasting` method:
+
+[source,java]
+----
+ PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .withCasting(new MyCasting())
+                .build();
+
+List<Person> people = Poiji.fromExcel(excel, Person.class, options);
 ----
 
 == Try with JShell
