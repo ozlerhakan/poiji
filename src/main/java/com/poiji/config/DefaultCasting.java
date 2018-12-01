@@ -1,4 +1,4 @@
-package com.poiji.util;
+package com.poiji.config;
 
 import com.poiji.option.PoijiOptions;
 
@@ -14,7 +14,7 @@ import java.util.Date;
 /**
  * Created by hakan on 22/01/2017.
  */
-public class DefaultCasting implements Casting {
+public final class DefaultCasting implements Casting {
 
     private int primitiveIntegerValue(String value) {
         try {
