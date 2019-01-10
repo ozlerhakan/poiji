@@ -43,13 +43,12 @@ public class DeserializerCaseTest {
 
     @Test
     public void shouldMapExcelToJava() {
-            try (InputStream stream = new FileInputStream(new File(path))) {
-                List<ProductExcelDTO> actualEmployees = Poiji.fromExcel(stream, poijiExcelType, ProductExcelDTO.class);
-
-                assertThat(actualEmployees, notNullValue());
-                assertThat(actualEmployees.size(), not(0));
-            } catch (IOException e) {
-                fail(e.getMessage());
-            }
+        try (InputStream stream = new FileInputStream(new File(path))) {
+            List<ProductExcelDTO> products = Poiji.fromExcel(stream, poijiExcelType, ProductExcelDTO.class);
+            assertThat(products, notNullValue());
+            assertThat(products.size(), not(0));
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
     }
 }
