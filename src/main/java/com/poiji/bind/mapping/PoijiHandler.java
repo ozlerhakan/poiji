@@ -129,9 +129,6 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             }
             ExcelCellRange range = field.getAnnotation(ExcelCellRange.class);
             if (range != null) {
-                if (column < range.begin() || column > range.end()) {
-                    continue;
-                }
                 Object ins = null;
                 ins = getInstance(field);
                 for (Field f : field.getType().getDeclaredFields()) {
@@ -164,7 +161,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
                if (excelCellName != null) {
                    Class<?> fieldType = field.getType();
-                   Integer titleColumn = titles.get(excelCellName.value() + column);
+                   Integer titleColumn = titles.get(excelCellName.value() );
                    //Fix both columns mapped to name passing this condition below
                    if (titleColumn != null && titleColumn == column) {
                        Object o = casting.castValue(fieldType, content, options);
@@ -215,7 +212,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         int headers = options.getHeaderStart();
 
         if (row <= headers) {
-            titles.put(formattedValue + column, column);
+            titles.put(formattedValue, column);
         }
 
         if (row + 1 <= options.skip()) {

@@ -2,21 +2,21 @@ package com.poiji.deserialize.model.byid;
 
 import com.poiji.annotation.ExcelCellName;
 
-public class PersonTest {
+public class PersonATest {
 
-    @ExcelCellName("Name")
+    @ExcelCellName("NameA")
     private String name;
 
-    @ExcelCellName("Age")
+    @ExcelCellName("AgeA")
     private Integer age;
 
-    @ExcelCellName("City")
+    @ExcelCellName("CityA")
     private String city;
 
-    @ExcelCellName("State")
+    @ExcelCellName("StateA")
     private String state;
 
-    @ExcelCellName("Zip Code")
+    @ExcelCellName("Zip CodeA")
     private Integer zip;
 
     public String getName() {
