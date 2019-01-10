@@ -4,24 +4,24 @@ import com.poiji.annotation.ExcelCellRange;
 
 public class Classes {
 
-	@ExcelCellRange(begin = 0, end = 4)
-	private PersonTest classA;
-	@ExcelCellRange(begin = 5, end = 9)
-	private PersonTest classB;
+	@ExcelCellRange
+	private PersonATest classA;
+	@ExcelCellRange
+	private PersonBTest classB;
 
-	public PersonTest getClassA() {
+	public PersonATest getClassA() {
 		return classA;
 	}
 
-	public void setClassA(PersonTest classA) {
+	public void setClassA(PersonATest classA) {
 		this.classA = classA;
 	}
 
-	public PersonTest getClassB() {
+	public PersonBTest getClassB() {
 		return classB;
 	}
 
-	public void setClassB(PersonTest classB) {
+	public void setClassB(PersonBTest classB) {
 		this.classB = classB;
 	}
 

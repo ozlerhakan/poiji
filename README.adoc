@@ -1,5 +1,5 @@
 = Poiji
-:version: v1.19.1
+:version: v1.19.2
 
 image:https://travis-ci.org/ozlerhakan/poiji.svg?branch=master["Build Status", link="https://travis-ci.org/ozlerhakan/poiji"] image:https://api.codacy.com/project/badge/Grade/6587e90886184da29a1b7c5634695c9d["Codacy code quality", link="https://www.codacy.com/app/ozlerhakan/poiji?utm_source=github.com&utm_medium=referral&utm_content=ozlerhakan/poiji&utm_campaign=Badge_Grade"] image:https://coveralls.io/repos/github/ozlerhakan/poiji/badge.svg?branch=master["Coverage Status", link="https://coveralls.io/github/ozlerhakan/poiji?branch=master"] image:https://img.shields.io/badge/apache.poi-4.0.0-brightgreen.svg[] image:https://img.shields.io/badge/gitter-join%20chat-blue.svg["Gitter", link="https://gitter.im/poiji/Lobby"] image:https://img.shields.io/badge/license-MIT-blue.svg[]
 
@@ -15,7 +15,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 <dependency>
   <groupId>com.github.ozlerhakan</groupId>
   <artifactId>poiji</artifactId>
-  <version>1.19.1</version>
+  <version>1.19.2</version>
 </dependency>
 ----
 
@@ -23,7 +23,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    compile 'com.github.ozlerhakan:poiji:1.19.1'
+    compile 'com.github.ozlerhakan:poiji:1.19.2'
 }
 ----
 
@@ -320,52 +320,36 @@ Car car = cars.get(0);
 Consider you have a table like below:
 
 |===
-5+|Class A 5+| Class B
-|Name | Age | City | State | Zip Code | Name | Age | City | State | Zip Code
+3+|Group A 3+| Group B
+|NameA | AgeA | CityA | NameB | AgeB | CityB
 
 |John Doe
 |21
 |Vienna
-|Virginia
-|22349
 |Smith Michael
 |32
 |McLean
-|Virginia
-|22309
 
 |Jane Doe
 |28
 |Greenbelt
-|Maryland
-|20993
 |Sean Paul
 |25
 |Los Angeles
-|California
-|92384
 
 |Paul Ryan
 |19
 |Alexandria
-|Virginia
-|22312
 |John Peter
 |25
 |Vienna
-|Virginia
-|22347
 
 |Peter Pan
 |23
 |Alexandria
-|Virginia
-|22314
 |Arnold Regan
 |35
 |Seattle
-|Washington
-|90384
 
 |===
 
@@ -373,36 +357,42 @@ The new `ExcelCellRange` annotation (as of 1.19) lets us aggregate a range of in
 
 [source,java]
 ----
-public class Classes {
+public class Groups {
 
-  @ExcelCellRange(begin = 0, end = 4)
-  private Person classA;
+  @ExcelCellRange
+  private GroupA groupA;
 
-  @ExcelCellRange(begin = 5, end = 9)
-  private Person classB;
+  @ExcelCellRange
+  private GroupB groupB;
 
 }
 ----
 
 [source, java]
 ----
-public class Person {
+public class GroupA {
 
-    @ExcelCellName("Name")
+    @ExcelCellName("NameA")
     private String name;
 
-    @ExcelCellName("Age")
+    @ExcelCellName("AgeA")
     private Integer age;
 
-    @ExcelCellName("City")
+    @ExcelCellName("CityA")
     private String city;
 
-    @ExcelCellName("State")
-    private String state;
+}
 
-    @ExcelCellName("Zip Code")
-    private Integer zip;
+public class GroupB {
 
+    @ExcelCellName("NameB")
+    private String name;
+
+    @ExcelCellName("AgeB")
+    private Integer age;
+
+    @ExcelCellName("CityB")
+    private String city;
 }
 ----
 
@@ -411,12 +401,12 @@ Using the conventional way, we can retrieve the data using `Poiji.fromExcel`:
 [source,java]
 ----
 PoijiOptions options = PoijiOptionsBuilder.settings().headerStart(1).build(); // header starts at 1 (zero-based).
-List<Classes> classes = Poiji.fromExcel(new File(excel), Classes.class, options);
+List<Groups> groups = Poiji.fromExcel(new File(excel), Groups.class, options);
 
-Classes firstRowClasses = actualClasses.get(0);
+Groups firstRowGroups = actualGroups.get(0);
 
-Person firstRowPerson1 = firstRowClasses.getClassA();
-Person secondRowPerson2 = firstRowClasses.getClassB();
+GroupA firstRowPerson1 = firstRowGroups.getGroupA();
+GroupB secondRowPerson2 = firstRowGroups.getGroupB();
 ----
 
 === Example 5

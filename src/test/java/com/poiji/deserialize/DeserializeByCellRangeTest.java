@@ -2,7 +2,8 @@ package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.byid.Classes;
-import com.poiji.deserialize.model.byid.PersonTest;
+import com.poiji.deserialize.model.byid.PersonATest;
+import com.poiji.deserialize.model.byid.PersonBTest;
 import com.poiji.option.PoijiOptions;
 import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
 import org.junit.Test;
@@ -49,10 +50,10 @@ public class DeserializeByCellRangeTest {
             Classes actualClasses1 = actualClasses.get(0);
             Classes actualClasses2 = actualClasses.get(1);
 
-            PersonTest expectedPerson1 = actualClasses1.getClassA();
-            PersonTest expectedPerson2 = actualClasses1.getClassB();
-            PersonTest expectedPerson3 = actualClasses2.getClassA();
-            PersonTest expectedPerson4 = actualClasses2.getClassB();
+            PersonATest expectedPerson1 = actualClasses1.getClassA();
+            PersonBTest expectedPerson2 = actualClasses1.getClassB();
+            PersonATest expectedPerson3 = actualClasses2.getClassA();
+            PersonBTest expectedPerson4 = actualClasses2.getClassB();
 
             assertThat(expectedPerson1.getAge(), is(28));
             assertThat(expectedPerson2.getCity(), is("Los Angeles"));

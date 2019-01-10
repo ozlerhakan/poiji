@@ -39,7 +39,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
         this.options = options;
         dataFormatter = new DataFormatter();
         titles = new HashMap<>();
-		casting = options.getCasting();
+        casting = options.getCasting();
     }
 
     @Override
@@ -84,7 +84,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
             int row = options.getHeaderStart();
             Row firstRow = sheet.getRow(row);
             for (Cell cell : firstRow) {
-                titles.put(cell.getStringCellValue() + cell.getColumnIndex(), cell.getColumnIndex());
+                titles.put(cell.getStringCellValue(), cell.getColumnIndex());
             }
         }
     }
@@ -101,7 +101,6 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     }
 
     private <T> T tailSetFieldValue(Row currentRow, Class<? super T> type, T instance) {
-        int column = 0;
         for (Field field : type.getDeclaredFields()) {
             ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
             if (excelRow != null) {
@@ -111,9 +110,6 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
             }
             ExcelCellRange excelCellRange = field.getAnnotation(ExcelCellRange.class);
             if (excelCellRange != null) {
-                if (column < excelCellRange.begin() || column > excelCellRange.end()) {
-                    continue;
-                }
                 Class<?> o = field.getType();
                 Object ins;
                 try {
@@ -122,29 +118,24 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
                     throw new PoijiInstantiationException("Cannot create a new instance of " + o.getName());
                 }
                 for (Field f : o.getDeclaredFields()) {
-                    tailSetFieldValue(currentRow, ins, f, column++);
+                    tailSetFieldValue(currentRow, ins, f);
                 }
-                try {
-                    field.setAccessible(true);
-                    field.set(instance, ins);
-                } catch (IllegalArgumentException | IllegalAccessException e) {
-                    throw new PoijiInstantiationException("Cannot access field " + field.getName());
-                }
+                setFieldData(instance, field, ins);
             } else {
-                tailSetFieldValue(currentRow, instance, field, column++);
+                tailSetFieldValue(currentRow, instance, field);
             }
         }
         return instance;
     }
 
-    private <T> void tailSetFieldValue(Row currentRow, T instance, Field field, int column) {
+    private <T> void tailSetFieldValue(Row currentRow, T instance, Field field) {
         ExcelCell index = field.getAnnotation(ExcelCell.class);
         if (index != null) {
             constructTypeValue(currentRow, instance, field, index.value());
         } else {
             ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
             if (excelCellName != null) {
-                Integer titleColumn = titles.get(excelCellName.value() + column);
+                Integer titleColumn = titles.get(excelCellName.value());
                 if (titleColumn != null) {
                     constructTypeValue(currentRow, instance, field, titleColumn);
                 }

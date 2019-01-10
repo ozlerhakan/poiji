@@ -13,8 +13,4 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Documented
 public @interface ExcelCellRange {
-	
-	int begin() default 0;
-	int end();
-
 }

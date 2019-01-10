@@ -1,13 +1,13 @@
 package com.poiji.deserialize.model.byid;
 
-import com.poiji.annotation.ExcelCell;
+import com.poiji.annotation.ExcelCellName;
 
 /**
  * Created by hakan on 22/01/2017.
  */
 public class Car extends Vehicle {
 
-    @ExcelCell(3)
+    @ExcelCellName("SEATS")
     private int nOfSeats;
 
     public int getnOfSeats() {
