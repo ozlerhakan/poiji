@@ -52,26 +52,41 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         reader.parse(is);
 
         WorkBookContentHandler wbch = (WorkBookContentHandler) reader.getContentHandler();
-        List<WorkBookSheet> sheets = wbch.getSheets();
+		List<WorkBookSheet> sheets = wbch.getSheets();
+		SheetIterator iter = (SheetIterator) workbookReader.getSheetsData();
+		int sheetCounter = 0;
+		if (options.getSheetName()==null) {
+			int requestedIndex = options.sheetIndex();
+			int nonHiddenSheetIndex = 0;
+			while (iter.hasNext()) {
+				try (InputStream stream = iter.next()) {
+					WorkBookSheet wbs = sheets.get(sheetCounter);
+					if (wbs.getState().equals("visible")) {
+						if (nonHiddenSheetIndex == requestedIndex) {
+							processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
+							return;
+						}
+						nonHiddenSheetIndex++;
+					}
+				}
+				sheetCounter++;
+			}
+		} else {
+			String sheetName = options.getSheetName();
+			while (iter.hasNext()) {
+					try (InputStream stream = iter.next()) {
+						WorkBookSheet wbs = sheets.get(sheetCounter);
+						if (wbs.getState().equals("visible")) {
+							if (iter.getSheetName().equalsIgnoreCase(sheetName)) {
+							processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
+							return;
+						}
+					}
+				}
+				sheetCounter++;
+			}
+		}
 
-        int requestedIndex = options.sheetIndex();
-        int nonHiddenSheetIndex = 0;
-        int sheetCounter = 0;
-
-        SheetIterator iter = (SheetIterator) workbookReader.getSheetsData();
-        while (iter.hasNext()) {
-            try (InputStream stream = iter.next()) {
-                WorkBookSheet wbs = sheets.get(sheetCounter);
-                if (wbs.getState().equals("visible")) {
-                    if (nonHiddenSheetIndex == requestedIndex) {
-                        processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
-                        return;
-                    }
-                    nonHiddenSheetIndex++;
-                }
-            }
-            sheetCounter++;
-        }
     }
 
     @SuppressWarnings("unchecked")
