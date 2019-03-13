@@ -63,32 +63,32 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
 
     private Sheet getSheetToProcess(Workbook workbook, PoijiOptions options) {
     	int nonHiddenSheetIndex = 0;
-		if (options.getSheetName() == null) {
-			int requestedIndex = options.sheetIndex();
-			if (options.ignoreHiddenSheets()) {
-				for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
-					if (!workbook.isSheetHidden(i) && !workbook.isSheetVeryHidden(i)) {
-						if (nonHiddenSheetIndex == requestedIndex) {
+		int requestedIndex = options.sheetIndex();
+		Sheet sheet = null;
+		if (options.ignoreHiddenSheets()) {
+			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+				if (!workbook.isSheetHidden(i) && !workbook.isSheetVeryHidden(i)) {
+					if (options.getSheetName() == null) {
+					  if (nonHiddenSheetIndex == requestedIndex) {
+						return workbook.getSheetAt(i);
+					 }
+					} else {
+						if(workbook.getSheetName(i).equalsIgnoreCase(options.getSheetName())) {
 							return workbook.getSheetAt(i);
-						}
-						nonHiddenSheetIndex++;
+						  }
 					}
+					nonHiddenSheetIndex++;
 				}
 			}
-			return workbook.getSheetAt(requestedIndex);
-		} 
-		for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
-			if (options.ignoreHiddenSheets()) {
-			  if (!workbook.isSheetHidden(i) && !workbook.isSheetVeryHidden(i)) {
-				if(workbook.getSheetName(i).equalsIgnoreCase(options.getSheetName())) {
-					return workbook.getSheetAt(i);
-				  }
-				}
-				nonHiddenSheetIndex++;
+		} else {
+			if(options.getSheetName() == null) {
+				sheet = workbook.getSheetAt(requestedIndex);
+			} else {
+				sheet = workbook.getSheet(options.getSheetName());
 			}
 		}
-		return workbook.getSheet(options.getSheetName());
-    }
+		return sheet;
+   }
 
     private void loadColumnTitles(Sheet sheet, int maxPhysicalNumberOfRows) {
         if (maxPhysicalNumberOfRows > 0) {
