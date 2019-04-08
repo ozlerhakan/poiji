@@ -147,13 +147,13 @@ public final class PoijiOptions {
     }
     
     private PoijiOptions setSheetName(String sheetName) {
-		this.sheetName = sheetName;
-		return this;
-	}
+        this.sheetName = sheetName;
+        return this;
+    }
 
-	public String getSheetName() {
-		return sheetName;
-	}
+    public String getSheetName() {
+        return sheetName;
+    }
 
     public static class PoijiOptionsBuilder {
 
@@ -263,16 +263,15 @@ public final class PoijiOptions {
         }
         
         /**
-		 * Set The sheet Name
-		 * 
-		 * @param sheetName
-		 * @return
-		 */
-		
-		public PoijiOptionsBuilder sheetName(String sheetName) {
-			this.sheetName = sheetName;
-			return this;
-		}
+         * Set The sheet Name
+         * 
+         * @param sheetName
+         * @return
+         */	
+        public PoijiOptionsBuilder sheetName(String sheetName) {
+            this.sheetName = sheetName;
+            return this;
+        }
 
         /**
          * skip a number of rows after the header row. The header row is not counted.

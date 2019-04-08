@@ -13,6 +13,7 @@ import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
+import org.apache.poi.xssf.eventusermodel.XSSFReader.SheetIterator;
 import org.apache.poi.xssf.model.StylesTable;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -52,42 +53,41 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         reader.parse(is);
 
         WorkBookContentHandler wbch = (WorkBookContentHandler) reader.getContentHandler();
-		List<WorkBookSheet> sheets = wbch.getSheets();
-		SheetIterator iter = (SheetIterator) workbookReader.getSheetsData();
-		int sheetCounter = 0;
-		if (options.getSheetName()==null) {
-			int requestedIndex = options.sheetIndex();
-			int nonHiddenSheetIndex = 0;
-			while (iter.hasNext()) {
-				try (InputStream stream = iter.next()) {
-					WorkBookSheet wbs = sheets.get(sheetCounter);
-					if (wbs.getState().equals("visible")) {
-						if (nonHiddenSheetIndex == requestedIndex) {
-							processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
-							return;
-						}
-						nonHiddenSheetIndex++;
-					}
-				}
-				sheetCounter++;
-			}
-		} else {
-			String sheetName = options.getSheetName();
-			while (iter.hasNext()) {
-					try (InputStream stream = iter.next()) {
-						WorkBookSheet wbs = sheets.get(sheetCounter);
-						if (wbs.getState().equals("visible")) {
-							if (iter.getSheetName().equalsIgnoreCase(sheetName)) {
-							processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
-							return;
-						}
-					}
-				}
-				sheetCounter++;
-			}
-		}
-
-    }
+	    List<WorkBookSheet> sheets = wbch.getSheets();
+	    SheetIterator iter = (SheetIterator) workbookReader.getSheetsData();
+	    int sheetCounter = 0;
+	    if (options.getSheetName() == null) {
+	      int requestedIndex = options.sheetIndex();
+	      int nonHiddenSheetIndex = 0;
+	      while (iter.hasNext()) {
+	        try (InputStream stream = iter.next()) {
+	          WorkBookSheet wbs = sheets.get(sheetCounter);
+	          if (wbs.getState().equals("visible")) {
+	            if (nonHiddenSheetIndex == requestedIndex) {
+	              processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
+	              return;
+	            }
+	            nonHiddenSheetIndex++;
+	          }
+	        }
+	        sheetCounter++;
+	      }
+	    } else {
+	      String sheetName = options.getSheetName();
+	      while (iter.hasNext()) {
+	        try (InputStream stream = iter.next()) {
+	          WorkBookSheet wbs = sheets.get(sheetCounter);
+	          if (wbs.getState().equals("visible")) {
+	            if (iter.getSheetName().equalsIgnoreCase(sheetName)) {
+	              processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
+	              return;
+	            }
+	          }
+	        }
+	        sheetCounter++;
+	      }
+	    }
+	  }
 
     @SuppressWarnings("unchecked")
     private <T> void processSheet(StylesTable styles,
