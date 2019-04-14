@@ -27,6 +27,7 @@ public final class PoijiOptions {
     private DateTimeFormatter dateTimeFormatter;
     private Casting casting;
     private int headerStart;
+    private String sheetName;
 
     private PoijiOptions() {
         super();
@@ -144,6 +145,15 @@ public final class PoijiOptions {
         this.headerStart = headerStart;
         return this;
     }
+    
+    private PoijiOptions setSheetName(String sheetName) {
+        this.sheetName = sheetName;
+        return this;
+    }
+
+    public String getSheetName() {
+        return sheetName;
+    }
 
     public static class PoijiOptionsBuilder {
 
@@ -159,6 +169,7 @@ public final class PoijiOptions {
         private Casting casting = new DefaultCasting();
         private int headerStart = 0;
         private int skip = 0;
+        private String sheetName;
 
         private PoijiOptionsBuilder() {
         }
@@ -228,6 +239,7 @@ public final class PoijiOptions {
                     .setDatePattern(datePattern)
                     .setDateTimeFormatter(dateTimeFormatter)
                     .setSheetIndex(sheetIndex)
+                    .setSheetName(sheetName)
                     .setIgnoreHiddenSheets(ignoreHiddenSheets)
                     .setTrimCellValue(trimCellValue)
                     .setDateRegex(dateRegex)
@@ -247,6 +259,17 @@ public final class PoijiOptions {
                 throw new PoijiException("Sheet index must be greater than or equal to 0");
             }
             this.sheetIndex = sheetIndex;
+            return this;
+        }
+        
+        /**
+         * Set The sheet Name
+         * 
+         * @param sheetName
+         * @return
+         */	
+        public PoijiOptionsBuilder sheetName(String sheetName) {
+            this.sheetName = sheetName;
             return this;
         }
 
