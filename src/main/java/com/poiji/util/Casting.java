@@ -128,13 +128,24 @@ public final class Casting {
         if (options.getDateRegex() != null && !value.matches(options.getDateRegex())) {
             return defaultDate(options);
         } else {
-            try {
-                final SimpleDateFormat sdf = new SimpleDateFormat(options.datePattern());
-                sdf.setLenient(options.getDateLenient());
-                return sdf.parse(value);
-            } catch (ParseException e) {
-                return defaultDate(options);
+            String[] patterns = options.datePattern();
+            Date parsed = defaultDate(options);
+            for(String pattern:patterns) {
+                try {
+                    final SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+                    //bug
+                    if(patterns.length==1) {
+                        sdf.setLenient(options.getDateLenient());
+                    }else
+                    {
+                        sdf.setLenient(false);
+                    }
+                    return sdf.parse(value);
+                } catch (ParseException e) {
+                    continue;
+                }
             }
+            return parsed;
         }
     }
 
