@@ -1,16 +1,17 @@
 package com.poiji.bind;
 
 import com.poiji.bind.mapping.UnmarshallerHelper;
-import com.poiji.exception.IllegalCastException;
-import com.poiji.exception.InvalidExcelFileExtension;
-import com.poiji.exception.PoijiExcelType;
-import com.poiji.exception.PoijiException;
+import com.poiji.exception.*;
 import com.poiji.option.PoijiOptions;
 import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
 import com.poiji.util.Files;
+import org.apache.poi.hssf.OldExcelFormatException;
+import org.apache.poi.hssf.extractor.OldExcelExtractor;
+import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
+import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
+import org.apache.poi.util.IOUtils;
 
-import java.io.File;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -192,6 +193,15 @@ public final class Poiji {
         return list;
     }
 
+    public static synchronized <T> List<T> fromExcel(final InputStream inputStream,
+                                                     final Class<T> type,
+                                                     final PoijiOptions options){
+        final ArrayList<T> list = new ArrayList<>();
+        final Unmarshaller unmarshaller = deserializer(inputStream, options);
+        unmarshaller.unmarshal(type, list::add);
+        return list;
+    }
+
     /**
      * converts excel rows into a list of objects
      *
@@ -230,6 +240,65 @@ public final class Poiji {
             return UnmarshallerHelper.XSSFInstance(poijiFile, options);
         } else {
             throw new InvalidExcelFileExtension("Invalid file extension (" + extension + "), excepted .xls or .xlsx");
+        }
+    }
+
+    /***
+     *
+     * @param inputStream
+     * @return
+     * @see OldExcelExtractor
+     */
+    private static boolean checkIfOlderformat(InputStream inputStream)
+    {
+        try {
+            //if ctor failed will raise an error
+            OldExcelExtractor extractor = new OldExcelExtractor(inputStream);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private static Unmarshaller deserializer(final InputStream inputStream, final PoijiOptions options){
+        try {
+            byte[] buff = new byte[4096];
+
+            int bytesRead = 0;
+
+            ByteArrayOutputStream bao = new ByteArrayOutputStream();
+
+            while((bytesRead = inputStream.read(buff)) != -1) {
+                bao.write(buff, 0, bytesRead);
+            }
+
+            byte[] data = bao.toByteArray();
+
+            ByteArrayInputStream byteStream = new ByteArrayInputStream(data);
+
+            final PoijiInputStream poijiInputStream = new PoijiInputStream<>(byteStream);
+
+            // Ensure that there is at least some data there
+            byte[] header8 = IOUtils.peekFirst8Bytes(byteStream);
+
+            //https://poi.apache.org/components/poifs/index.html
+
+            if (NPOIFSFileSystem.hasPOIFSHeader(header8)) {
+
+                return UnmarshallerHelper.HSSFInstance(poijiInputStream, options);
+
+            } else if (DocumentFactoryHelper.hasOOXMLHeader(byteStream)) {
+
+                return UnmarshallerHelper.XSSFInstance(poijiInputStream, options);
+
+            }else if (checkIfOlderformat(inputStream)) {
+                throw new OldExcelFormatException("found old Excel file,not supported");
+            }
+            throw new InvalidExcelStreamException("invalid or unsupported Excel stream");
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
