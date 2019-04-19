@@ -8,6 +8,7 @@ import com.poiji.util.Files;
 import org.apache.poi.hssf.OldExcelFormatException;
 import org.apache.poi.hssf.extractor.OldExcelExtractor;
 import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
+import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.apache.poi.util.IOUtils;
 
@@ -243,24 +244,6 @@ public final class Poiji {
         }
     }
 
-    /***
-     *
-     * @param inputStream
-     * @return
-     * @see OldExcelExtractor
-     */
-    private static boolean checkIfOlderformat(InputStream inputStream)
-    {
-        try {
-            //if ctor failed will raise an error
-            OldExcelExtractor extractor = new OldExcelExtractor(inputStream);
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     private static Unmarshaller deserializer(final InputStream inputStream, final PoijiOptions options){
         try {
             byte[] buff = new byte[4096];
@@ -282,17 +265,18 @@ public final class Poiji {
             // Ensure that there is at least some data there
             byte[] header8 = IOUtils.peekFirst8Bytes(byteStream);
 
-            //https://poi.apache.org/components/poifs/index.html
-
-            if (NPOIFSFileSystem.hasPOIFSHeader(header8)) {
+            if (FileMagic.valueOf(header8) == FileMagic.OLE2) {
 
                 return UnmarshallerHelper.HSSFInstance(poijiInputStream, options);
 
-            } else if (DocumentFactoryHelper.hasOOXMLHeader(byteStream)) {
+            } else if (FileMagic.valueOf(header8) == FileMagic.OOXML) {
 
                 return UnmarshallerHelper.XSSFInstance(poijiInputStream, options);
 
-            }else if (checkIfOlderformat(inputStream)) {
+            }else if (FileMagic.valueOf(header8) == FileMagic.BIFF2
+                    ||FileMagic.valueOf(header8) == FileMagic.BIFF3
+                    ||FileMagic.valueOf(header8) == FileMagic.BIFF4
+            ) {
                 throw new OldExcelFormatException("found old Excel file,not supported");
             }
             throw new InvalidExcelStreamException("invalid or unsupported Excel stream");
