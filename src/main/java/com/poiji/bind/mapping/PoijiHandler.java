@@ -135,7 +135,11 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         int column = cellAddress.getColumn();
 
         if (row == 0) {
-            titles.put(formattedValue, column);
+        	if(options.trimTagName()) {
+                formattedValue = formattedValue.trim();
+            }
+        	
+        	titles.put(formattedValue, column);
         }
 
         if (row + 1 <= options.skip()) {

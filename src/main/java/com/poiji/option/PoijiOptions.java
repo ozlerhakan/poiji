@@ -16,8 +16,9 @@ public final class PoijiOptions {
     private int sheetIndex;
     private String password;
     private String dateRegex;
-    private String datePattern;
+    private String[] datePattern;
     private boolean dateLenient;
+    private boolean trimTagName;
     private boolean trimCellValue;
     private boolean ignoreHiddenSheets;
     private boolean preferNullOverDefault;
@@ -32,7 +33,7 @@ public final class PoijiOptions {
         return this;
     }
 
-    private PoijiOptions setDatePattern(String datePattern) {
+    private PoijiOptions setDatePattern(String[] datePattern) {
         this.datePattern = datePattern;
         return this;
     }
@@ -56,7 +57,7 @@ public final class PoijiOptions {
         return this;
     }
 
-    public String datePattern() {
+    public String[] datePattern() {
         return datePattern;
     }
 
@@ -86,7 +87,17 @@ public final class PoijiOptions {
         return this;
     }
 
-    public boolean trimCellValue() {
+    
+    public boolean trimTagName() {
+		return trimTagName;
+	}
+
+	public PoijiOptions setTrimTagName(boolean trimTagName) {
+		this.trimTagName = trimTagName;
+		return this;
+	}
+
+	public boolean trimCellValue() {
         return trimCellValue;
     }
 
@@ -129,10 +140,11 @@ public final class PoijiOptions {
         private String password;
         private String dateRegex;
         private boolean dateLenient;
+        private boolean trimTagName;
         private boolean trimCellValue;
         private boolean ignoreHiddenSheets;
         private boolean preferNullOverDefault;
-        private String datePattern = DEFAULT_DATE_PATTERN;
+        private String[] datePattern = DEFAULT_DATE_PATTERN;
         private DateTimeFormatter dateTimeFormatter = DEFAULT_DATE_TIME_FORMATTER;
 
         private PoijiOptionsBuilder() {
@@ -151,6 +163,7 @@ public final class PoijiOptions {
                     .setDateTimeFormatter(dateTimeFormatter)
                     .setSheetIndex(sheetIndex)
                     .setIgnoreHiddenSheets(ignoreHiddenSheets)
+                    .setTrimTagName(trimTagName)
                     .setTrimCellValue(trimCellValue)
                     .setDateRegex(dateRegex)
                     .setDateLenient(dateLenient);
@@ -179,7 +192,7 @@ public final class PoijiOptions {
          * @param datePattern date time formatter
          * @return this
          */
-        public PoijiOptionsBuilder datePattern(String datePattern) {
+        public PoijiOptionsBuilder datePattern(String ...datePattern) {
             this.datePattern = datePattern;
             return this;
         }
@@ -254,7 +267,19 @@ public final class PoijiOptions {
             return this;
         }
 
+        
         /**
+         * 
+         * Trim tag name
+         * @param trimTagName trim the tag name
+         * @return this 
+         */
+        public PoijiOptionsBuilder trimTagName(boolean trimTagName){
+        	this.trimTagName = trimTagName;
+        	return this;
+        }
+        
+        /**Name
          * Trim cell value
          *
          * @param trimCellValue trim the cell value before processing work book.
