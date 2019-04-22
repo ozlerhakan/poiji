@@ -1,18 +1,24 @@
 package com.poiji.bind;
 
 import com.poiji.bind.mapping.UnmarshallerHelper;
-import com.poiji.exception.*;
+
+import com.poiji.exception.InvalidExcelFileExtension;
+import com.poiji.exception.IllegalCastException;
+import com.poiji.exception.PoijiException;
+import com.poiji.exception.InvalidExcelStreamException;
+import com.poiji.exception.PoijiExcelType;
 import com.poiji.option.PoijiOptions;
 import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
 import com.poiji.util.Files;
 import org.apache.poi.hssf.OldExcelFormatException;
-import org.apache.poi.hssf.extractor.OldExcelExtractor;
-import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
 import org.apache.poi.poifs.filesystem.FileMagic;
-import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.apache.poi.util.IOUtils;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.File;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
