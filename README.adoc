@@ -1,9 +1,9 @@
 = Poiji
-:version: v1.8
+:version: v1.20.0
 
-image:https://travis-ci.org/ozlerhakan/poiji.svg?branch=master["Build Status", link="https://travis-ci.org/ozlerhakan/poiji"] image:https://api.codacy.com/project/badge/Grade/6587e90886184da29a1b7c5634695c9d["Codacy code quality", link="https://www.codacy.com/app/ozlerhakan/poiji?utm_source=github.com&utm_medium=referral&utm_content=ozlerhakan/poiji&utm_campaign=Badge_Grade"] image:https://coveralls.io/repos/github/ozlerhakan/poiji/badge.svg?branch=master["Coverage Status", link="https://coveralls.io/github/ozlerhakan/poiji?branch=master"] image:https://img.shields.io/badge/license-MIT-blue.svg[]
+image:https://travis-ci.org/ozlerhakan/poiji.svg?branch=master["Build Status", link="https://travis-ci.org/ozlerhakan/poiji"] image:https://api.codacy.com/project/badge/Grade/6587e90886184da29a1b7c5634695c9d["Codacy code quality", link="https://www.codacy.com/app/ozlerhakan/poiji?utm_source=github.com&utm_medium=referral&utm_content=ozlerhakan/poiji&utm_campaign=Badge_Grade"] image:https://coveralls.io/repos/github/ozlerhakan/poiji/badge.svg?branch=master["Coverage Status", link="https://coveralls.io/github/ozlerhakan/poiji?branch=master"] image:https://img.shields.io/badge/apache.poi-4.0.0-brightgreen.svg[] image:https://img.shields.io/badge/gitter-join%20chat-blue.svg["Gitter", link="https://gitter.im/poiji/Lobby"] image:https://img.shields.io/badge/license-MIT-blue.svg[]
 
-Poiji is a teeny Java framework that provides one way mapping from Excel sheets to Java classes. In a way it lets us convert each row of the specified excel data into Java objects. Poiji uses https://poi.apache.org/[Apache Poi] (the Java API for Microsoft Documents) under the hood to fulfill the mapping process.
+Poiji is a teeny Java library that provides one way mapping from Excel sheets to Java classes. In a way it lets us convert each row of the specified excel data into Java objects. Poiji uses https://poi.apache.org/[Apache Poi] (the Java API for Microsoft Documents) under the hood to fulfill the mapping process.
 
 == How it works
 
@@ -15,7 +15,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 <dependency>
   <groupId>com.github.ozlerhakan</groupId>
   <artifactId>poiji</artifactId>
-  <version>1.8</version>
+  <version>1.20.0</version>
 </dependency>
 ----
 
@@ -23,11 +23,42 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    compile 'com.github.ozlerhakan:poiji:1.8'
+    compile 'com.github.ozlerhakan:poiji:1.20.0'
 }
 ----
 
 You can find the latest and earlier development versions including javadoc and source files on https://oss.sonatype.org/content/groups/public/com/github/ozlerhakan/poiji/[Sonatypes OSS repository].
+
+.`Poiji.fromExcel` Structure
+----
+com.poiji.bind.Poiji#fromExcel(java.io.File, java.lang.Class<T>)
+com.poiji.bind.Poiji#fromExcel(java.io.File, java.lang.Class<T>, java.util.function.Consumer<? super T>)
+com.poiji.bind.Poiji#fromExcel(java.io.File, java.lang.Class<T>, com.poiji.option.PoijiOptions)
+com.poiji.bind.Poiji#fromExcel(java.io.File, java.lang.Class<T>, com.poiji.option.PoijiOptions, java.util.function.Consumer<? super T>)
+com.poiji.bind.Poiji#fromExcel(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>)
+com.poiji.bind.Poiji#fromExcel(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>, java.util.function.Consumer<? super T>)
+com.poiji.bind.Poiji#fromExcel(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>, com.poiji.option.PoijiOptions)
+com.poiji.bind.Poiji#fromExcel(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>, com.poiji.option.PoijiOptions, java.util.function.Consumer<? super T>)
+----
+
+.`PoijiOptions.PoijiOptionsBuilder` Structure
+----
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#settings()
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#build()
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#dateLenient(boolean)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#dateRegex(String)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#datePattern(String)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#dateTimeFormatter(java.time.format.DateTimeFormatter)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#ignoreHiddenSheets(boolean)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#password(String)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#preferNullOverDefault(boolean)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#settings(int)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#sheetIndex(int)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#skip(int)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#trimCellValue(boolean)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#headerStart(int)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#withCasting(Casting)
+----
 
 === Example 1
 
@@ -37,8 +68,11 @@ Create your object model:
 ----
 public class Employee {
 
-    @ExcelCell(0)                <1>
-    private long employeeId;     <2>
+    @ExcelRow                    <1>
+    private int rowIndex;
+
+    @ExcelCell(0)                <2>
+    private long employeeId;     <3>
 
     @ExcelCell(1)
     private String name;
@@ -60,7 +94,8 @@ public class Employee {
     @Override
     public String toString() {
         return "Employee{" +
-                "employeeId=" + employeeId +
+                "rowIndex=" + rowIndex +
+                ", employeeId=" + employeeId +
                 ", name='" + name + '\'' +
                 ", surname='" + surname + '\'' +
                 ", age=" + age +
@@ -70,8 +105,9 @@ public class Employee {
     }
 }
 ----
-<1> a field must be annotated with `@ExcelCell` along with its property in order to get the value from the right coordinate in the target excel sheet.
-<2> an annotated field can be either protected, private or public modifier. The field may be either of `boolean`, `int`, `long`, `float`, `double`, `java.util.Date` or `String`.
+<1> As of 1.10, optionally we can access the index of each row item by using the `ExcelRow` annotation. Annotated variable should be of type `int`, `double`, `float` or `long`.
+<2> A field must be annotated with `@ExcelCell` along with its property in order to get the value from the right coordinate in the target excel sheet.
+<3> An annotated field can be either protected, private or public modifier. The field may be either of `boolean`, `int`, `long`, `float`, `double`, or their wrapper classes. You can add a field of `java.util.Date`, `java.time.DateTime` and `String` as well.
 
 This is the excel file (`employees.xlsx`) we want to map to a list of `Employee` instance:
 
@@ -105,20 +141,24 @@ The snippet below shows how to obtain the excel data using `Poiji`.
 [source,java]
 ----
 List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class);
+// alternatively
+InputStream stream = new FileInputStream(new File("employees.xls"))
+List<Employee> employees = Poiji.fromExcel(stream, PoijiExcelType.XLS, Employee.class, options);
+
 employees.size();
 // 3
 Employee firstEmployee = employees.get(0);
-// Employee{employeeId=123923, name='Joe', surname='Doe', age=30, single=true, birthday='4/9/1987'}
+// Employee{rowIndex=1, employeeId=123923, name='Joe', surname='Doe', age=30, single=true, birthday='4/9/1987'}
 ----
 
-By default, Poiji ignores the first row of the excel data. You can override this behaviour by setting a `PoijiOptions`.
+By default, Poiji ignores the header row of the excel data. If you want to ignore the first row of data, you need to use `PoijiOptions`.
 
 [source,java]
 ----
-PoijiOptions options = PoijiOptionsBuilder.settings(2).build();
+PoijiOptions options = PoijiOptionsBuilder.settings(1).build(); // we eliminate Joe Doe.
 List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class, options);
 Employee firstEmployee = employees.get(0);
-// Employee{employeeId=123123, name='Sophie', surname='Derue', age=20, single=true, birthday='5/3/1997'}
+// Employee{rowIndex=2, employeeId=123123, name='Sophie', surname='Derue', age=20, single=true, birthday='5/3/1997'}
 ----
 
 By default, Poiji selects the first sheet of an excel file. You can override this behaviour like below:
@@ -139,9 +179,94 @@ PoijiOptions options = PoijiOptionsBuilder.settings()
                        .preferNullOverDefault(true) <1>
                        .build();
 ----
-1. Annotated date fields will have a `null` value, if the specified date pattern cannot be parsed.
+1. a field that is of type either `java.util.Date`, `Float`, `Double`, `Integer`, `Long` or `String` will have a `null` value.
+
+=== Encrypted Excel Files
+
+Consider that your excel file is protected with a password, you can define the password via `PoijiOptionsBuilder` to read rows:
+
+----
+PoijiOptions options = PoijiOptionsBuilder.settings()
+                    .password("1234")
+                    .build();
+List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class, options);
+----
 
 === Example 2
+
+The version `1.11` introduces a new annotation called `ExcelCellName` so that we can read the values by column names directly.
+
+[source,java]
+----
+public class Person {
+
+    @ExcelCellName("Name")  <1>
+    protected String name;
+
+    @ExcelCellName("Address")
+    protected String address;
+
+    @ExcelCellName("Age")
+    protected int age;
+
+    @ExcelCellName("Email")
+    protected String email;
+
+}
+----
+1. We need to specify the `name` of the column for which the corresponding value is looked. `@ExcelCellName` is case-sensitive and the excel file should't contain duplicated column names.
+
+For example, here is the excel (`person.xls`) file we want to use:
+
+|===
+| Name |Address |Age |Email
+
+|Joe
+|San Francisco, CA
+|30
+|joe@doe.com
+
+|Sophie
+|Costa Mesa, CA
+|20
+|sophie@doe.com
+
+|===
+
+[source,java]
+----
+List<Person> people = Poiji.fromExcel(new File("person.xls"), Person.class);
+people.size();
+// 2
+Person person = people.get(0);
+// Joe
+// San Francisco, CA
+// 30
+// joe@doe.com
+----
+
+Given that the first column always stands for the names of people, you're able to combine the `ExcelCell` annotation with `ExcelCellName` in your object model:
+
+[source,java]
+----
+public class Person {
+
+    @ExcelCell(0)
+    protected String name;
+
+    @ExcelCellName("Address")
+    protected String address;
+
+    @ExcelCellName("Age")
+    protected int age;
+
+    @ExcelCellName("Email")
+    protected String email;
+
+}
+----
+
+=== Example 3
 
 Your object model may be derived from a super class:
 
@@ -190,7 +315,192 @@ Car car = cars.get(0);
 // 4
 ----
 
-=== Try with JShell
+=== Example 4
+
+Consider you have a table like below:
+
+|===
+3+|Group A 3+| Group B
+|NameA | AgeA | CityA | NameB | AgeB | CityB
+
+|John Doe
+|21
+|Vienna
+|Smith Michael
+|32
+|McLean
+
+|Jane Doe
+|28
+|Greenbelt
+|Sean Paul
+|25
+|Los Angeles
+
+|Paul Ryan
+|19
+|Alexandria
+|John Peter
+|25
+|Vienna
+
+|Peter Pan
+|23
+|Alexandria
+|Arnold Regan
+|35
+|Seattle
+
+|===
+
+The new `ExcelCellRange` annotation (as of 1.19) lets us aggregate a range of information in one object model. In this case, we collect the details of the first person in `classA` and for second person in `classB`:
+
+[source,java]
+----
+public class Groups {
+
+  @ExcelCellRange
+  private GroupA groupA;
+
+  @ExcelCellRange
+  private GroupB groupB;
+
+}
+----
+
+[source, java]
+----
+public class GroupA {
+
+    @ExcelCellName("NameA")
+    private String name;
+
+    @ExcelCellName("AgeA")
+    private Integer age;
+
+    @ExcelCellName("CityA")
+    private String city;
+
+}
+
+public class GroupB {
+
+    @ExcelCellName("NameB")
+    private String name;
+
+    @ExcelCellName("AgeB")
+    private Integer age;
+
+    @ExcelCellName("CityB")
+    private String city;
+}
+----
+
+Using the conventional way, we can retrieve the data using `Poiji.fromExcel`:
+
+[source,java]
+----
+PoijiOptions options = PoijiOptionsBuilder.settings().headerStart(1).build(); // header starts at 1 (zero-based).
+List<Groups> groups = Poiji.fromExcel(new File(excel), Groups.class, options);
+
+Groups firstRowGroups = actualGroups.get(0);
+
+GroupA firstRowPerson1 = firstRowGroups.getGroupA();
+GroupB secondRowPerson2 = firstRowGroups.getGroupB();
+----
+
+=== Example 5
+
+As of 1.14, Poiji supports Consumer Interface. As https://github.com/ozlerhakan/poiji/pull/39#issuecomment-409521808[@fmarazita] explained the usage, there are several benefits of having a Consumer:
+
+1. Huge excel file ( without you have all in memory)
+2. Run time processing/filtering data
+3. DB batch insertion
+
+For example, we have a Calculation entity class and want to insert each row into a database while retrieving:
+
+[source, java]
+----
+class Calculation {
+
+  @ExcelCell(0)
+  String name
+
+  @ExcelCell(1)
+  int a
+
+  @ExcelCell(2)
+  int b
+
+  public int getA(){
+    return a;
+  }
+
+  public int getB(){
+    return b;
+  }
+
+  public int getName(){
+    return name;
+  }
+
+}
+----
+
+[source, java]
+----
+File fileCalculation = new File(example.xlsx);
+
+PoijiOptions options = PoijiOptionsBuilder.settings().sheetIndex(1).build();
+
+Poiji.fromExcel(fileCalculation, Calculation.class, options, this::dbInsertion);
+
+private void dbInsertion(Calculation siCalculation) {
+  int value= siCalculation.getA() + siCalculation.getB();
+  String name = siCalculation.getName();
+  insertDB(name , value);
+}
+----
+
+=== Example 6
+
+Since Poiji 1.19.1, you can create your own casting implementation without relying on the default Poiji casting configuration using the `Casting` interface.
+
+[source,java]
+----
+public class MyCasting implements Casting {
+    @Override
+    public Object castValue(Class<?> fieldType, String value, PoijiOptions options) {
+       return value.trim();
+    }
+}
+
+public class Person {
+
+    @ExcelCell(0)
+    protected String employeeId;
+
+    @ExcelCell(1)
+    protected String name;
+
+    @ExcelCell(2)
+    protected String surname;
+
+}
+----
+
+Then you can add your custom implementation with the `withCasting` method:
+
+[source,java]
+----
+ PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .withCasting(new MyCasting())
+                .build();
+
+List<Person> people = Poiji.fromExcel(excel, Person.class, options);
+----
+
+== Try with JShell
 
 Since we have a new pedagogic tool, Java 9 REPL, you can try Poiji in JShell. Clone the repo and follow the steps below. JShell should open up a new jshell session once loading the startup scripts and the specified jars that must be in the classpath. You must first import and create related packages and classes before using Poiji. We are able to use directly Poiji and Employee classes because they are already imported from `jshell/snippets` with `try-with-jshell.sh`.
 
@@ -208,6 +518,11 @@ Employee{employeeId=123923, name='Joe', surname='Doe', age=30, single=true, birt
 Employee{employeeId=123123, name='Sophie', surname='Derue', age=20, single=false, birthday='5/3/1997'}
 Employee{employeeId=135923, name='Paul', surname='Raul', age=31, single=false, birthday='4/9/1986'}
 ----
+
+== Stargazers over time
+
+image:https://starcharts.herokuapp.com/ozlerhakan/poiji.svg["Stargazers over time", link="https://starcharts.herokuapp.com/ozlerhakan/poiji"]
+
 
 == License
 

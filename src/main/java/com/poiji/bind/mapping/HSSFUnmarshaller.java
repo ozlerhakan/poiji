@@ -1,11 +1,14 @@
 package com.poiji.bind.mapping;
 
 import com.poiji.annotation.ExcelCell;
+import com.poiji.annotation.ExcelCellName;
+import com.poiji.annotation.ExcelCellRange;
+import com.poiji.annotation.ExcelRow;
+import com.poiji.bind.Unmarshaller;
+import com.poiji.config.Casting;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.PoijiInstantiationException;
-import com.poiji.bind.PoijiWorkbook;
 import com.poiji.option.PoijiOptions;
-import com.poiji.util.Casting;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -15,50 +18,86 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
+
+import static java.lang.String.valueOf;
 
 /**
  * This is the main class that converts the excel sheet fromExcel Java object
  * Created by hakan on 16/01/2017.
  */
-final class HSSFUnmarshaller extends Unmarshaller {
+abstract class HSSFUnmarshaller implements Unmarshaller {
 
     private final DataFormatter dataFormatter;
-    private final PoijiOptions options;
-    private final PoijiWorkbook poijiWorkbook;
+    protected final PoijiOptions options;
     private final Casting casting;
+    private Map<String, Integer> titles;
 
-    HSSFUnmarshaller(final PoijiWorkbook poijiWorkbook, PoijiOptions options) {
-        this.poijiWorkbook = poijiWorkbook;
+    HSSFUnmarshaller(PoijiOptions options) {
         this.options = options;
         dataFormatter = new DataFormatter();
-        casting = Casting.getInstance();
+        titles = new HashMap<>();
+        casting = options.getCasting();
     }
 
-    public <T> List<T> unmarshal(Class<T> type) {
-        Workbook workbook = poijiWorkbook.workbook();
-        Sheet sheet = workbook.getSheetAt(options.sheetIndex());
+    @Override
+    public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
+        Workbook workbook = workbook();
+
+        Sheet sheet = this.getSheetToProcess(workbook, options);
 
         int skip = options.skip();
         int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
-        List<T> list = new ArrayList<>(maxPhysicalNumberOfRows);
+
+        loadColumnTitles(sheet, maxPhysicalNumberOfRows);
 
         for (Row currentRow : sheet) {
-
-            if (skip(currentRow, skip))
-                continue;
-
-            if (isRowEmpty(currentRow))
-                continue;
-
-            if (maxPhysicalNumberOfRows > list.size()) {
+            if (!skip(currentRow, skip) && !isRowEmpty(currentRow)) {
                 T t = deserialize0(currentRow, type);
-                list.add(t);
+                consumer.accept(t);
             }
         }
+    }
 
-        return list;
+    private Sheet getSheetToProcess(Workbook workbook, PoijiOptions options) {
+        int nonHiddenSheetIndex = 0;
+        int requestedIndex = options.sheetIndex();
+        Sheet sheet = null;
+        if (options.ignoreHiddenSheets()) {
+          for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+            if (!workbook.isSheetHidden(i) && !workbook.isSheetVeryHidden(i)) {
+              if (options.getSheetName() == null) {
+                if (nonHiddenSheetIndex == requestedIndex) {
+                  return workbook.getSheetAt(i);
+                }
+              } else {
+                if (workbook.getSheetName(i).equalsIgnoreCase(options.getSheetName())) {
+                  return workbook.getSheetAt(i);
+                }
+              }
+              nonHiddenSheetIndex++;
+            }
+          }
+        } else {
+          if (options.getSheetName() == null) {
+            sheet = workbook.getSheetAt(requestedIndex);
+          } else {
+            sheet = workbook.getSheet(options.getSheetName());
+          }
+        }
+        return sheet;
+      }
+
+    private void loadColumnTitles(Sheet sheet, int maxPhysicalNumberOfRows) {
+        if (maxPhysicalNumberOfRows > 0) {
+            int row = options.getHeaderStart();
+            Row firstRow = sheet.getRow(row);
+            for (Cell cell : firstRow) {
+                titles.put(cell.getStringCellValue(), cell.getColumnIndex());
+            }
+        }
     }
 
     private <T> T deserialize0(Row currentRow, Class<T> type) {
@@ -74,28 +113,65 @@ final class HSSFUnmarshaller extends Unmarshaller {
 
     private <T> T tailSetFieldValue(Row currentRow, Class<? super T> type, T instance) {
         for (Field field : type.getDeclaredFields()) {
-
-            ExcelCell index = field.getAnnotation(ExcelCell.class);
-            if (index != null) {
-                Class<?> fieldType = field.getType();
-                Cell cell = currentRow.getCell(index.value());
-
+            ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
+            if (excelRow != null) {
                 Object o;
-                if (cell != null) {
-                    String value = dataFormatter.formatCellValue(cell);
-                    o = casting.castValue(fieldType, value, options);
-                } else {
-                    o = casting.castValue(fieldType, "", options);
-                }
+                o = casting.castValue(field.getType(), valueOf(currentRow.getRowNum()), options);
+                setFieldData(instance, field, o);
+            }
+            ExcelCellRange excelCellRange = field.getAnnotation(ExcelCellRange.class);
+            if (excelCellRange != null) {
+                Class<?> o = field.getType();
+                Object ins;
                 try {
-                    field.setAccessible(true);
-                    field.set(instance, o);
-                } catch (IllegalAccessException e) {
-                    throw new IllegalCastException("Unexpected cast type {" + o + "} of field" + field.getName());
+                    ins = o.getDeclaredConstructor().newInstance();
+                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
+                    throw new PoijiInstantiationException("Cannot create a new instance of " + o.getName());
                 }
+                for (Field f : o.getDeclaredFields()) {
+                    tailSetFieldValue(currentRow, ins, f);
+                }
+                setFieldData(instance, field, ins);
+            } else {
+                tailSetFieldValue(currentRow, instance, field);
             }
         }
         return instance;
+    }
+
+    private <T> void tailSetFieldValue(Row currentRow, T instance, Field field) {
+        ExcelCell index = field.getAnnotation(ExcelCell.class);
+        if (index != null) {
+            constructTypeValue(currentRow, instance, field, index.value());
+        } else {
+            ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
+            if (excelCellName != null) {
+                Integer titleColumn = titles.get(excelCellName.value());
+                if (titleColumn != null) {
+                    constructTypeValue(currentRow, instance, field, titleColumn);
+                }
+            }
+        }
+    }
+
+    private <T> void constructTypeValue(Row currentRow, T instance, Field field, int column) {
+        Class<?> fieldType = field.getType();
+        Cell cell = currentRow.getCell(column);
+
+        if (cell != null) {
+            String value = dataFormatter.formatCellValue(cell);
+            Object o = casting.castValue(fieldType, value, options);
+            setFieldData(instance, field, o);
+        }
+    }
+
+    private <T> void setFieldData(T instance, Field field, Object o) {
+        try {
+            field.setAccessible(true);
+            field.set(instance, o);
+        } catch (IllegalAccessException e) {
+            throw new IllegalCastException("Unexpected cast type {" + o + "} of field" + field.getName());
+        }
     }
 
     private <T> T setFieldValue(Row currentRow, Class<? super T> subclass, T instance) {
@@ -111,9 +187,12 @@ final class HSSFUnmarshaller extends Unmarshaller {
     private boolean isRowEmpty(Row row) {
         for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
             Cell cell = row.getCell(c, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-            if (cell != null && cell.getCellTypeEnum() != CellType.BLANK)
+            if (cell != null && cell.getCellType() != CellType.BLANK) {
                 return false;
+            }
         }
         return true;
     }
+
+    protected abstract Workbook workbook();
 }
