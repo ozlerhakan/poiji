@@ -46,6 +46,7 @@
 
     <properties>
         <apache.poi.version>4.0.0</apache.poi.version>
+        <apache.commons.compress.version>1.18</apache.commons.compress.version>
         <junit.version>4.12</junit.version>
         <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -63,6 +64,11 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>${apache.poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>${apache.commons.compress.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
