@@ -102,7 +102,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         // For ExcelRow annotation
         if(columnToField.containsKey(-1)) {
             Field field = columnToField.get(-1);
-            Object o = casting.castValue(field.getType(), valueOf(internalCount), options);
+            Object o = casting.castValue(field.getType(), valueOf(internalCount), internalCount, -1, options);
             setFieldData(field, o, instance);
         }
         if(columnToField.containsKey(column)) {
@@ -123,7 +123,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
             ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
             if (excelRow != null) {
-                Object o = casting.castValue(field.getType(), valueOf(internalCount), options);
+                Object o = casting.castValue(field.getType(), valueOf(internalCount), internalCount, -1, options);
                 setFieldData(field, o, instance);
                 columnToField.put(-1, field);
             }
@@ -154,7 +154,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
            if (index != null) {
                Class<?> fieldType = field.getType();
                if (column == index.value()) {
-                   Object o = casting.castValue(fieldType, content, options);
+                   Object o = casting.castValue(fieldType, content, internalCount, column, options);
                    setFieldData(field, o, ins);
                }
            } else {
@@ -164,7 +164,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                    Integer titleColumn = titles.get(excelCellName.value() );
                    //Fix both columns mapped to name passing this condition below
                    if (titleColumn != null && titleColumn == column) {
-                       Object o = casting.castValue(fieldType, content, options);
+                       Object o = casting.castValue(fieldType, content, internalCount, column, options);
                        setFieldData(field, o, ins);
                        return true;
                    }

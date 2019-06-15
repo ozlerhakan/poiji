@@ -9,12 +9,7 @@ import com.poiji.config.Casting;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.PoijiInstantiationException;
 import com.poiji.option.PoijiOptions;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -116,7 +111,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
             ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
             if (excelRow != null) {
                 Object o;
-                o = casting.castValue(field.getType(), valueOf(currentRow.getRowNum()), options);
+                o = casting.castValue(field.getType(), valueOf(currentRow.getRowNum()), currentRow.getRowNum(), -1, options);
                 setFieldData(instance, field, o);
             }
             ExcelCellRange excelCellRange = field.getAnnotation(ExcelCellRange.class);
@@ -160,7 +155,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
 
         if (cell != null) {
             String value = dataFormatter.formatCellValue(cell);
-            Object o = casting.castValue(fieldType, value, options);
+            Object o = casting.castValue(fieldType, value, currentRow.getRowNum(), column, options);
             setFieldData(instance, field, o);
         }
     }
