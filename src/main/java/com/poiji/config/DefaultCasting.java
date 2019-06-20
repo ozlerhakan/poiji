@@ -7,88 +7,129 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by hakan on 22/01/2017.
  */
 public final class DefaultCasting implements Casting {
+    private final boolean errorLoggingEnabled;
 
-    private int primitiveIntegerValue(String value) {
+    private final List<DefaultCastingError> errors = new ArrayList<DefaultCastingError>();
+
+    public DefaultCasting() {
+        this(false);
+    }
+
+    public DefaultCasting(boolean errorLoggingEnabled) {
+        this.errorLoggingEnabled = errorLoggingEnabled;
+    }
+
+    private void logError(String value, Object defaultValue, String sheetName, int row, int col, Exception exception) {
+        if (errorLoggingEnabled) {
+            errors.add(new DefaultCastingError(value, defaultValue, sheetName, row, col, exception));
+        }
+    }
+
+    private int primitiveIntegerValue(String value, String sheetName, int row, int col) {
         try {
             return new Integer(value);
         } catch (NumberFormatException nfe) {
-            return 0;
+            int defaultValue = 0;
+
+            logError(value, defaultValue, sheetName, row, col, nfe);
+
+            return defaultValue;
         }
     }
 
-    private Integer integerValue(String value, PoijiOptions options) {
+    private Integer integerValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
             return new Integer(value);
         } catch (NumberFormatException nfe) {
-            if (Boolean.TRUE.equals(options.preferNullOverDefault())) {
-                return null;
-            }
-            return 0;
+            Integer defaultValue = Boolean.TRUE.equals(options.preferNullOverDefault()) ? null : 0;
+
+            logError(value, defaultValue, sheetName, row, col, nfe);
+
+            return defaultValue;
         }
     }
 
-    private long primitiveLongValue(String value) {
+    private long primitiveLongValue(String value, String sheetName, int row, int col) {
         try {
             return new Long(value);
         } catch (NumberFormatException nfe) {
-            return 0L;
+            long defaultValue = 0L;
+
+            logError(value, defaultValue, sheetName, row, col, nfe);
+
+            return defaultValue;
         }
     }
 
-    private Long longValue(String value, PoijiOptions options) {
+    private Long longValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
             return new Long(value);
         } catch (NumberFormatException nfe) {
-            if (Boolean.TRUE.equals(options.preferNullOverDefault())) {
-                return null;
-            }
-            return 0L;
+            Long defaultValue = Boolean.TRUE.equals(options.preferNullOverDefault()) ? null : 0L;
+
+            logError(value, defaultValue, sheetName, row, col, nfe);
+
+            return defaultValue;
         }
     }
 
-    private double primitiveDoubleValue(String value) {
+    private double primitiveDoubleValue(String value, String sheetName, int row, int col) {
         try {
             return new Double(value);
         } catch (NumberFormatException nfe) {
-            return 0d;
+            double defaultValue = 0d;
+
+            logError(value, defaultValue, sheetName, row, col, nfe);
+
+            return defaultValue;
         }
     }
 
-    private Double doubleValue(String value, PoijiOptions options) {
+    private Double doubleValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
             return new Double(value);
         } catch (NumberFormatException nfe) {
-            if (Boolean.TRUE.equals(options.preferNullOverDefault())) {
-                return null;
-            }
-            return 0d;
+            Double defaultValue = Boolean.TRUE.equals(options.preferNullOverDefault()) ? null : 0d;
+
+            logError(value, defaultValue, sheetName, row, col, nfe);
+
+            return defaultValue;
         }
     }
 
-    private float primitiveFloatValue(String value) {
+    private float primitiveFloatValue(String value, String sheetName, int row, int col) {
         try {
             return new Float(value);
         } catch (NumberFormatException nfe) {
-            return 0f;
+            float defaultValue = 0f;
+
+            logError(value, defaultValue, sheetName, row, col, nfe);
+
+            return defaultValue;
         }
     }
 
-    private Float floatValue(String value, PoijiOptions options) {
+    private Float floatValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
             return new Float(value);
         } catch (NumberFormatException nfe) {
-            if (Boolean.TRUE.equals(options.preferNullOverDefault())) {
-                return null;
-            }
-            return 0f;
+            Float defaultValue = Boolean.TRUE.equals(options.preferNullOverDefault()) ? null : 0f;
+
+            logError(value, defaultValue, sheetName, row, col, nfe);
+
+            return defaultValue;
         }
     }
 
@@ -107,19 +148,20 @@ public final class DefaultCasting implements Casting {
         return LocalDate.now();
     }
 
-    private BigDecimal bigDecimalValue(String value, PoijiOptions options) {
+    private BigDecimal bigDecimalValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
             String clean = value != null ? value.replace(",", ".") : "";
             return new BigDecimal(clean);
         } catch (NumberFormatException nfe) {
-            if (Boolean.TRUE.equals(options.preferNullOverDefault())) {
-                return null;
-            }
-            return BigDecimal.ZERO;
+            BigDecimal defaultValue = Boolean.TRUE.equals(options.preferNullOverDefault()) ? null : BigDecimal.ZERO;
+
+            logError(value, defaultValue, sheetName, row, col, nfe);
+
+            return defaultValue;
         }
     }
 
-    private Date dateValue(String value, PoijiOptions options) {
+    private Date dateValue(String value, String sheetName, int row, int col, PoijiOptions options) {
 
         //ISSUE #57
         //if a date regex has been specified then it wont be null
@@ -137,12 +179,16 @@ public final class DefaultCasting implements Casting {
                 sdf.setLenient(options.getDateLenient());
                 return sdf.parse(value);
             } catch (ParseException e) {
-                return defaultDate(options);
+                Date defaultValue = defaultDate(options);
+
+                logError(value, defaultValue, sheetName, row, col, e);
+
+                return defaultValue;
             }
         }
     }
 
-    private LocalDate localDateValue(String value, PoijiOptions options) {
+    private LocalDate localDateValue(String value, String sheetName, int row, int col, PoijiOptions options) {
 
         //ISSUE #57
         //if a date regex has been specified then it wont be null
@@ -158,20 +204,41 @@ public final class DefaultCasting implements Casting {
             try {
                 return LocalDate.parse(value, options.dateTimeFormatter());
             } catch (DateTimeParseException e) {
-                return defaultLocalDate(options);
+                LocalDate defaultValue = defaultLocalDate(options);
+
+                logError(value, defaultValue, sheetName, row, col, e);
+
+                return defaultValue;
             }
         }
     }
 
-    private Object enumValue(String value, Class type) {
-        return Arrays
+    private Object enumValue(String value, String sheetName, int row, int col, Class type) {
+        Optional<Object> object = Arrays
                 .stream(type.getEnumConstants())
                 .filter(o -> ((Enum) o).name().equals(value))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
+
+        if (object.isPresent()) {
+            return object.get();
+        } else {
+            Object defaultValue = null;
+
+            IllegalArgumentException exception = new IllegalArgumentException("No enumeration " + type.getSimpleName() + "." + value);
+
+            logError(value, defaultValue, sheetName, row, col, exception);
+
+            return defaultValue;
+        }
     }
 
     public Object castValue(Class<?> fieldType, String value, PoijiOptions options) {
+        return castValue(fieldType, value, -1, -1, options);
+    }
+
+    public Object castValue(Class<?> fieldType, String value, int row, int col, PoijiOptions options) {
+
+        String sheetName = options.getSheetName();
 
         if (options.trimCellValue()) {
             value = value.trim();
@@ -180,43 +247,43 @@ public final class DefaultCasting implements Casting {
         Object o = value;
 
         if (fieldType.getName().equals("int")) {
-            o = primitiveIntegerValue(value);
+            o = primitiveIntegerValue(value, sheetName, row, col);
 
         } else if (fieldType.getName().equals("java.lang.Integer")) {
-            o = integerValue(value, options);
+            o = integerValue(value, sheetName, row, col, options);
 
         } else if (fieldType.getName().equals("java.math.BigDecimal")) {
-            o = bigDecimalValue(value, options);
+            o = bigDecimalValue(value, sheetName, row, col, options);
 
         } else if (fieldType.getName().equals("long")) {
-            o = primitiveLongValue(value);
+            o = primitiveLongValue(value, sheetName, row, col);
 
         } else if (fieldType.getName().equals("java.lang.Long")) {
-            o = longValue(value, options);
+            o = longValue(value, sheetName, row, col, options);
 
         } else if (fieldType.getName().equals("double")) {
-            o = primitiveDoubleValue(value);
+            o = primitiveDoubleValue(value, sheetName, row, col);
 
         } else if (fieldType.getName().equals("java.lang.Double")) {
-            o = doubleValue(value, options);
+            o = doubleValue(value, sheetName, row, col, options);
 
         } else if (fieldType.getName().equals("float")) {
-            o = primitiveFloatValue(value);
+            o = primitiveFloatValue(value, sheetName, row, col);
 
         } else if (fieldType.getName().equals("java.lang.Float")) {
-            o = floatValue(value, options);
+            o = floatValue(value, sheetName, row, col, options);
 
         } else if (fieldType.getName().equals("boolean") || fieldType.getName().equals("java.lang.Boolean")) {
             o = Boolean.valueOf(value);
 
         } else if (fieldType.getName().equals("java.util.Date")) {
-            o = dateValue(value, options);
+            o = dateValue(value, sheetName, row, col, options);
 
         } else if (fieldType.getName().equals("java.time.LocalDate")) {
-            o = localDateValue(value, options);
+            o = localDateValue(value, sheetName, row, col, options);
 
         } else if (fieldType.isEnum()) {
-            o = enumValue(value, fieldType);
+            o = enumValue(value, sheetName, row, col, fieldType);
 
         } else {
             if (value.isEmpty()) {
@@ -230,5 +297,64 @@ public final class DefaultCasting implements Casting {
             }
         }
         return o;
+    }
+
+    public boolean isErrorLoggingEnabled() {
+        return errorLoggingEnabled;
+    }
+
+    public List<DefaultCastingError> getErrors() {
+        if (errorLoggingEnabled) {
+            return Collections.unmodifiableList(errors);
+        } else {
+            throw new IllegalStateException("logging not enabled");
+        }
+    }
+
+    public static final class DefaultCastingError {
+        private String value;
+
+        private Object defaultValue;
+
+        private String sheetName;
+
+        private int row;
+
+        private int column;
+
+        private Exception exception;
+
+        DefaultCastingError(String value, Object defaultValue, String sheetName, int row, int column, Exception exception) {
+            this.value = value;
+            this.defaultValue = defaultValue;
+            this.sheetName = sheetName;
+            this.row = row;
+            this.column = column;
+            this.exception = exception;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public Object getDefaultValue() {
+            return defaultValue;
+        }
+
+        public String getSheetName() {
+            return sheetName;
+        }
+
+        public int getRow() {
+            return row;
+        }
+
+        public int getColumn() {
+            return column;
+        }
+
+        public Exception getException() {
+            return exception;
+        }
     }
 }

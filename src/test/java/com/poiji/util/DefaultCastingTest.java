@@ -12,6 +12,7 @@ import java.util.Date;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
@@ -29,6 +30,12 @@ public class DefaultCastingTest {
     public void getInstance() {
 
         assertNotNull(casting);
+        assertFalse(casting.isErrorLoggingEnabled());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void loggingDisabledException() {
+        casting.getErrors();
     }
 
     @Test
