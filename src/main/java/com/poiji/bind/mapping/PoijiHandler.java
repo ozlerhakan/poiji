@@ -12,6 +12,7 @@ import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.usermodel.XSSFComment;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -56,7 +57,11 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     private <T> T newInstanceOf(Class<T> type) {
         T newInstance;
         try {
-            newInstance = type.getDeclaredConstructor().newInstance();
+            Constructor<T> constructor = type.getDeclaredConstructor();
+            if (!constructor.isAccessible()) {
+                constructor.setAccessible(true);
+            }
+            newInstance = constructor.newInstance();
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
             throw new IllegalCastException("Cannot create a new instance of " + type.getName());
         }
