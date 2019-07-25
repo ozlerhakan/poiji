@@ -9,6 +9,8 @@ import com.poiji.config.Casting;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.PoijiInstantiationException;
 import com.poiji.option.PoijiOptions;
+import com.poiji.util.ReflectUtil;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -101,13 +103,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     }
 
     private <T> T deserialize0(Row currentRow, Class<T> type) {
-        T instance;
-        try {
-            instance = type.getDeclaredConstructor().newInstance();
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
-            throw new PoijiInstantiationException("Cannot create a new instance of " + type.getName());
-        }
-
+        T instance = ReflectUtil.newInstanceOf(type);
         return setFieldValue(currentRow, type, instance);
     }
 
@@ -122,12 +118,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
             ExcelCellRange excelCellRange = field.getAnnotation(ExcelCellRange.class);
             if (excelCellRange != null) {
                 Class<?> o = field.getType();
-                Object ins;
-                try {
-                    ins = o.getDeclaredConstructor().newInstance();
-                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
-                    throw new PoijiInstantiationException("Cannot create a new instance of " + o.getName());
-                }
+                Object ins = ReflectUtil.newInstanceOf(o);
                 for (Field f : o.getDeclaredFields()) {
                     tailSetFieldValue(currentRow, ins, f);
                 }

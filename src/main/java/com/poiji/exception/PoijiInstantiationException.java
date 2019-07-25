@@ -9,4 +9,8 @@ public final class PoijiInstantiationException extends PoijiException {
         super(message);
     }
 
+    public PoijiInstantiationException(String message, Exception cause) {
+        super(message, cause);
+    }
+
 }

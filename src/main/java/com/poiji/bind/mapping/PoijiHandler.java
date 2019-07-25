@@ -8,6 +8,8 @@ import com.poiji.config.Casting;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.PoijiInstantiationException;
 import com.poiji.option.PoijiOptions;
+import com.poiji.util.ReflectUtil;
+
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.usermodel.XSSFComment;
@@ -53,17 +55,6 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         columnToSuperClassField = new HashMap<>();
     }
 
-    private <T> T newInstanceOf(Class<T> type) {
-        T newInstance;
-        try {
-            newInstance = type.getDeclaredConstructor().newInstance();
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
-            throw new IllegalCastException("Cannot create a new instance of " + type.getName());
-        }
-
-        return newInstance;
-    }
-
     private void setFieldValue(String content, Class<? super T> subclass, int column) {
         if (subclass != Object.class) {
             if(setValue(content, subclass, column)) {
@@ -78,16 +69,11 @@ final class PoijiHandler<T> implements SheetContentsHandler {
      * **/
     private Object getInstance(Field field) {
         Object ins = null;
-        try {
-            if (fieldInstances.containsKey(field.getName())) {
-                ins = fieldInstances.get(field.getName());
-            } else {
-                ins = field.getType().getDeclaredConstructor().newInstance();
-                fieldInstances.put(field.getName(), ins);
-            }
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException
-                | InstantiationException e) {
-            throw new PoijiInstantiationException("Cannot create a new instance of " + type.getName());
+        if (fieldInstances.containsKey(field.getName())) {
+            ins = fieldInstances.get(field.getName());
+        } else {
+            ins = ReflectUtil.newInstanceOf(field.getType());
+            fieldInstances.put(field.getName(), ins);
         }
         return ins;
     }
@@ -185,7 +171,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     @Override
     public void startRow(int rowNum) {
         if (rowNum + 1 > options.skip()) {
-            instance = newInstanceOf(type);
+            instance = ReflectUtil.newInstanceOf(type);
             fieldInstances = new HashMap<>();
         }
     }
