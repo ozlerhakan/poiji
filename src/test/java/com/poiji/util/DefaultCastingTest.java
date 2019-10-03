@@ -17,6 +17,7 @@ import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class DefaultCastingTest {
 
@@ -142,6 +143,20 @@ public class DefaultCastingTest {
 
         assertEquals(expectedDate, actualDate);
     }
+
+    @Test
+    public void castLocalDateUnmatchedDateRegex()  {
+
+        PoijiOptions options = PoijiOptionsBuilder.settings()
+                .dateRegex("\\d{2}\\/\\d{2}\\/\\d{4}")
+                .preferNullOverDefault(true)
+                .build();
+
+        LocalDate testLocalDate = (LocalDate) casting.castValue(LocalDate.class, "05-01-2016", options);
+
+        assertNull(testLocalDate);
+    }
+
 
     @Test
     public void castEnum() {

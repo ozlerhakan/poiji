@@ -8,7 +8,7 @@ import java.text.NumberFormat;
 public class Parsers {
 
     private Parsers() {
-        super();
+        // static factory
     }
 
     public static NumberParser longs() {
