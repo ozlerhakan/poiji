@@ -1,4 +1,4 @@
-package com.poiji.parer;
+package com.poiji.parser;
 
 import java.text.NumberFormat;
 import java.text.ParsePosition;
@@ -11,7 +11,7 @@ public class NumberParser implements Parser<Number> {
         this.numberFormat = numberFormat;
     }
 
-    public Number parse(String value) throws NumberFormatException {
+    public Number parse(String value) {
         return parseNumber(value, numberFormat);
     }
 

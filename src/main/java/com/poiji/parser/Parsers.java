@@ -1,4 +1,4 @@
-package com.poiji.parer;
+package com.poiji.parser;
 
 import java.text.NumberFormat;
 

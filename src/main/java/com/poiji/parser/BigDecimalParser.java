@@ -1,4 +1,4 @@
-package com.poiji.parer;
+package com.poiji.parser;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -24,7 +24,7 @@ public class BigDecimalParser implements Parser<BigDecimal> {
     }
 
     @Override
-    public BigDecimal parse(String value) throws NumberFormatException {
+    public BigDecimal parse(String value) {
         return (BigDecimal) delegate.parse(value);
     }
 }

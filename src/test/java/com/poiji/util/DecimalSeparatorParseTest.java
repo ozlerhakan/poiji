@@ -21,6 +21,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 public class DecimalSeparatorParseTest {
 
+    private static final String FILENAME = "decimal_separator_parse.xlsx";
+
     private static class Row {
 
         @SuppressWarnings("unused")
@@ -57,9 +59,8 @@ public class DecimalSeparatorParseTest {
 
     private void parseAndVerify() {
         InputStream inputStream = Thread.currentThread().getContextClassLoader()
-                .getResourceAsStream("DecimalSeparatorParse.xlsx");
+                .getResourceAsStream(FILENAME);
         PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
-                .sheetName("sheet")
                 .preferNullOverDefault(true)
                 .build();
 

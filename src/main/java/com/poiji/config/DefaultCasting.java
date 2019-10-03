@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.poiji.option.PoijiOptions;
-import com.poiji.parer.Parsers;
+import com.poiji.parser.Parsers;
 
 /**
  * Created by hakan on 22/01/2017.
