@@ -24,6 +24,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import static org.apache.poi.xssf.eventusermodel.XSSFReader.SheetIterator;
@@ -56,7 +57,10 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
 	    List<WorkBookSheet> sheets = wbch.getSheets();
 	    SheetIterator iter = (SheetIterator) workbookReader.getSheetsData();
 	    int sheetCounter = 0;
-	    if (options.getSheetName() == null) {
+
+	    Optional<String> maybeSheetName = SheetNameExtractor.getSheetName(type, options);
+
+	    if (!maybeSheetName.isPresent()) {
 	      int requestedIndex = options.sheetIndex();
 	      int nonHiddenSheetIndex = 0;
 	      while (iter.hasNext()) {
@@ -73,7 +77,7 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
 	        sheetCounter++;
 	      }
 	    } else {
-	      String sheetName = options.getSheetName();
+	      String sheetName = maybeSheetName.get();
 	      while (iter.hasNext()) {
 	        try (InputStream stream = iter.next()) {
 	          WorkBookSheet wbs = sheets.get(sheetCounter);

@@ -7,7 +7,6 @@ import com.poiji.annotation.ExcelRow;
 import com.poiji.bind.Unmarshaller;
 import com.poiji.config.Casting;
 import com.poiji.exception.IllegalCastException;
-import com.poiji.exception.PoijiInstantiationException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.ReflectUtil;
 
@@ -19,9 +18,9 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import static java.lang.String.valueOf;
@@ -47,8 +46,9 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     @Override
     public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
         Workbook workbook = workbook();
+        Optional<String> maybeSheetName = SheetNameExtractor.getSheetName(type, options);
 
-        Sheet sheet = this.getSheetToProcess(workbook, options);
+        Sheet sheet = this.getSheetToProcess(workbook, options, maybeSheetName.orElse(null));
 
         int skip = options.skip();
         int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
@@ -63,19 +63,19 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
         }
     }
 
-    private Sheet getSheetToProcess(Workbook workbook, PoijiOptions options) {
+    private Sheet getSheetToProcess(Workbook workbook, PoijiOptions options, String sheetName) {
         int nonHiddenSheetIndex = 0;
         int requestedIndex = options.sheetIndex();
         Sheet sheet = null;
         if (options.ignoreHiddenSheets()) {
           for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
             if (!workbook.isSheetHidden(i) && !workbook.isSheetVeryHidden(i)) {
-              if (options.getSheetName() == null) {
+              if (sheetName == null) {
                 if (nonHiddenSheetIndex == requestedIndex) {
                   return workbook.getSheetAt(i);
                 }
               } else {
-                if (workbook.getSheetName(i).equalsIgnoreCase(options.getSheetName())) {
+                if (workbook.getSheetName(i).equalsIgnoreCase(sheetName)) {
                   return workbook.getSheetAt(i);
                 }
               }
@@ -83,10 +83,10 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
             }
           }
         } else {
-          if (options.getSheetName() == null) {
+          if (sheetName == null) {
             sheet = workbook.getSheetAt(requestedIndex);
           } else {
-            sheet = workbook.getSheet(options.getSheetName());
+            sheet = workbook.getSheet(sheetName);
           }
         }
         return sheet;
