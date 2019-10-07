@@ -1,6 +1,7 @@
 package com.poiji.bind.mapping;
 
 import com.poiji.bind.Unmarshaller;
+import com.poiji.exception.LimitCrossedException;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import org.apache.poi.ooxml.util.SAXHelper;
@@ -105,7 +106,10 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
                     = new XSSFSheetXMLHandler(styles, null, readOnlySharedStringsTable, poijiHandler, formatter, false);
             reader.setContentHandler(contentHandler);
             reader.parse(sheetSource);
-        } catch (SAXException | IOException e) {
+        } catch (LimitCrossedException e) {
+			IOUtils.closeQuietly(sheetInputStream);
+			// swallowing the exception for good :)
+		} catch (SAXException | IOException e) {
             throw new PoijiException("Problem occurred while reading data", e);
         }
     }

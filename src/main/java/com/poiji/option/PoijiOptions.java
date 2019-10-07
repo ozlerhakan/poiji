@@ -16,6 +16,7 @@ import static com.poiji.util.PoijiConstants.DEFAULT_DATE_TIME_FORMATTER;
 public final class PoijiOptions {
 
     private int skip;
+    private int limit;
     private int sheetIndex;
     private String password;
     private String dateRegex;
@@ -38,7 +39,16 @@ public final class PoijiOptions {
         return this;
     }
 
-    private PoijiOptions setDatePattern(String datePattern) {
+    public int getLimit() {
+		return limit;
+	}
+
+	public PoijiOptions setLimit(int limit) {
+		this.limit = limit;
+		return this;
+	}
+
+	private PoijiOptions setDatePattern(String datePattern) {
         this.datePattern = datePattern;
         return this;
     }
@@ -157,6 +167,7 @@ public final class PoijiOptions {
 
     public static class PoijiOptionsBuilder {
 
+        private int limit=Integer.MAX_VALUE;
         private int sheetIndex;
         private String password;
         private String dateRegex;
@@ -245,7 +256,8 @@ public final class PoijiOptions {
                     .setDateRegex(dateRegex)
                     .setDateLenient(dateLenient)
                     .setHeaderStart(headerStart)
-                    .setCasting(casting);
+                    .setCasting(casting)
+                    .setLimit(limit);
         }
 
         /**
@@ -284,6 +296,21 @@ public final class PoijiOptions {
                 throw new PoijiException("Skip index must be greater than or equal to 0");
             }
             this.skip = skip;
+            return this;
+        }
+
+         /**
+         * limit a number of rows after the header & skipped rows row. The header & skipped rows are not counted.
+         *
+         * @param limit number
+         * @return this
+         */
+
+        public PoijiOptionsBuilder limit(int limit) {
+            if(limit<0) {
+	            throw new PoijiException("limit must be greater than or equal to 0");
+            }
+            this.limit = limit;
             return this;
         }
 
