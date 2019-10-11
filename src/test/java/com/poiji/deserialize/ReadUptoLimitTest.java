@@ -18,7 +18,7 @@ public class ReadUptoLimitTest {
 	@Test
 	public void limitWithoutSkip() {
 
-		PoijiOptions options = PoijiOptionsBuilder.settings().limit(3).build();
+		PoijiOptions options = PoijiOptionsBuilder.settings().limit(4).build();
 
 		List<Person> personListFromXSSF = Poiji.fromExcel(new File("src/test/resources/person.xlsx"), Person.class,
 				options);
@@ -33,7 +33,7 @@ public class ReadUptoLimitTest {
 	@Test
 	public void limitWithSkip() {
 
-		PoijiOptions options = PoijiOptionsBuilder.settings().skip(4).limit(3).build();
+		PoijiOptions options = PoijiOptionsBuilder.settings().skip(2).limit(4).build();
 
 		List<Person> personListFromXSSF = Poiji.fromExcel(new File("src/test/resources/person.xlsx"), Person.class,
 				options);

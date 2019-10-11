@@ -257,7 +257,7 @@ public final class PoijiOptions {
                     .setDateLenient(dateLenient)
                     .setHeaderStart(headerStart)
                     .setCasting(casting)
-                    .setLimit(limit);
+                    .setLimit(limit + headerStart + 1);
         }
 
         /**

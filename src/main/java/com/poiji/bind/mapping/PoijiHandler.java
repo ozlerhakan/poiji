@@ -34,7 +34,6 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     private T instance;
     private Consumer<? super T> consumer;
     private int internalCount;
-    private int totalRowReaded;
     private int limit;
 
     private Class<T> type;
@@ -196,7 +195,6 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
         CellAddress cellAddress = new CellAddress(cellReference);
         int row = cellAddress.getRow();
-        int prev = internalCount;
         internalCount = row;
         int column = cellAddress.getColumn();
         int headers = options.getHeaderStart();
@@ -208,11 +206,9 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         if (row + 1 <= options.skip()) {
             return;
         }
-        if (row > prev) {
-            totalRowReaded++;
-            if (totalRowReaded > limit)
+
+        if (row +1 >= limit)
                 throw new LimitCrossedException("Limit crossed, Stop Iteration");
-        }
 
         setFieldValue(formattedValue, type, column);
     }
