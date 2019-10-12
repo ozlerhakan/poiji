@@ -8,12 +8,23 @@ import java.util.List;
 import org.junit.Test;
 
 import com.poiji.bind.Poiji;
+import com.poiji.deserialize.model.byid.ConfigPerson;
 import com.poiji.deserialize.model.byid.Person;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
 
 public class ReadUptoLimitTest {
+
+	@Test
+	public void testWithoutAnyLimit() {
+
+		List<ConfigPerson> actualEmployees = Poiji.fromExcel(new File("src/test/resources/employees.xlsx"),
+				ConfigPerson.class);
+		
+		assertEquals(3, actualEmployees.size());
+
+	}
 
 	@Test
 	public void limitWithoutSkip() {
@@ -48,7 +59,7 @@ public class ReadUptoLimitTest {
 	public void negativeLimitOptionThrowsException() {
 
 		PoijiOptions options = PoijiOptionsBuilder.settings().limit(-1).build();
-		Poiji.fromExcel(new File("src/test/resources/person.xlsx"), Person.class, options,System.out::println);
+		Poiji.fromExcel(new File("src/test/resources/person.xlsx"), Person.class, options, System.out::println);
 	}
 
 }
