@@ -8,6 +8,9 @@ import java.lang.reflect.ReflectPermission;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.poiji.exception.PoijiExcelType;
+import com.poiji.exception.PoijiInstantiationException;
+
 public class ReflectUtilTest {
 
     @BeforeClass
@@ -40,6 +43,11 @@ public class ReflectUtilTest {
     public void newInstanceOfPrivateModel() {
         PrivateModel obj = ReflectUtil.newInstanceOf(PrivateModel.class);
         assertNotNull(obj);
+    }
+
+    @Test(expected = PoijiInstantiationException.class)
+    public void newInstanceOfEnum() {
+        ReflectUtil.newInstanceOf(PoijiExcelType.class);
     }
 
     static class PackageModel {

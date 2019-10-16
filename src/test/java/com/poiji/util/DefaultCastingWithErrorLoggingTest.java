@@ -1,7 +1,7 @@
 package com.poiji.util;
 
 import com.poiji.config.DefaultCasting;
-import com.poiji.config.DefaultCasting.DefaultCastingError;
+import com.poiji.config.DefaultCastingError;
 import com.poiji.option.PoijiOptions;
 import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
 import org.junit.Before;
