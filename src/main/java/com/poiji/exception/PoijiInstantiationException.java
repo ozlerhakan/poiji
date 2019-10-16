@@ -5,10 +5,6 @@ package com.poiji.exception;
  */
 public final class PoijiInstantiationException extends PoijiException {
 
-    public PoijiInstantiationException(String message) {
-        super(message);
-    }
-
     public PoijiInstantiationException(String message, Exception cause) {
         super(message, cause);
     }

@@ -5,3 +5,5 @@ poiji.iml
 .classpath
 .project
 .settings
+.attach_pid*
+.~lock.*

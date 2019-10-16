@@ -6,7 +6,6 @@ import com.poiji.annotation.ExcelCellRange;
 import com.poiji.annotation.ExcelRow;
 import com.poiji.config.Casting;
 import com.poiji.exception.IllegalCastException;
-import com.poiji.exception.PoijiInstantiationException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.ReflectUtil;
 
@@ -15,7 +14,6 @@ import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandl
 import org.apache.poi.xssf.usermodel.XSSFComment;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -50,7 +48,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         this.consumer = consumer;
 
         casting = options.getCasting();
-        titles = new HashMap<String, Integer>();
+        titles = new HashMap<>();
         columnToField = new HashMap<>();
         columnToSuperClassField = new HashMap<>();
     }
