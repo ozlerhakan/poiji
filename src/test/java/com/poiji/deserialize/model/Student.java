@@ -44,7 +44,7 @@ public class Student {
 
     @Override
     public String toString() {
-        return "ProductExcelDTO {" +
+        return "Student {" +
                 " name=" + name +
                 ", id=" + id + "'" +
                 ", phone='" + phone + "'" +
