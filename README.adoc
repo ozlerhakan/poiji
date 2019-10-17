@@ -181,6 +181,36 @@ PoijiOptions options = PoijiOptionsBuilder.settings()
 ----
 1. a field that is of type either `java.util.Date`, `Float`, `Double`, `Integer`, `Long` or `String` will have a `null` value.
 
+=== Example 2
+Poiji allows specifying the sheet name using annotation
+
+[source,java]
+----
+@ExcelSheet("Sheet2")  (1)
+public class Student {
+
+    @ExcelCell(0)
+    private String name;
+
+    @ExcelCell(1)
+    private String id;
+
+    @ExcelCell(2)
+    private String phone;
+
+
+    @Override
+    public String toString() {
+        return "Student {" +
+                " name=" + name +
+                ", id=" + id + "'" +
+                ", phone='" + phone + "'" +
+                '}';
+    }
+}
+----
+<1> With the `ExcelSheet` annotation we are configuring the name of the sheet to read data from. The other sheets will be ignored.
+
 === Encrypted Excel Files
 
 Consider that your excel file is protected with a password, you can define the password via `PoijiOptionsBuilder` to read rows:
@@ -192,7 +222,7 @@ PoijiOptions options = PoijiOptionsBuilder.settings()
 List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class, options);
 ----
 
-=== Example 2
+=== Example 3
 
 The version `1.11` introduces a new annotation called `ExcelCellName` so that we can read the values by column names directly.
 
@@ -266,7 +296,7 @@ public class Person {
 }
 ----
 
-=== Example 3
+=== Example 4
 
 Your object model may be derived from a super class:
 
@@ -315,7 +345,7 @@ Car car = cars.get(0);
 // 4
 ----
 
-=== Example 4
+=== Example 5
 
 Consider you have a table like below:
 
@@ -409,7 +439,7 @@ GroupA firstRowPerson1 = firstRowGroups.getGroupA();
 GroupB secondRowPerson2 = firstRowGroups.getGroupB();
 ----
 
-=== Example 5
+=== Example 6
 
 As of 1.14, Poiji supports Consumer Interface. As https://github.com/ozlerhakan/poiji/pull/39#issuecomment-409521808[@fmarazita] explained the usage, there are several benefits of having a Consumer:
 
@@ -462,7 +492,7 @@ private void dbInsertion(Calculation siCalculation) {
 }
 ----
 
-=== Example 6
+=== Example 7
 
 Since Poiji 1.19.1, you can create your own casting implementation without relying on the default Poiji casting configuration using the `Casting` interface.
 

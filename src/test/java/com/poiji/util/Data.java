@@ -1,5 +1,6 @@
 package com.poiji.util;
 
+import com.poiji.deserialize.model.Student;
 import com.poiji.deserialize.model.byid.Employee;
 import com.poiji.deserialize.model.byid.Person;
 import com.poiji.deserialize.model.byid.Sample;
@@ -102,5 +103,22 @@ public final class Data {
         samples.add(sample1);
         samples.add(sample2);
         return samples;
+    }
+
+
+    public static List<Student> unmarshallingStudents() {
+        List<Student> students = new ArrayList<>();
+        Student student = new Student();
+        student.setName("Terry");
+        student.setId("3");
+        student.setPhone("123");
+        students.add(student);
+
+        student = new Student();
+        student.setName("William");
+        student.setId("4");
+        student.setPhone("456");
+        students.add(student);
+        return students;
     }
 }
