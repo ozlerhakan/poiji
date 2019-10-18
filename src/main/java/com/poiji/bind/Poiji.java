@@ -218,9 +218,8 @@ public final class Poiji {
         unmarshaller.unmarshal(type, consumer);
     }
 
-    @SuppressWarnings("unchecked")
     private static Unmarshaller deserializer(final File file, final PoijiOptions options) {
-        final PoijiFile poijiFile = new PoijiFile(file);
+        final PoijiFile<?> poijiFile = new PoijiFile<>(file);
 
         String extension = files.getExtension(file.getName());
 
@@ -233,9 +232,8 @@ public final class Poiji {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private static Unmarshaller deserializer(final InputStream inputStream, PoijiExcelType excelType, final PoijiOptions options) {
-        final PoijiInputStream poijiInputStream = new PoijiInputStream<>(inputStream);
+        final PoijiInputStream<?> poijiInputStream = new PoijiInputStream<>(inputStream);
 
         if (excelType == PoijiExcelType.XLS) {
             return UnmarshallerHelper.HSSFInstance(poijiInputStream, options);

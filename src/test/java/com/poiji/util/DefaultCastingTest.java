@@ -68,7 +68,7 @@ public class DefaultCastingTest {
 
         Integer testVal = (Integer) casting.castValue(int.class, "10", options);
 
-        assertEquals(new Integer(10), testVal);
+        assertEquals(Integer.valueOf(10), testVal);
     }
 
     @Test
@@ -76,7 +76,7 @@ public class DefaultCastingTest {
 
         Double testVal = (Double) casting.castValue(double.class, "81.56891", options);
 
-        assertEquals(new Double(81.56891), testVal);
+        assertEquals(Double.valueOf(81.56891), testVal);
     }
 
     @Test
@@ -112,7 +112,7 @@ public class DefaultCastingTest {
 
         Float testVal = (Float) casting.castValue(float.class, "81.56891", options);
 
-        assertEquals(new Float(81.56891), testVal);
+        assertEquals(Float.valueOf(81.56891f), testVal);
     }
 
     @Test
@@ -130,12 +130,12 @@ public class DefaultCastingTest {
 
         Long testVal = (Long) casting.castValue(long.class, "9223372036854775807.1", options);
 
-        assertEquals(new Long(0), testVal);
+        assertEquals(Long.valueOf(0), testVal);
     }
 
     @Test
     public void castLocalDate() {
-        PoijiOptions options = PoijiOptionsBuilder.settings().datePattern("dd/MM/yyyy").build();
+        PoijiOptions options = PoijiOptionsBuilder.settings().build();
 
         LocalDate expectedDate = LocalDate.of(2018, 8, 1);
 

@@ -17,15 +17,14 @@ import java.util.function.Consumer;
  */
 final class XSSFUnmarshallerStream extends XSSFUnmarshaller {
 
-    private final PoijiInputStream poijiInputStream;
+    private final PoijiInputStream<?> poijiInputStream;
 
-    XSSFUnmarshallerStream(PoijiInputStream poijiInputStream, PoijiOptions options) {
+    XSSFUnmarshallerStream(PoijiInputStream<?> poijiInputStream, PoijiOptions options) {
         super(options);
         this.poijiInputStream = poijiInputStream;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
 
         if (options.getPassword() != null) {

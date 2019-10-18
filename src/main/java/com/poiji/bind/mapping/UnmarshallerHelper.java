@@ -10,19 +10,19 @@ import com.poiji.option.PoijiOptions;
  */
 public final class UnmarshallerHelper {
 
-    public static Unmarshaller HSSFInstance(PoijiFile poijiFile, PoijiOptions options) {
+    public static Unmarshaller HSSFInstance(PoijiFile<?> poijiFile, PoijiOptions options) {
         return new HSSFUnmarshallerFile(poijiFile, options);
     }
 
-    public static Unmarshaller HSSFInstance(PoijiInputStream poijiInputStream, PoijiOptions options) {
+    public static Unmarshaller HSSFInstance(PoijiInputStream<?> poijiInputStream, PoijiOptions options) {
         return new HSSFUnmarshallerStream(poijiInputStream, options);
     }
 
-    public static Unmarshaller XSSFInstance(PoijiFile poijiFile, PoijiOptions options) {
+    public static Unmarshaller XSSFInstance(PoijiFile<?> poijiFile, PoijiOptions options) {
         return new XSSFUnmarshallerFile(poijiFile, options);
     }
 
-    public static Unmarshaller XSSFInstance(PoijiInputStream poijiInputStream, PoijiOptions options) {
+    public static Unmarshaller XSSFInstance(PoijiInputStream<?> poijiInputStream, PoijiOptions options) {
         return new XSSFUnmarshallerStream(poijiInputStream, options);
     }
 }

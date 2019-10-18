@@ -18,15 +18,14 @@ import java.util.function.Consumer;
  */
 final class XSSFUnmarshallerFile extends XSSFUnmarshaller {
 
-    private final PoijiFile poijiFile;
+    private final PoijiFile<?> poijiFile;
 
-    XSSFUnmarshallerFile(PoijiFile poijiFile, PoijiOptions options) {
+    XSSFUnmarshallerFile(PoijiFile<?> poijiFile, PoijiOptions options) {
         super(options);
         this.poijiFile = poijiFile;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
 
         if (options.getPassword() != null) {

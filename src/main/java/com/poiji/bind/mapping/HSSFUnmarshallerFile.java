@@ -15,9 +15,9 @@ import java.io.IOException;
  */
 final class HSSFUnmarshallerFile extends HSSFUnmarshaller implements Unmarshaller {
 
-    private final PoijiFile poijiFile;
+    private final PoijiFile<?> poijiFile;
 
-    HSSFUnmarshallerFile(PoijiFile poijiFile, PoijiOptions options) {
+    HSSFUnmarshallerFile(PoijiFile<?> poijiFile, PoijiOptions options) {
         super(options);
         this.poijiFile = poijiFile;
     }

@@ -42,7 +42,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     private Map<Integer, Field> columnToField;
     private Map<Integer, Field> columnToSuperClassField;
 
-    PoijiHandler(Class<T> type, PoijiOptions options, Consumer<T> consumer) {
+    PoijiHandler(Class<T> type, PoijiOptions options, Consumer<? super T> consumer) {
         this.type = type;
         this.options = options;
         this.consumer = consumer;

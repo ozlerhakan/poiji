@@ -14,9 +14,9 @@ import java.io.IOException;
  */
 final class HSSFUnmarshallerStream extends HSSFUnmarshaller implements Unmarshaller {
 
-    private final PoijiInputStream poijiInputStream;
+    private final PoijiInputStream<?> poijiInputStream;
 
-    HSSFUnmarshallerStream(PoijiInputStream poijiInputStream, PoijiOptions options) {
+    HSSFUnmarshallerStream(PoijiInputStream<?> poijiInputStream, PoijiOptions options) {
         super(options);
         this.poijiInputStream = poijiInputStream;
     }

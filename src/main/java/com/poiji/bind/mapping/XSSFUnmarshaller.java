@@ -13,7 +13,6 @@ import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
-import org.apache.poi.xssf.eventusermodel.XSSFReader.SheetIterator;
 import org.apache.poi.xssf.model.StylesTable;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -93,7 +92,6 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
 	    }
 	  }
 
-    @SuppressWarnings("unchecked")
     private <T> void processSheet(StylesTable styles,
                                   XMLReader reader,
                                   ReadOnlySharedStringsTable readOnlySharedStringsTable,
@@ -104,7 +102,7 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         DataFormatter formatter = new DataFormatter();
         InputSource sheetSource = new InputSource(sheetInputStream);
         try {
-            PoijiHandler poijiHandler = new PoijiHandler(type, options, consumer);
+            PoijiHandler<T> poijiHandler = new PoijiHandler<>(type, options, consumer);
             ContentHandler contentHandler
                     = new XSSFSheetXMLHandler(styles, null, readOnlySharedStringsTable, poijiHandler, formatter, false);
             reader.setContentHandler(contentHandler);

@@ -23,9 +23,9 @@ public class ExcelByIdAndByNameTest {
 
     private String path;
     private List<Person> expectedPersonList;
-    private Class clazz;
+    private Class<?> clazz;
 
-    public ExcelByIdAndByNameTest(String path, List<Person> expectedPersonList, Class clazz) {
+    public ExcelByIdAndByNameTest(String path, List<Person> expectedPersonList, Class<?> clazz) {
         this.path = path;
         this.expectedPersonList = expectedPersonList;
         this.clazz = clazz;
@@ -45,14 +45,14 @@ public class ExcelByIdAndByNameTest {
     public void testExcel() {
         try {
             if (clazz == Person.class) {
-                List<Person> actualCars = Poiji.fromExcel(new File(path), clazz);
+                List<Person> actualCars = Poiji.fromExcel(new File(path), Person.class);
                 assertEquals(expectedPersonList.get(0).getRow(), actualCars.get(0).getRow());
                 assertEquals(expectedPersonList.get(1).getRow(), actualCars.get(1).getRow());
                 assertEquals(expectedPersonList.get(2).getRow(), actualCars.get(2).getRow());
                 assertEquals(expectedPersonList.get(3).getRow(), actualCars.get(3).getRow());
                 assertEquals(expectedPersonList.get(4).getRow(), actualCars.get(4).getRow());
-            } else {
-                List<PersonByName> actualCars = Poiji.fromExcel(new File(path), clazz);
+            } else if (clazz == PersonByName.class) {
+                List<PersonByName> actualCars = Poiji.fromExcel(new File(path), PersonByName.class);
                 assertEquals(expectedPersonList.get(0).getRow(), actualCars.get(0).getRow());
                 assertEquals(expectedPersonList.get(1).getRow(), actualCars.get(1).getRow());
                 assertEquals(expectedPersonList.get(2).getRow(), actualCars.get(2).getRow());
