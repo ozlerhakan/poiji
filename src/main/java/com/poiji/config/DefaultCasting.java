@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -151,12 +152,25 @@ public final class DefaultCasting implements Casting {
             return options.preferNullOverDefault() ? null : LocalDate.now();
         } else {
             try {
-                return LocalDate.parse(value, options.dateTimeFormatter());
+                return LocalDate.parse(value, options.dateFormatter());
             } catch (DateTimeParseException e) {
                 return onError(value, sheetName, row, col, e, options.preferNullOverDefault() ? null : LocalDate.now());
             }
         }
     }
+
+    private LocalDateTime localDateTimeValue(String value, String sheetName, int row, int col, PoijiOptions options) {
+        if (options.getDateTimeRegex() != null && !value.matches(options.getDateTimeRegex())) {
+            return options.preferNullOverDefault() ? null : LocalDateTime.now();
+        } else {
+            try {
+                return LocalDateTime.parse(value, options.dateTimeFormatter());
+            } catch (DateTimeParseException e) {
+                return onError(value, sheetName, row, col, e, options.preferNullOverDefault() ? null : LocalDateTime.now());
+            }
+        }
+    }
+
 
     private Object enumValue(String value, String sheetName, int row, int col, Class type) {
         return Arrays.stream(type.getEnumConstants())
@@ -216,6 +230,9 @@ public final class DefaultCasting implements Casting {
 
         } else if (fieldType.getName().equals("java.time.LocalDate")) {
             o = localDateValue(value, sheetName, row, col, options);
+
+        } else if (fieldType.getName().equals("java.time.LocalDateTime")) {
+            o = localDateTimeValue(value, sheetName, row, col, options);
 
         } else if (fieldType.isEnum()) {
             o = enumValue(value, sheetName, row, col, fieldType);

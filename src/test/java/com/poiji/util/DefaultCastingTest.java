@@ -3,6 +3,7 @@ package com.poiji.util;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Locale;
 
@@ -140,6 +141,17 @@ public class DefaultCastingTest {
         LocalDate expectedDate = LocalDate.of(2018, 8, 1);
 
         LocalDate actualDate = (LocalDate) casting.castValue(LocalDate.class, "01/08/2018", options);
+
+        assertEquals(expectedDate, actualDate);
+    }
+
+    @Test
+    public void castLocalDateTime() {
+        PoijiOptions options = PoijiOptionsBuilder.settings().build();
+
+        LocalDateTime expectedDate = LocalDateTime.of(2018, 8, 1, 10, 00, 00);
+
+        LocalDateTime actualDate = (LocalDateTime) casting.castValue(LocalDateTime.class, "01/08/2018 10:00:00", options);
 
         assertEquals(expectedDate, actualDate);
     }
