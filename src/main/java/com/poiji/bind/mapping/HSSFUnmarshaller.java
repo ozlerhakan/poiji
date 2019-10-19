@@ -35,9 +35,11 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     protected final PoijiOptions options;
     private final Casting casting;
     private Map<String, Integer> titles;
+    private int limit;
 
     HSSFUnmarshaller(PoijiOptions options) {
         this.options = options;
+        this.limit = options.getLimit();
         dataFormatter = new DataFormatter();
         titles = new HashMap<>();
         casting = options.getCasting();
@@ -57,6 +59,9 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
 
         for (Row currentRow : sheet) {
             if (!skip(currentRow, skip) && !isRowEmpty(currentRow)) {
+            	
+            	if(currentRow.getRowNum() + 1  >= limit)
+                    return;
                 T t = deserialize0(currentRow, type);
                 consumer.accept(t);
             }

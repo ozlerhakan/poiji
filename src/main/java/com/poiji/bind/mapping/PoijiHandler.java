@@ -6,6 +6,8 @@ import com.poiji.annotation.ExcelCellRange;
 import com.poiji.annotation.ExcelRow;
 import com.poiji.config.Casting;
 import com.poiji.exception.IllegalCastException;
+import com.poiji.exception.LimitCrossedException;
+import com.poiji.exception.PoijiInstantiationException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.ReflectUtil;
 
@@ -31,6 +33,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     private T instance;
     private Consumer<? super T> consumer;
     private int internalCount;
+    private int limit;
 
     private Class<T> type;
     private PoijiOptions options;
@@ -46,6 +49,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         this.type = type;
         this.options = options;
         this.consumer = consumer;
+        this.limit = options.getLimit();
 
         casting = options.getCasting();
         titles = new HashMap<>();
@@ -190,7 +194,6 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
         CellAddress cellAddress = new CellAddress(cellReference);
         int row = cellAddress.getRow();
-
         internalCount = row;
         int column = cellAddress.getColumn();
         int headers = options.getHeaderStart();
@@ -202,6 +205,9 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         if (row + 1 <= options.skip()) {
             return;
         }
+
+        if (row +1 >= limit)
+                throw new LimitCrossedException("Limit crossed, Stop Iteration");
 
         setFieldValue(formattedValue, type, column);
     }
