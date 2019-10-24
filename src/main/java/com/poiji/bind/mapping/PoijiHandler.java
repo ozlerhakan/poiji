@@ -80,13 +80,8 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         return ins;
     }
 
-    /***
-     * 	Modified this method so that for each time it reads a cell
-     * 	it doesn't need to check all fields even after it as found
-     * 	the matching field
-     *
-     * */
     private boolean setValue(String content, Class<? super T> type, int column) {
+        boolean valueSet = false;
         // For ExcelRow annotation
         if(columnToField.containsKey(-1)) {
             Field field = columnToField.get(-1);
@@ -100,12 +95,11 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                 ins = getInstance(columnToSuperClassField.get(column));
                 if (setValue(field, column, content, ins)) {
                     setFieldData(columnToSuperClassField.get(column), ins, instance);
-                    return true;
-                } else {
-                    return false;
+                    valueSet = true;
                 }
+            } else {
+                valueSet = setValue(field, column, content, instance);
             }
-            return setValue(field, column, content, instance);
         }
         for (Field field : type.getDeclaredFields()) {
 
@@ -124,17 +118,18 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                         setFieldData(field, ins, instance);
                         columnToField.put(column, f);
                         columnToSuperClassField.put(column, field);
-                        return true;
+                        valueSet = true;
+                        break;
                     }
                 }
             } else {
                 if(setValue(field, column, content, instance)) {
                     columnToField.put(column, field);
-                    return true;
+                    valueSet = true;
                 }
             }
         }
-        return false;
+        return valueSet;
     }
 
     private boolean setValue(Field field, int column, String content, Object ins) {
