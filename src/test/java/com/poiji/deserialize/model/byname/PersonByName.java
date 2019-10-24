@@ -8,9 +8,6 @@ import com.poiji.annotation.ExcelRow;
  */
 public class PersonByName {
 
-    @ExcelRow
-    protected int row;
-
     @ExcelCellName("Name")
     protected String name;
 
@@ -23,6 +20,8 @@ public class PersonByName {
     @ExcelCellName("Email")
     protected String email;
 
+    @ExcelRow
+    protected int row;
 
     public int getRow() {
         return row;
