@@ -1,5 +1,16 @@
 package com.poiji.bind.mapping;
 
+import static java.lang.String.valueOf;
+
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
+
+import org.apache.poi.ss.util.CellAddress;
+import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
+import org.apache.poi.xssf.usermodel.XSSFComment;
+
 import com.poiji.annotation.ExcelCell;
 import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelCellRange;
@@ -7,20 +18,8 @@ import com.poiji.annotation.ExcelRow;
 import com.poiji.config.Casting;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.LimitCrossedException;
-import com.poiji.exception.PoijiInstantiationException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.ReflectUtil;
-
-import org.apache.poi.ss.util.CellAddress;
-import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
-import org.apache.poi.xssf.usermodel.XSSFComment;
-
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Consumer;
-
-import static java.lang.String.valueOf;
 
 /**
  * This class handles the processing of a .xlsx file,
@@ -30,6 +29,7 @@ import static java.lang.String.valueOf;
  */
 final class PoijiHandler<T> implements SheetContentsHandler {
 
+    private static final int NOT_POIJI_COLUMN = Integer.MIN_VALUE;
     private T instance;
     private Consumer<? super T> consumer;
     private int internalCount;
@@ -93,14 +93,22 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             if (columnToSuperClassField.containsKey(column)) {
                 Object ins = null;
                 ins = getInstance(columnToSuperClassField.get(column));
-                if (setValue(field, column, content, ins)) {
+                int columnForField = setValue(field, column, content, ins);
+
+                if (columnForField!=NOT_POIJI_COLUMN && columnForField == column) {
                     setFieldData(columnToSuperClassField.get(column), ins, instance);
                     valueSet = true;
                 }
+
             } else {
-                valueSet = setValue(field, column, content, instance);
+                int columnForField = setValue(field, column, content, instance);
+                if( columnForField != NOT_POIJI_COLUMN && columnForField == column)
+                        valueSet = true;
             }
         }
+
+        if(valueSet) return true;
+
         for (Field field : type.getDeclaredFields()) {
 
             ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
@@ -114,46 +122,64 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                 Object ins = null;
                 ins = getInstance(field);
                 for (Field f : field.getType().getDeclaredFields()) {
-                    if (setValue(f, column, content, ins)) {
+                    int columnForF = setValue(f, column, content, ins);
+
+                    if (columnForF != NOT_POIJI_COLUMN) {
+
                         setFieldData(field, ins, instance);
-                        columnToField.put(column, f);
-                        columnToSuperClassField.put(column, field);
-                        valueSet = true;
-                        break;
+
+                        columnToField.put(columnForF, f);
+                        columnToSuperClassField.put(columnForF, field);
+
+                       if(columnForF == column)
+                           valueSet = true;
                     }
                 }
             } else {
-                if(setValue(field, column, content, instance)) {
-                    columnToField.put(column, field);
-                    valueSet = true;
+                int columnNumForField = setValue(field, column, content, instance);
+                if( columnNumForField != NOT_POIJI_COLUMN ) {
+                    if(columnNumForField == column)
+                        valueSet = true;
+                    columnToField.put(columnNumForField, field);
                 }
+
             }
         }
         return valueSet;
     }
 
-    private boolean setValue(Field field, int column, String content, Object ins) {
+    /*
+     * Returns column number of this @field, If value set returns same @column
+     * else returns NOT_POIJI_COLUMN
+     */
+
+    private int setValue(Field field, int column, String content, Object ins) {
            ExcelCell index = field.getAnnotation(ExcelCell.class);
            if (index != null) {
                Class<?> fieldType = field.getType();
                if (column == index.value()) {
                    Object o = casting.castValue(fieldType, content, internalCount, column, options);
                    setFieldData(field, o, ins);
+                    return column;
                }
+               return index.value();
            } else {
                ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
                if (excelCellName != null) {
                    Class<?> fieldType = field.getType();
                    Integer titleColumn = titles.get(excelCellName.value() );
                    //Fix both columns mapped to name passing this condition below
-                   if (titleColumn != null && titleColumn == column) {
-                       Object o = casting.castValue(fieldType, content, internalCount, column, options);
-                       setFieldData(field, o, ins);
-                       return true;
+                   if (titleColumn != null) {
+                       if(titleColumn == column) {
+                           Object o = casting.castValue(fieldType, content, internalCount, column, options);
+                           setFieldData(field, o, ins);
+                       }
+                       return titleColumn;
                    }
+
                }
            }
-           return false;
+           return NOT_POIJI_COLUMN;
     }
 
     private void setFieldData(Field field, Object o, Object instance) {
@@ -177,7 +203,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     public void endRow(int rowNum) {
 
         if (internalCount != rowNum)
-			return;
+            return;
 
         if (rowNum + 1 > options.skip()) {
             consumer.accept(instance);
