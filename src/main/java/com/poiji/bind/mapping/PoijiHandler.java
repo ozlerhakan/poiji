@@ -160,7 +160,6 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                if (column == index.value()) {
                    Object o = casting.castValue(fieldType, content, internalCount, column, options);
                    setFieldData(field, o, ins);
-                    return column;
                }
                return index.value();
            } else {
