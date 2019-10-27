@@ -81,7 +81,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     }
 
     private boolean setValue(String content, Class<? super T> type, int column) {
-        boolean valueSet = false;
+        
         // For ExcelRow annotation
         if(columnToField.containsKey(-1)) {
             Field field = columnToField.get(-1);
@@ -93,21 +93,15 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             if (columnToSuperClassField.containsKey(column)) {
                 Object ins = null;
                 ins = getInstance(columnToSuperClassField.get(column));
-                int columnForField = setValue(field, column, content, ins);
-
-                if (columnForField!=NOT_POIJI_COLUMN && columnForField == column) {
-                    setFieldData(columnToSuperClassField.get(column), ins, instance);
-                    valueSet = true;
-                }
-
+                setValue(field, column, content, ins);
+                setFieldData(columnToSuperClassField.get(column), ins, instance);
             } else {
-                int columnForField = setValue(field, column, content, instance);
-                if( columnForField != NOT_POIJI_COLUMN && columnForField == column)
-                        valueSet = true;
+                setValue(field, column, content, instance);
             }
+            return true;
         }
 
-        if(valueSet) return true;
+        boolean valueSet = false;
 
         for (Field field : type.getDeclaredFields()) {
 
