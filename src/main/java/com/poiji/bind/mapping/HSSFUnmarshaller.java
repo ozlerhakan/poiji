@@ -60,7 +60,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
         for (Row currentRow : sheet) {
             if (!skip(currentRow, skip) && !isRowEmpty(currentRow)) {
             	
-            	if(currentRow.getRowNum() + 1  >= limit)
+            	if(currentRow.getRowNum() > limit)
                     return;
                 T t = deserialize0(currentRow, type);
                 consumer.accept(t);

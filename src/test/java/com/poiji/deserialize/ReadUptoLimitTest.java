@@ -33,11 +33,11 @@ public class ReadUptoLimitTest {
 
 		List<Person> personListFromXSSF = Poiji.fromExcel(new File("src/test/resources/person.xlsx"), Person.class,
 				options);
-		assertEquals(3, personListFromXSSF.size());
+		assertEquals(4, personListFromXSSF.size());
 
 		List<Person> personListFromHSSF = Poiji.fromExcel(new File("src/test/resources/person.xls"), Person.class,
 				options);
-		assertEquals(3, personListFromHSSF.size());
+		assertEquals(4, personListFromHSSF.size());
 
 	}
 
@@ -48,11 +48,11 @@ public class ReadUptoLimitTest {
 
 		List<Person> personListFromXSSF = Poiji.fromExcel(new File("src/test/resources/person.xlsx"), Person.class,
 				options);
-		assertEquals(1, personListFromXSSF.size());
+		assertEquals(3, personListFromXSSF.size());
 
 		List<Person> personListFromHSSF = Poiji.fromExcel(new File("src/test/resources/person.xls"), Person.class,
 				options);
-		assertEquals(1, personListFromHSSF.size());
+		assertEquals(3, personListFromHSSF.size());
 	}
 
 	@Test(expected = PoijiException.class)

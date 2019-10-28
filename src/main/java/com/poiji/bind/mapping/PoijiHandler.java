@@ -197,11 +197,11 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             titles.put(formattedValue, column);
         }
 
-        if (row + 1 <= options.skip()) {
+        if (row < options.skip()) {
             return;
         }
-
-        if (row +1 >= limit)
+        
+        if (row > limit)
                 throw new LimitCrossedException("Limit crossed, Stop Iteration");
 
         setFieldValue(formattedValue, type, column);
