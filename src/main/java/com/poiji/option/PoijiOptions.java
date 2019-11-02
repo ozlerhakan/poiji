@@ -17,6 +17,8 @@ public final class PoijiOptions {
 
     private int skip;
     private int limit;
+    private int readEvery;
+    private int skipEvery;
     private int sheetIndex;
     private String password;
     private String dateRegex;
@@ -40,15 +42,33 @@ public final class PoijiOptions {
     }
 
     public int getLimit() {
-		return limit;
-	}
+        return limit;
+    }
 
-	public PoijiOptions setLimit(int limit) {
-		this.limit = limit;
-		return this;
-	}
+    public PoijiOptions setLimit(int limit) {
+        this.limit = limit;
+        return this;
+    }
 
-	private PoijiOptions setDatePattern(String datePattern) {
+    public int getReadEvery() {
+        return readEvery;
+    }
+
+    public int getSkipEvery() {
+        return skipEvery;
+    }
+
+    private PoijiOptions setReadEvery(int readEvery) {
+        this.readEvery = readEvery;
+        return this;
+    }
+
+    private PoijiOptions setSkipEvery(int skipEvery) {
+        this.skipEvery = skipEvery;
+        return this;
+    }
+
+    private PoijiOptions setDatePattern(String datePattern) {
         this.datePattern = datePattern;
         return this;
     }
@@ -168,6 +188,8 @@ public final class PoijiOptions {
     public static class PoijiOptionsBuilder {
 
         private int limit=Integer.MAX_VALUE;
+        private int readEvery=1;
+        private int skipEvery=0;
         private int sheetIndex;
         private String password;
         private String dateRegex;
@@ -257,7 +279,9 @@ public final class PoijiOptions {
                     .setDateLenient(dateLenient)
                     .setHeaderStart(headerStart)
                     .setCasting(casting)
-                    .setLimit(limit == Integer.MAX_VALUE ? limit : limit + skip + headerStart);
+                    .setLimit(limit == Integer.MAX_VALUE ? limit : limit + skip + headerStart)
+                    .setReadEvery(skipEvery == 0 ? 1 : readEvery)
+                    .setSkipEvery(skipEvery);
         }
 
         /**
@@ -279,7 +303,7 @@ public final class PoijiOptions {
          * 
          * @param sheetName
          * @return
-         */	
+         */
         public PoijiOptionsBuilder sheetName(String sheetName) {
             this.sheetName = sheetName;
             return this;
@@ -308,9 +332,32 @@ public final class PoijiOptions {
 
         public PoijiOptionsBuilder limit(int limit) {
             if(limit<0) {
-	            throw new PoijiException("limit must be greater than or equal to 0");
+                throw new PoijiException("limit must be greater than or equal to 0");
             }
             this.limit = limit;
+            return this;
+        }
+
+        /**
+        *  Alternate reads and skip. The header & skipped rows from top are not counted.
+        *
+        *  Note:- Available rows to read are between skip and limit options;
+        *
+        * @param readEvery
+        * specifies how many rows to read without skipping
+        *
+        * @param skipEvery
+        * specifies how many rows to skip after the rows read
+        *
+        * @return this
+        */
+
+        public PoijiOptionsBuilder jumpReads(int readEvery,int skipEvery) {
+            if(skipEvery<0 || readEvery<1) {
+                throw new PoijiException("skipEvery must be greater 0 and readEvery must be greater 1");  
+            }
+            this.readEvery = readEvery;
+            this.skipEvery = skipEvery;
             return this;
         }
 

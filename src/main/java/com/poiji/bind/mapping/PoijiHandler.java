@@ -34,7 +34,8 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     private Consumer<? super T> consumer;
     private int internalCount;
     private int limit;
-
+    private int readEvery;
+    private int skipEvery;
     private Class<T> type;
     private PoijiOptions options;
 
@@ -50,6 +51,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         this.options = options;
         this.consumer = consumer;
         this.limit = options.getLimit();
+        this.readEvery = options.getReadEvery();
 
         casting = options.getCasting();
         titles = new HashMap<>();
@@ -167,10 +169,17 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     @Override
     public void startRow(int rowNum) {
-        if (rowNum + 1 > options.skip()) {
-            instance = ReflectUtil.newInstanceOf(type);
-            fieldInstances = new HashMap<>();
-        }
+          if (rowNum > limit)
+              throw new LimitCrossedException("Limit crossed, Stop Iteration");
+
+          if (rowNum >= options.skip()) {
+
+              if (readEvery > 0) {
+                  instance = ReflectUtil.newInstanceOf(type);
+                  fieldInstances = new HashMap<>();
+              }
+
+          }
     }
 
     @Override
@@ -179,8 +188,21 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         if (internalCount != rowNum)
 			return;
 
-        if (rowNum + 1 > options.skip()) {
-            consumer.accept(instance);
+        if (rowNum >= options.skip()) {
+            if (skipEvery > 0) {
+                skipEvery--;
+                if (skipEvery == 0)
+                    readEvery = options.getReadEvery();
+            } else {
+                consumer.accept(instance);
+                readEvery--;
+                if (readEvery == 0) {
+                    if (options.getSkipEvery() == 0)
+                        readEvery = options.getReadEvery();
+                    else
+                        skipEvery = options.getSkipEvery();
+                }
+            }
         }
     }
 
@@ -197,13 +219,10 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             titles.put(formattedValue, column);
         }
 
-        if (row < options.skip()) {
+        if (row < options.skip() || skipEvery > 0) {
             return;
         }
         
-        if (row > limit)
-                throw new LimitCrossedException("Limit crossed, Stop Iteration");
-
         setFieldValue(formattedValue, type, column);
     }
 
