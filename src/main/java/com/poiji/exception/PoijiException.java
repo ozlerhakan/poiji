@@ -6,6 +6,7 @@ package com.poiji.exception;
  * Created by hakan on 18/01/2017.
  * @since   Poiji 1.0
  */
+@SuppressWarnings("serial")
 public class PoijiException extends RuntimeException {
 
     public PoijiException(String message) {

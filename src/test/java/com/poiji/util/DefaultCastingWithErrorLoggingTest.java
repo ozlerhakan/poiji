@@ -819,7 +819,7 @@ public class DefaultCastingWithErrorLoggingTest {
     }
 
     // Convenience Methods
-    private void assertSingleCastingErrorPresent(String sheetName, int row, int col, String value, Object defaultValue, Class exClass) {
+    private void assertSingleCastingErrorPresent(String sheetName, int row, int col, String value, Object defaultValue, Class<?> exClass) {
         assertEquals(casting.getErrors().size(), 1);
 
         assertCastingErrorEquals(casting.getErrors().get(0), sheetName, row, col, value, defaultValue, exClass);
@@ -831,7 +831,7 @@ public class DefaultCastingWithErrorLoggingTest {
                                           int col,
                                           String value,
                                           Object defaultValue,
-                                          Class exClass) {
+                                          Class<?> exClass) {
         assertEquals(sheetName, castingError.getSheetName());
         assertEquals(row, castingError.getRow());
         assertEquals(col, castingError.getColumn());
