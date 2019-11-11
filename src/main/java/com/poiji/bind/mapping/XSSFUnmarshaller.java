@@ -13,8 +13,8 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
-import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.eventusermodel.XSSFReader.SheetIterator;
+import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.model.StylesTable;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -27,8 +27,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-
-import static org.apache.poi.xssf.eventusermodel.XSSFReader.SheetIterator;
 
 /**
  * Created by hakan on 22/10/2017

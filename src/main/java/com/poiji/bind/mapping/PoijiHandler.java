@@ -6,11 +6,8 @@ import com.poiji.annotation.ExcelCellRange;
 import com.poiji.annotation.ExcelRow;
 import com.poiji.config.Casting;
 import com.poiji.exception.IllegalCastException;
-import com.poiji.exception.LimitCrossedException;
-import com.poiji.exception.PoijiInstantiationException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.ReflectUtil;
-
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.usermodel.XSSFComment;
@@ -32,6 +29,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     private T instance;
     private Consumer<? super T> consumer;
+    private int internalRow;
     private int internalCount;
     private int limit;
 
@@ -81,31 +79,11 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     }
 
     private boolean setValue(String content, Class<? super T> type, int column) {
-        boolean valueSet = false;
-        // For ExcelRow annotation
-        if(columnToField.containsKey(-1)) {
-            Field field = columnToField.get(-1);
-            Object o = casting.castValue(field.getType(), valueOf(internalCount), internalCount, -1, options);
-            setFieldData(field, o, instance);
-        }
-        if(columnToField.containsKey(column)) {
-            Field field = columnToField.get(column);
-            if (columnToSuperClassField.containsKey(column)) {
-                Object ins = null;
-                ins = getInstance(columnToSuperClassField.get(column));
-                if (setValue(field, column, content, ins)) {
-                    setFieldData(columnToSuperClassField.get(column), ins, instance);
-                    valueSet = true;
-                }
-            } else {
-                valueSet = setValue(field, column, content, instance);
-            }
-        }
-        for (Field field : type.getDeclaredFields()) {
 
+        for (Field field : type.getDeclaredFields()) {
             ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
             if (excelRow != null) {
-                Object o = casting.castValue(field.getType(), valueOf(internalCount), internalCount, -1, options);
+                Object o = casting.castValue(field.getType(), valueOf(internalCount), options);
                 setFieldData(field, o, instance);
                 columnToField.put(-1, field);
             }
@@ -118,42 +96,61 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                         setFieldData(field, ins, instance);
                         columnToField.put(column, f);
                         columnToSuperClassField.put(column, field);
-                        valueSet = true;
-                        break;
+//                        return true;
                     }
                 }
             } else {
                 if(setValue(field, column, content, instance)) {
                     columnToField.put(column, field);
-                    valueSet = true;
+//                    return true;
                 }
             }
         }
-        return valueSet;
+
+        // For ExcelRow annotation
+        if(columnToField.containsKey(-1)) {
+            Field field = columnToField.get(-1);
+            Object o = casting.castValue(field.getType(), valueOf(internalCount), options);
+            setFieldData(field, o, instance);
+        }
+        if(columnToField.containsKey(column)) {
+            Field field = columnToField.get(column);
+            if (columnToSuperClassField.containsKey(column)) {
+                Object ins;
+                ins = getInstance(columnToSuperClassField.get(column));
+                if (setValue(field, column, content, ins)) {
+                    setFieldData(columnToSuperClassField.get(column), ins, instance);
+                    return true;
+                }
+            }
+            return setValue(field, column, content, instance);
+        }
+
+        return false;
     }
 
     private boolean setValue(Field field, int column, String content, Object ins) {
-           ExcelCell index = field.getAnnotation(ExcelCell.class);
-           if (index != null) {
-               Class<?> fieldType = field.getType();
-               if (column == index.value()) {
-                   Object o = casting.castValue(fieldType, content, internalCount, column, options);
-                   setFieldData(field, o, ins);
-               }
-           } else {
-               ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
-               if (excelCellName != null) {
-                   Class<?> fieldType = field.getType();
-                   Integer titleColumn = titles.get(excelCellName.value() );
-                   //Fix both columns mapped to name passing this condition below
-                   if (titleColumn != null && titleColumn == column) {
-                       Object o = casting.castValue(fieldType, content, internalCount, column, options);
-                       setFieldData(field, o, ins);
-                       return true;
-                   }
-               }
-           }
-           return false;
+        ExcelCell index = field.getAnnotation(ExcelCell.class);
+        if (index != null) {
+            Class<?> fieldType = field.getType();
+            if (column == index.value()) {
+                Object o = casting.castValue(fieldType, content, options);
+                setFieldData(field, o, ins);
+            }
+        } else {
+            ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
+            if (excelCellName != null) {
+                Class<?> fieldType = field.getType();
+                Integer titleColumn = titles.get(excelCellName.value() );
+                //Fix both columns mapped to name passing this condition below
+                if (titleColumn != null && titleColumn == column) {
+                    Object o = casting.castValue(fieldType, content, options);
+                    setFieldData(field, o, ins);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void setFieldData(Field field, Object o, Object instance) {
@@ -168,6 +165,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     @Override
     public void startRow(int rowNum) {
         if (rowNum + 1 > options.skip()) {
+            internalCount += 1;
             instance = ReflectUtil.newInstanceOf(type);
             fieldInstances = new HashMap<>();
         }
@@ -176,7 +174,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     @Override
     public void endRow(int rowNum) {
 
-        if (internalCount != rowNum)
+        if (internalRow != rowNum)
 			return;
 
         if (rowNum + 1 > options.skip()) {
@@ -186,12 +184,11 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     @Override
     public void cell(String cellReference, String formattedValue, XSSFComment comment) {
-
         CellAddress cellAddress = new CellAddress(cellReference);
         int row = cellAddress.getRow();
-        internalCount = row;
-        int column = cellAddress.getColumn();
+
         int headers = options.getHeaderStart();
+        int column = cellAddress.getColumn();
 
         if (row <= headers) {
             titles.put(formattedValue, column);
@@ -201,8 +198,11 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             return;
         }
 
-        if (row +1 >= limit)
-                throw new LimitCrossedException("Limit crossed, Stop Iteration");
+        if (limit != 0 && internalCount > limit) {
+            return;
+        }
+
+        internalRow = row;
 
         setFieldValue(formattedValue, type, column);
     }

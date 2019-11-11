@@ -1,18 +1,17 @@
 package com.poiji.deserialize;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.File;
-import java.util.List;
-
-import org.junit.Test;
-
 import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.byid.ConfigPerson;
 import com.poiji.deserialize.model.byid.Person;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
+import org.junit.Test;
+
+import java.io.File;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 public class ReadUptoLimitTest {
 
@@ -33,26 +32,26 @@ public class ReadUptoLimitTest {
 
 		List<Person> personListFromXSSF = Poiji.fromExcel(new File("src/test/resources/person.xlsx"), Person.class,
 				options);
-		assertEquals(3, personListFromXSSF.size());
+		assertEquals(4, personListFromXSSF.size());
 
 		List<Person> personListFromHSSF = Poiji.fromExcel(new File("src/test/resources/person.xls"), Person.class,
 				options);
-		assertEquals(3, personListFromHSSF.size());
+		assertEquals(4, personListFromHSSF.size());
 
 	}
 
 	@Test
 	public void limitWithSkip() {
 
-		PoijiOptions options = PoijiOptionsBuilder.settings().skip(2).limit(4).build();
+		PoijiOptions options = PoijiOptionsBuilder.settings().skip(2).limit(2).build();
 
 		List<Person> personListFromXSSF = Poiji.fromExcel(new File("src/test/resources/person.xlsx"), Person.class,
 				options);
-		assertEquals(1, personListFromXSSF.size());
+		assertEquals(2, personListFromXSSF.size());
 
 		List<Person> personListFromHSSF = Poiji.fromExcel(new File("src/test/resources/person.xls"), Person.class,
 				options);
-		assertEquals(1, personListFromHSSF.size());
+		assertEquals(2, personListFromHSSF.size());
 	}
 
 	@Test(expected = PoijiException.class)

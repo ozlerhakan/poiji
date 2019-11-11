@@ -40,15 +40,15 @@ public final class PoijiOptions {
     }
 
     public int getLimit() {
-		return limit;
-	}
+        return limit;
+    }
 
-	public PoijiOptions setLimit(int limit) {
-		this.limit = limit;
-		return this;
-	}
+    public PoijiOptions setLimit(int limit) {
+        this.limit = limit;
+        return this;
+    }
 
-	private PoijiOptions setDatePattern(String datePattern) {
+    private PoijiOptions setDatePattern(String datePattern) {
         this.datePattern = datePattern;
         return this;
     }
@@ -155,7 +155,7 @@ public final class PoijiOptions {
         this.headerStart = headerStart;
         return this;
     }
-    
+
     private PoijiOptions setSheetName(String sheetName) {
         this.sheetName = sheetName;
         return this;
@@ -167,7 +167,6 @@ public final class PoijiOptions {
 
     public static class PoijiOptionsBuilder {
 
-        private int limit=Integer.MAX_VALUE;
         private int sheetIndex;
         private String password;
         private String dateRegex;
@@ -180,6 +179,7 @@ public final class PoijiOptions {
         private Casting casting = new DefaultCasting();
         private int headerStart = 0;
         private int skip = 0;
+        private int limit = 0;
         private String sheetName;
 
         private PoijiOptionsBuilder() {
@@ -257,7 +257,7 @@ public final class PoijiOptions {
                     .setDateLenient(dateLenient)
                     .setHeaderStart(headerStart)
                     .setCasting(casting)
-                    .setLimit(limit == Integer.MAX_VALUE ? limit : limit + headerStart + 1);
+                    .setLimit(limit);
         }
 
         /**
@@ -273,13 +273,13 @@ public final class PoijiOptions {
             this.sheetIndex = sheetIndex;
             return this;
         }
-        
+
         /**
          * Set The sheet Name
-         * 
+         *
          * @param sheetName
          * @return
-         */	
+         */
         public PoijiOptionsBuilder sheetName(String sheetName) {
             this.sheetName = sheetName;
             return this;
@@ -299,7 +299,7 @@ public final class PoijiOptions {
             return this;
         }
 
-         /**
+        /**
          * limit a number of rows after the header & skipped rows row. The header & skipped rows are not counted.
          *
          * @param limit number
@@ -307,8 +307,8 @@ public final class PoijiOptions {
          */
 
         public PoijiOptionsBuilder limit(int limit) {
-            if(limit<0) {
-	            throw new PoijiException("limit must be greater than or equal to 0");
+            if (limit < 1) {
+                throw new PoijiException("limit must be greater than 0");
             }
             this.limit = limit;
             return this;

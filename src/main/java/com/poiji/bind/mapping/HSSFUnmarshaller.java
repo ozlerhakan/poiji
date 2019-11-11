@@ -9,7 +9,6 @@ import com.poiji.config.Casting;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.ReflectUtil;
-
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -36,6 +35,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     private final Casting casting;
     private Map<String, Integer> titles;
     private int limit;
+    private int internalCount;
 
     HSSFUnmarshaller(PoijiOptions options) {
         this.options = options;
@@ -59,9 +59,11 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
 
         for (Row currentRow : sheet) {
             if (!skip(currentRow, skip) && !isRowEmpty(currentRow)) {
-            	
-            	if(currentRow.getRowNum() + 1  >= limit)
+                internalCount += 1;
+
+            	if(limit != 0 && internalCount > limit)
                     return;
+
                 T t = deserialize0(currentRow, type);
                 consumer.accept(t);
             }
