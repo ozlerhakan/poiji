@@ -44,7 +44,7 @@ public class CalculationExcelTest {
                 .appendPattern("M/d/")
                 .appendValueReduced(ChronoField.YEAR_OF_ERA, 2, 2, LocalDate.now().minusYears(80)).toFormatter();
 
-        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().sheetIndex(1).dateTimeFormatter(formatter).build();
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().sheetIndex(1).dateFormatter(formatter).build();
 
         List<Calculation> calculations = Poiji.fromExcel(new File(path), Calculation.class, options);
 
