@@ -7,8 +7,8 @@ import com.poiji.exception.PoijiException;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
-import static com.poiji.util.PoijiConstants.DEFAULT_DATE_PATTERN;
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_FORMATTER;
+import static com.poiji.util.PoijiConstants.DEFAULT_DATE_PATTERN;
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_TIME_FORMATTER;
 
 /**
@@ -233,7 +233,7 @@ public final class PoijiOptions {
          * set a date formatter, default date time formatter is "dd/M/yyyy"
          * for java.time.LocalDate
          *
-         * @param dateTimeFormatter date time formatter
+         * @param dateFormatter date time formatter
          * @return this
          */
         public PoijiOptionsBuilder dateFormatter(DateTimeFormatter dateFormatter) {
@@ -312,10 +312,10 @@ public final class PoijiOptions {
         }
 
         /**
-         * Set The sheet Name
+         * Set the sheet Name
          *
-         * @param sheetName
-         * @return
+         * @param sheetName excel sheet name
+         * @return this
          */
         public PoijiOptionsBuilder sheetName(String sheetName) {
             this.sheetName = sheetName;
