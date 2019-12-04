@@ -83,7 +83,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         for (Field field : type.getDeclaredFields()) {
             ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
             if (excelRow != null) {
-                Object o = casting.castValue(field.getType(), valueOf(internalCount), options);
+                Object o = casting.castValue(field.getType(), valueOf(internalRow), options);
                 setFieldData(field, o, instance);
                 columnToField.put(-1, field);
             }
@@ -110,7 +110,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         // For ExcelRow annotation
         if(columnToField.containsKey(-1)) {
             Field field = columnToField.get(-1);
-            Object o = casting.castValue(field.getType(), valueOf(internalCount), options);
+            Object o = casting.castValue(field.getType(), valueOf(internalRow), options);
             setFieldData(field, o, instance);
         }
         if(columnToField.containsKey(column)) {
