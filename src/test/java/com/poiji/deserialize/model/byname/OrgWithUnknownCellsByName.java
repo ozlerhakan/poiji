@@ -2,8 +2,11 @@ package com.poiji.deserialize.model.byname;
 
 import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelRow;
+import com.poiji.annotation.ExcelUnknownCells;
 
-public class Organisation {
+import java.util.Map;
+
+public class OrgWithUnknownCellsByName {
 
     public static final String HEADER_ORGANISATION_ID = "Organisation ID";
     public static final String HEADER_CUSTOMER_EXTERNAL_ID = "Customer External ID";
@@ -18,6 +21,13 @@ public class Organisation {
 
     @ExcelCellName(HEADER_ORGANISATION_EXTERNAL_ID)
     private String externalId;
+
+    @ExcelUnknownCells
+    private Map<String, String> unknownCells;
+
+    public Map<String, String> getUnknownCells() {
+        return unknownCells;
+    }
 
     @ExcelCellName(HEADER_ORGANISATION_NAME)
     private String name;
