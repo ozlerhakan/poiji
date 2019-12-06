@@ -1,12 +1,9 @@
 package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
-import com.poiji.deserialize.model.byid.Person;
 import com.poiji.deserialize.model.byname.Organisation;
 import com.poiji.option.PoijiOptions;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import java.io.File;
 import java.util.List;
@@ -14,15 +11,22 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.runners.Parameterized.Parameters;
 
 public class MissingRowIndexTest {
 
     @Test
-    public void emptyLine() {
+    public void emptyLineXlsx() {
+        emptyLineTest("src/test/resources/missing-row-1.xlsx");
+    }
 
+    @Test
+    public void emptyLineXls() {
+        emptyLineTest("src/test/resources/missing-row-1.xls");
+    }
+
+    private void emptyLineTest(String excelFilePath) {
         List<Organisation> organisations = Poiji.fromExcel(
-                new File("src/test/resources/missing-row-1.xlsx"),
+                new File(excelFilePath),
                 Organisation.class,
                 PoijiOptions.PoijiOptionsBuilder.settings()
                         .sheetName("Organisation")
@@ -35,10 +39,18 @@ public class MissingRowIndexTest {
     }
 
     @Test
-    public void nullLine() {
+    public void nullLineXlsx() {
+        nullLineTest("src/test/resources/missing-row-2.xlsx");
+    }
 
+    @Test
+    public void nullLineXls() {
+        nullLineTest("src/test/resources/missing-row-2.xls");
+    }
+
+    private void nullLineTest(String s) {
         List<Organisation> organisations = Poiji.fromExcel(
-                new File("src/test/resources/missing-row-2.xlsx"),
+                new File(s),
                 Organisation.class,
                 PoijiOptions.PoijiOptionsBuilder.settings()
                         .sheetName("Organisation")
