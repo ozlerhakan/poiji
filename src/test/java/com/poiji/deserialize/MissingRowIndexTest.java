@@ -1,7 +1,7 @@
 package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
-import com.poiji.deserialize.model.byname.Organisation;
+import com.poiji.deserialize.model.byname.OrganisationByName;
 import com.poiji.option.PoijiOptions;
 import org.junit.Test;
 
@@ -25,17 +25,17 @@ public class MissingRowIndexTest {
     }
 
     private void emptyLineTest(String excelFilePath) {
-        List<Organisation> organisations = Poiji.fromExcel(
-                new File(excelFilePath),
-                Organisation.class,
+        List<OrganisationByName> organisations = Poiji.fromExcel(
+                new File("src/test/resources/missing-row-1.xlsx"),
+                OrganisationByName.class,
                 PoijiOptions.PoijiOptionsBuilder.settings()
                         .sheetName("Organisation")
                         .build()
         );
         assertThat(organisations, notNullValue());
         assertThat(organisations.size(), is(2));
-        assertThat(organisations.stream().map(Organisation::getRowIndex).min(Integer::compareTo).get(), is(2));
-        assertThat(organisations.stream().map(Organisation::getRowIndex).max(Integer::compareTo).get(), is(3));
+        assertThat(organisations.stream().map(OrganisationByName::getRowIndex).min(Integer::compareTo).get(), is(2));
+        assertThat(organisations.stream().map(OrganisationByName::getRowIndex).max(Integer::compareTo).get(), is(3));
     }
 
     @Test
@@ -49,9 +49,9 @@ public class MissingRowIndexTest {
     }
 
     private void nullLineTest(String s) {
-        List<Organisation> organisations = Poiji.fromExcel(
-                new File(s),
-                Organisation.class,
+        List<OrganisationByName> organisations = Poiji.fromExcel(
+                new File("src/test/resources/missing-row-2.xlsx"),
+                OrganisationByName.class,
                 PoijiOptions.PoijiOptionsBuilder.settings()
                         .sheetName("Organisation")
                         .build()
@@ -59,7 +59,7 @@ public class MissingRowIndexTest {
 
         assertThat(organisations, notNullValue());
         assertThat(organisations.size(), is(4));
-        assertThat(organisations.stream().map(Organisation::getRowIndex).min(Integer::compareTo).get(), is(2));
-        assertThat(organisations.stream().map(Organisation::getRowIndex).max(Integer::compareTo).get(), is(5));
+        assertThat(organisations.stream().map(OrganisationByName::getRowIndex).min(Integer::compareTo).get(), is(2));
+        assertThat(organisations.stream().map(OrganisationByName::getRowIndex).max(Integer::compareTo).get(), is(5));
     }
 }

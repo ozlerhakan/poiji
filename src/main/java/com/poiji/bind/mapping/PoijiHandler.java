@@ -4,6 +4,7 @@ import com.poiji.annotation.ExcelCell;
 import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelCellRange;
 import com.poiji.annotation.ExcelRow;
+import com.poiji.annotation.ExcelUnknownCells;
 import com.poiji.config.Casting;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
@@ -16,6 +17,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static java.lang.String.valueOf;
 
@@ -37,7 +39,8 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     private PoijiOptions options;
 
     private final Casting casting;
-    private Map<String, Integer> titles;
+    private Map<String, Integer> columnIndexPerTitle;
+    private Map<Integer, String> titlePerColumnIndex;
     // New maps used to speed up computing and handle inner objects
     private Map<String, Object> fieldInstances;
     private Map<Integer, Field> columnToField;
@@ -50,7 +53,8 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         this.limit = options.getLimit();
 
         casting = options.getCasting();
-        titles = new HashMap<>();
+        columnIndexPerTitle = new HashMap<>();
+        titlePerColumnIndex = new HashMap<>();
         columnToField = new HashMap<>();
         columnToSuperClassField = new HashMap<>();
     }
@@ -80,32 +84,56 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     private boolean setValue(String content, Class<? super T> type, int column) {
 
-        for (Field field : type.getDeclaredFields()) {
-            ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
-            if (excelRow != null) {
-                Object o = casting.castValue(field.getType(), valueOf(internalRow), options);
-                setFieldData(field, o, instance);
-                columnToField.put(-1, field);
-            }
-            ExcelCellRange range = field.getAnnotation(ExcelCellRange.class);
-            if (range != null) {
-                Object ins = null;
-                ins = getInstance(field);
-                for (Field f : field.getType().getDeclaredFields()) {
-                    if (setValue(f, column, content, ins)) {
-                        setFieldData(field, ins, instance);
-                        columnToField.put(column, f);
-                        columnToSuperClassField.put(column, field);
-//                        return true;
+
+        Stream.of(type.getDeclaredFields())
+                .filter(field -> field.getAnnotation(ExcelUnknownCells.class) == null)
+                .forEach(field -> {
+                    ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
+                    if (excelRow != null) {
+                        Object o = casting.castValue(field.getType(), valueOf(internalRow), options);
+                        setFieldData(field, o, instance);
+                        columnToField.put(-1, field);
                     }
-                }
-            } else {
-                if(setValue(field, column, content, instance)) {
-                    columnToField.put(column, field);
+                    ExcelCellRange range = field.getAnnotation(ExcelCellRange.class);
+                    if (range != null) {
+                        Object ins = null;
+                        ins = getInstance(field);
+                        for (Field f : field.getType().getDeclaredFields()) {
+                            if (setValue(f, column, content, ins)) {
+                                setFieldData(field, ins, instance);
+                                columnToField.put(column, f);
+                                columnToSuperClassField.put(column, field);
+//                        return true;
+                            }
+                        }
+                    } else {
+                        if(setValue(field, column, content, instance)) {
+                            columnToField.put(column, field);
 //                    return true;
-                }
-            }
-        }
+                        }
+                    }
+                });
+
+        Stream.of(type.getDeclaredFields())
+                .filter(field -> field.getAnnotation(ExcelUnknownCells.class) != null)
+                .forEach(field -> {
+                    if (!columnToField.containsKey(column)) {
+                        try {
+                            Map<String, String> excelUnknownCellsMap;
+                            field.setAccessible(true);
+                            if (field.get(instance) == null) {
+                                excelUnknownCellsMap = new HashMap<>();
+                                setFieldData(field, excelUnknownCellsMap, instance);
+                            } else {
+                                excelUnknownCellsMap = (Map) field.get(instance);
+                            }
+
+                            excelUnknownCellsMap.put(titlePerColumnIndex.get(column), content);
+                        } catch (IllegalAccessException e) {
+                            throw new IllegalCastException("Could not read content of field " + field.getName() + " on Object {" + instance + "}");
+                        }
+                    }
+                });
 
         // For ExcelRow annotation
         if(columnToField.containsKey(-1)) {
@@ -136,12 +164,13 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             if (column == index.value()) {
                 Object o = casting.castValue(fieldType, content, options);
                 setFieldData(field, o, ins);
+                return true;
             }
         } else {
             ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
             if (excelCellName != null) {
                 Class<?> fieldType = field.getType();
-                Integer titleColumn = titles.get(excelCellName.value() );
+                Integer titleColumn = columnIndexPerTitle.get(excelCellName.value() );
                 //Fix both columns mapped to name passing this condition below
                 if (titleColumn != null && titleColumn == column) {
                     Object o = casting.castValue(fieldType, content, options);
@@ -191,7 +220,9 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         int column = cellAddress.getColumn();
 
         if (row <= headers) {
-            titles.put(formattedValue, column);
+            columnIndexPerTitle.put(formattedValue, column);
+
+            titlePerColumnIndex.put(column, getTitleNameForMap(formattedValue, column));
         }
 
         if (row + 1 <= options.skip()) {
@@ -205,6 +236,17 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         internalRow = row;
 
         setFieldValue(formattedValue, type, column);
+    }
+
+    private String getTitleNameForMap(String cellContent, int columnIndex) {
+        String titleName;
+        if (titlePerColumnIndex.containsValue(cellContent)
+                || cellContent.isEmpty()) {
+            titleName = cellContent + "@" + columnIndex;
+        } else {
+            titleName = cellContent;
+        }
+        return titleName;
     }
 
     @Override

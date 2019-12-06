@@ -531,6 +531,53 @@ Then you can add your custom implementation with the `withCasting` method:
 List<Person> people = Poiji.fromExcel(excel, Person.class, options);
 ----
 
+=== Example 8
+
+Since Poiji NOT_RELEASED_YET, you can annotate a `Map<String, String>` with `@ExcelUnknownCells` to parse all entries,
+which are not mapped in any other way (for example by index or by name).
+
+This is our object model:
+
+[source,java]
+----
+public class MusicTrack {
+
+    @ExcelCellName("ID")
+    private String employeeId;
+
+    @ExcelCellName("AUTHOR")
+    private String author;
+
+    @ExcelCellName("NAME")
+    private String name;
+
+    @ExcelUnknownCells
+    private Map<String, String> unknownCells;
+
+}
+----
+
+This is the excel file we want to parse:
+
+|===
+|ID | AUTHOR |NAME |ENCODING |BITRATE
+
+|123923
+|Joe Doe
+|The example song
+|mp3
+|256
+
+|56437
+|Jane Doe
+|The random song
+|flac
+|1500
+|===
+
+The object corresponding to the first row of the excel sheet then has a map with `{ENCODING=mp3, BITRATE=256}`
+and the one for the second row has `{ENCODING=flac, BITRATE=1500}`.
+
 == Try with JShell
 
 Since we have a new pedagogic tool, Java 9 REPL, you can try Poiji in JShell. Clone the repo and follow the steps below. JShell should open up a new jshell session once loading the startup scripts and the specified jars that must be in the classpath. You must first import and create related packages and classes before using Poiji. We are able to use directly Poiji and Employee classes because they are already imported from `jshell/snippets` with `try-with-jshell.sh`.

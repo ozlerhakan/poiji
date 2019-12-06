@@ -4,6 +4,7 @@ import com.poiji.annotation.ExcelCell;
 import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelCellRange;
 import com.poiji.annotation.ExcelRow;
+import com.poiji.annotation.ExcelUnknownCells;
 import com.poiji.bind.Unmarshaller;
 import com.poiji.config.Casting;
 import com.poiji.exception.IllegalCastException;
@@ -17,10 +18,16 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static java.lang.String.valueOf;
 
@@ -33,7 +40,8 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     private final DataFormatter dataFormatter;
     protected final PoijiOptions options;
     private final Casting casting;
-    private Map<String, Integer> titles;
+    private Map<String, Integer> columnIndexPerTitle;
+    private Map<Integer, String> titlePerColumnIndex;
     private int limit;
     private int internalCount;
 
@@ -41,7 +49,8 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
         this.options = options;
         this.limit = options.getLimit();
         dataFormatter = new DataFormatter();
-        titles = new HashMap<>();
+        columnIndexPerTitle = new HashMap<>();
+        titlePerColumnIndex = new HashMap<>();
         casting = options.getCasting();
     }
 
@@ -61,7 +70,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
             if (!skip(currentRow, skip) && !isRowEmpty(currentRow)) {
                 internalCount += 1;
 
-            	if(limit != 0 && internalCount > limit)
+                if (limit != 0 && internalCount > limit)
                     return;
 
                 T t = deserialize0(currentRow, type);
@@ -75,38 +84,52 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
         int requestedIndex = options.sheetIndex();
         Sheet sheet = null;
         if (options.ignoreHiddenSheets()) {
-          for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
-            if (!workbook.isSheetHidden(i) && !workbook.isSheetVeryHidden(i)) {
-              if (sheetName == null) {
-                if (nonHiddenSheetIndex == requestedIndex) {
-                  return workbook.getSheetAt(i);
+            for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                if (!workbook.isSheetHidden(i) && !workbook.isSheetVeryHidden(i)) {
+                    if (sheetName == null) {
+                        if (nonHiddenSheetIndex == requestedIndex) {
+                            return workbook.getSheetAt(i);
+                        }
+                    } else {
+                        if (workbook.getSheetName(i).equalsIgnoreCase(sheetName)) {
+                            return workbook.getSheetAt(i);
+                        }
+                    }
+                    nonHiddenSheetIndex++;
                 }
-              } else {
-                if (workbook.getSheetName(i).equalsIgnoreCase(sheetName)) {
-                  return workbook.getSheetAt(i);
-                }
-              }
-              nonHiddenSheetIndex++;
             }
-          }
         } else {
-          if (sheetName == null) {
-            sheet = workbook.getSheetAt(requestedIndex);
-          } else {
-            sheet = workbook.getSheet(sheetName);
-          }
+            if (sheetName == null) {
+                sheet = workbook.getSheetAt(requestedIndex);
+            } else {
+                sheet = workbook.getSheet(sheetName);
+            }
         }
         return sheet;
-      }
+    }
 
     private void loadColumnTitles(Sheet sheet, int maxPhysicalNumberOfRows) {
         if (maxPhysicalNumberOfRows > 0) {
             int row = options.getHeaderStart();
             Row firstRow = sheet.getRow(row);
             for (Cell cell : firstRow) {
-                titles.put(cell.getStringCellValue(), cell.getColumnIndex());
+                columnIndexPerTitle.put(cell.getStringCellValue(), cell.getColumnIndex());
+
+                titlePerColumnIndex.put(cell.getColumnIndex(),
+                        getTitleNameForMap(cell.getStringCellValue(), cell.getColumnIndex()));
             }
         }
+    }
+
+    private String getTitleNameForMap(String cellContent, int columnIndex) {
+        String titleName;
+        if (titlePerColumnIndex.containsValue(cellContent)
+                || cellContent.isEmpty()) {
+            titleName = cellContent + "@" + columnIndex;
+        } else {
+            titleName = cellContent;
+        }
+        return titleName;
     }
 
     private <T> T deserialize0(Row currentRow, Class<T> type) {
@@ -115,41 +138,63 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     }
 
     private <T> T tailSetFieldValue(Row currentRow, Class<? super T> type, T instance) {
+        List<Integer> mappedColumnIndices = new ArrayList<>();
+        List<Field> unknownCells = new ArrayList<>();
+
         for (Field field : type.getDeclaredFields()) {
             ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
+            ExcelCellRange excelCellRange = field.getAnnotation(ExcelCellRange.class);
+            ExcelUnknownCells excelUnknownCells = field.getAnnotation(ExcelUnknownCells.class);
             if (excelRow != null) {
                 Object o;
                 o = casting.castValue(field.getType(), valueOf(currentRow.getRowNum()), currentRow.getRowNum(), -1, options);
                 setFieldData(instance, field, o);
-            }
-            ExcelCellRange excelCellRange = field.getAnnotation(ExcelCellRange.class);
-            if (excelCellRange != null) {
+            } else if (excelCellRange != null) {
+
                 Class<?> o = field.getType();
                 Object ins = ReflectUtil.newInstanceOf(o);
                 for (Field f : o.getDeclaredFields()) {
-                    tailSetFieldValue(currentRow, ins, f);
+                    mappedColumnIndices.add(tailSetFieldValue(currentRow, ins, f));
                 }
                 setFieldData(instance, field, ins);
+            } else if (excelUnknownCells != null) {
+                unknownCells.add(field);
             } else {
-                tailSetFieldValue(currentRow, instance, field);
+                mappedColumnIndices.add(tailSetFieldValue(currentRow, instance, field));
             }
         }
+
+        Map<String, String> excelUnknownCellsMap = StreamSupport
+                .stream(Spliterators.spliteratorUnknownSize(currentRow.cellIterator(), Spliterator.ORDERED), false)
+                .filter(cell -> !mappedColumnIndices.contains(cell.getColumnIndex()))
+                .filter(cell -> !cell.toString().isEmpty())
+                .collect(Collectors.toMap(
+                        cell -> titlePerColumnIndex.get(cell.getColumnIndex()),
+                        Object::toString
+                ));
+
+        unknownCells.forEach(field -> setFieldData(instance, field, excelUnknownCellsMap));
+
         return instance;
     }
 
-    private <T> void tailSetFieldValue(Row currentRow, T instance, Field field) {
+    private <T> Integer tailSetFieldValue(Row currentRow, T instance, Field field) {
         ExcelCell index = field.getAnnotation(ExcelCell.class);
         if (index != null) {
             constructTypeValue(currentRow, instance, field, index.value());
+            return index.value();
         } else {
             ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
             if (excelCellName != null) {
-                Integer titleColumn = titles.get(excelCellName.value());
+                Integer titleColumn = columnIndexPerTitle.get(excelCellName.value());
                 if (titleColumn != null) {
                     constructTypeValue(currentRow, instance, field, titleColumn);
+                    return titleColumn;
                 }
             }
         }
+
+        return null;
     }
 
     private <T> void constructTypeValue(Row currentRow, T instance, Field field, int column) {
