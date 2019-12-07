@@ -1,5 +1,5 @@
 = Poiji
-:version: v2.2.0
+:version: v2.3.0
 
 image:https://travis-ci.org/ozlerhakan/poiji.svg?branch=master["Build Status", link="https://travis-ci.org/ozlerhakan/poiji"] image:https://api.codacy.com/project/badge/Grade/6587e90886184da29a1b7c5634695c9d["Codacy code quality", link="https://www.codacy.com/app/ozlerhakan/poiji?utm_source=github.com&utm_medium=referral&utm_content=ozlerhakan/poiji&utm_campaign=Badge_Grade"] image:https://coveralls.io/repos/github/ozlerhakan/poiji/badge.svg?branch=master["Coverage Status", link="https://coveralls.io/github/ozlerhakan/poiji?branch=master"] image:https://img.shields.io/badge/apache.poi-4.1.0-brightgreen.svg[] image:https://img.shields.io/badge/gitter-join%20chat-blue.svg["Gitter", link="https://gitter.im/poiji/Lobby"] image:https://img.shields.io/badge/license-MIT-blue.svg[]
 
@@ -15,7 +15,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 <dependency>
   <groupId>com.github.ozlerhakan</groupId>
   <artifactId>poiji</artifactId>
-  <version>2.2.0</version>
+  <version>2.3.0</version>
 </dependency>
 ----
 
@@ -23,7 +23,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    compile 'com.github.ozlerhakan:poiji:2.2.0'
+    compile 'com.github.ozlerhakan:poiji:2.3.0'
 }
 ----
 
@@ -533,7 +533,7 @@ List<Person> people = Poiji.fromExcel(excel, Person.class, options);
 
 === Example 8
 
-Since Poiji NOT_RELEASED_YET, you can annotate a `Map<String, String>` with `@ExcelUnknownCells` to parse all entries,
+Since Poiji 2.3.0, you can annotate a `Map<String, String>` with `@ExcelUnknownCells` to parse all entries,
 which are not mapped in any other way (for example by index or by name).
 
 This is our object model:
