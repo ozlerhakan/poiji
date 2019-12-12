@@ -108,7 +108,7 @@ public class Employee {
 ----
 <1> As of 1.10, optionally we can access the index of each row item by using the `ExcelRow` annotation. Annotated variable should be of type `int`, `double`, `float` or `long`.
 <2> A field must be annotated with `@ExcelCell` along with its property in order to get the value from the right coordinate in the target excel sheet.
-<3> An annotated field can be either protected, private or public modifier. The field may be either of `boolean`, `int`, `long`, `float`, `double`, or their wrapper classes. You can add a field of `java.util.Date`, `java.time.DateTime` and `String` as well.
+<3> An annotated field can be either protected, private or public modifier. The field may be either of `boolean`, `int`, `long`, `float`, `double`, or their wrapper classes. You can add a field of `java.util.Date`, `java.time.LocalDate`, `java.time.LocalDateTime` and `String` as well.
 
 This is the excel file (`employees.xlsx`) we want to map to a list of `Employee` instance:
 
