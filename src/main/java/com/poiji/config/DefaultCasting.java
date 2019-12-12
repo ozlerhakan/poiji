@@ -195,43 +195,43 @@ public final class DefaultCasting implements Casting {
 
         Object o;
 
-        if (fieldType.getName().equals("int")) {
+        if (fieldType == int.class) {
             o = primitiveIntegerValue(value, sheetName, row, col);
 
-        } else if (fieldType.getName().equals("java.lang.Integer")) {
+        } else if (fieldType == Integer.class) {
             o = integerValue(value, sheetName, row, col, options);
 
-        } else if (fieldType.getName().equals("java.math.BigDecimal")) {
+        } else if (fieldType == BigDecimal.class) {
             o = bigDecimalValue(value, sheetName, row, col, options);
 
-        } else if (fieldType.getName().equals("long")) {
+        } else if (fieldType == long.class) {
             o = primitiveLongValue(value, sheetName, row, col);
 
-        } else if (fieldType.getName().equals("java.lang.Long")) {
+        } else if (fieldType == Long.class) {
             o = longValue(value, sheetName, row, col, options);
 
-        } else if (fieldType.getName().equals("double")) {
+        } else if (fieldType == double.class) {
             o = primitiveDoubleValue(value, sheetName, row, col);
 
-        } else if (fieldType.getName().equals("java.lang.Double")) {
+        } else if (fieldType == Double.class) {
             o = doubleValue(value, sheetName, row, col, options);
 
-        } else if (fieldType.getName().equals("float")) {
+        } else if (fieldType == float.class) {
             o = primitiveFloatValue(value, sheetName, row, col);
 
-        } else if (fieldType.getName().equals("java.lang.Float")) {
+        } else if (fieldType == Float.class) {
             o = floatValue(value, sheetName, row, col, options);
 
-        } else if (fieldType.getName().equals("boolean") || fieldType.getName().equals("java.lang.Boolean")) {
+        } else if (fieldType == boolean.class || fieldType == Boolean.class) {
             o = Boolean.valueOf(value);
 
-        } else if (fieldType.getName().equals("java.util.Date")) {
+        } else if (fieldType == Date.class) {
             o = dateValue(value, sheetName, row, col, options);
 
-        } else if (fieldType.getName().equals("java.time.LocalDate")) {
+        } else if (fieldType == LocalDate.class) {
             o = localDateValue(value, sheetName, row, col, options);
 
-        } else if (fieldType.getName().equals("java.time.LocalDateTime")) {
+        } else if (fieldType == LocalDateTime.class) {
             o = localDateTimeValue(value, sheetName, row, col, options);
 
         } else if (fieldType.isEnum()) {
