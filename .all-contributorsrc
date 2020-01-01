@@ -13,6 +13,20 @@
       "link": "[<%= symbol %>](<%= url %> \"<%= description %>\"),"
     }
   },
-  "skipCi": "true",
-  "contributors": []
+  "skipCi": true,
+  "contributors": [
+    {
+      "login": "Brutus5000",
+      "name": "Brutus5000",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/6843462?v=4",
+      "profile": "https://github.com/Brutus5000",
+      "contributions": [
+        "design"
+      ]
+    }
+  ],
+  "projectName": "poiji",
+  "projectOwner": "ozlerhakan",
+  "repoType": "github",
+  "repoHost": "https://github.com"
 }
