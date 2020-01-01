@@ -13,6 +13,20 @@
       "link": "[<%= symbol %>](<%= url %> \"<%= description %>\"),"
     }
   },
-  "skipCi": "true",
-  "contributors": []
+  "skipCi": true,
+  "contributors": [
+    {
+      "login": "brunslo",
+      "name": "Loren Bruns",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/3261911?v=4",
+      "profile": "https://github.com/brunslo",
+      "contributions": [
+        "design"
+      ]
+    }
+  ],
+  "projectName": "poiji",
+  "projectOwner": "ozlerhakan",
+  "repoType": "github",
+  "repoHost": "https://github.com"
 }
