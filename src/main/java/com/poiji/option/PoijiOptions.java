@@ -1,5 +1,6 @@
 package com.poiji.option;
 
+import com.poiji.annotation.ExcelCellName;
 import com.poiji.config.Casting;
 import com.poiji.config.DefaultCasting;
 import com.poiji.exception.PoijiException;
@@ -32,6 +33,7 @@ public final class PoijiOptions {
     private Casting casting;
     private int headerStart;
     private String sheetName;
+    private boolean caseInsensitive;
 
     private PoijiOptions() {
         super();
@@ -186,6 +188,15 @@ public final class PoijiOptions {
         return sheetName;
     }
 
+    public boolean getCaseInsensitive() {
+        return caseInsensitive;
+    }
+
+    public PoijiOptions setCaseInsensitive(final boolean caseInsensitive) {
+        this.caseInsensitive = caseInsensitive;
+        return this;
+    }
+
     public static class PoijiOptionsBuilder {
 
         private int sheetIndex;
@@ -204,6 +215,7 @@ public final class PoijiOptions {
         private int skip = 0;
         private int limit = 0;
         private String sheetName;
+        private boolean caseInsensitive;
 
         private PoijiOptionsBuilder() {
         }
@@ -294,7 +306,8 @@ public final class PoijiOptions {
                     .setDateLenient(dateLenient)
                     .setHeaderStart(headerStart)
                     .setCasting(casting)
-                    .setLimit(limit);
+                    .setLimit(limit)
+                    .setCaseInsensitive(caseInsensitive);
         }
 
         /**
@@ -448,6 +461,17 @@ public final class PoijiOptions {
                 throw new PoijiException("Header index must be greater than or equal to 0");
             }
             this.headerStart = headerStart;
+            return this;
+        }
+
+        /**
+         * Permits case insensitive column names mapping for annotation {@link ExcelCellName}.
+         * Default - false.
+         *
+         * @param caseInsensitive true or false
+         */
+        public PoijiOptionsBuilder caseInsensitive(final boolean caseInsensitive) {
+            this.caseInsensitive = caseInsensitive;
             return this;
         }
     }

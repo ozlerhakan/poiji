@@ -170,7 +170,10 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
             if (excelCellName != null) {
                 Class<?> fieldType = field.getType();
-                Integer titleColumn = columnIndexPerTitle.get(excelCellName.value() );
+                final String titleName = options.getCaseInsensitive()
+                    ? excelCellName.value().toLowerCase()
+                    : excelCellName.value();
+                final Integer titleColumn = columnIndexPerTitle.get(titleName);
                 //Fix both columns mapped to name passing this condition below
                 if (titleColumn != null && titleColumn == column) {
                     Object o = casting.castValue(fieldType, content, options);
@@ -220,7 +223,10 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         int column = cellAddress.getColumn();
 
         if (row <= headers) {
-            columnIndexPerTitle.put(formattedValue, column);
+            columnIndexPerTitle.put(
+                options.getCaseInsensitive() ? formattedValue.toLowerCase() : formattedValue,
+                column
+            );
 
             titlePerColumnIndex.put(column, getTitleNameForMap(formattedValue, column));
         }
