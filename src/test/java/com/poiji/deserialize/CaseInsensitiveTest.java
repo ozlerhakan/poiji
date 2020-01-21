@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -27,7 +28,7 @@ public class CaseInsensitiveTest {
 
     @Parameterized.Parameters
     public static List<String> excel() {
-        return Collections.singletonList("src/test/resources/case_insensitive.xlsx");
+        return asList("src/test/resources/case_insensitive.xlsx", "src/test/resources/case_insensitive.xls");
     }
 
     @Test
