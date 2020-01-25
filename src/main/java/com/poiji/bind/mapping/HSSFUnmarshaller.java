@@ -40,9 +40,10 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     private final DataFormatter dataFormatter;
     protected final PoijiOptions options;
     private final Casting casting;
-    private Map<String, Integer> columnIndexPerTitle;
-    private Map<Integer, String> titlePerColumnIndex;
-    private int limit;
+    private final Map<String, Integer> columnIndexPerTitle;
+    private final Map<Integer, String> titlePerColumnIndex;
+    private final Map<Integer, String> caseSensitiveTitlePerColumnIndex;
+    private final int limit;
     private int internalCount;
 
     HSSFUnmarshaller(PoijiOptions options) {
@@ -51,6 +52,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
         dataFormatter = new DataFormatter();
         columnIndexPerTitle = new HashMap<>();
         titlePerColumnIndex = new HashMap<>();
+        caseSensitiveTitlePerColumnIndex = new HashMap<>();
         casting = options.getCasting();
     }
 
@@ -73,8 +75,8 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
                 if (limit != 0 && internalCount > limit)
                     return;
 
-                T t = deserialize0(currentRow, type);
-                consumer.accept(t);
+                T instance = deserializeRowToInstance(currentRow, type);
+                consumer.accept(instance);
             }
         }
     }
@@ -113,10 +115,13 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
             int row = options.getHeaderStart();
             Row firstRow = sheet.getRow(row);
             for (Cell cell : firstRow) {
-                columnIndexPerTitle.put(cell.getStringCellValue(), cell.getColumnIndex());
-
-                titlePerColumnIndex.put(cell.getColumnIndex(),
-                        getTitleNameForMap(cell.getStringCellValue(), cell.getColumnIndex()));
+                final int columnIndex = cell.getColumnIndex();
+                caseSensitiveTitlePerColumnIndex.put(columnIndex, getTitleNameForMap(cell.getStringCellValue(), columnIndex));
+                final String titleName = options.getCaseInsensitive()
+                    ? cell.getStringCellValue().toLowerCase()
+                    : cell.getStringCellValue();
+                columnIndexPerTitle.put(titleName, columnIndex);
+                titlePerColumnIndex.put(columnIndex, getTitleNameForMap(titleName, columnIndex));
             }
         }
     }
@@ -132,9 +137,9 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
         return titleName;
     }
 
-    private <T> T deserialize0(Row currentRow, Class<T> type) {
+    private <T> T deserializeRowToInstance(Row currentRow, Class<T> type) {
         T instance = ReflectUtil.newInstanceOf(type);
-        return setFieldValue(currentRow, type, instance);
+        return setFieldValuesFromRowIntoInstance(currentRow, type, instance);
     }
 
     private <T> T tailSetFieldValue(Row currentRow, Class<? super T> type, T instance) {
@@ -142,22 +147,19 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
         List<Field> unknownCells = new ArrayList<>();
 
         for (Field field : type.getDeclaredFields()) {
-            ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
-            ExcelCellRange excelCellRange = field.getAnnotation(ExcelCellRange.class);
-            ExcelUnknownCells excelUnknownCells = field.getAnnotation(ExcelUnknownCells.class);
-            if (excelRow != null) {
-                Object o;
-                o = casting.castValue(field.getType(), valueOf(currentRow.getRowNum()), currentRow.getRowNum(), -1, options);
-                setFieldData(instance, field, o);
-            } else if (excelCellRange != null) {
+            if (field.getAnnotation(ExcelRow.class) != null) {
+                final int rowNum = currentRow.getRowNum();
+                final Object data = casting.castValue(field.getType(), valueOf(rowNum), rowNum, -1, options);
+                setFieldData(instance, field, data);
+            } else if (field.getAnnotation(ExcelCellRange.class) != null) {
 
-                Class<?> o = field.getType();
-                Object ins = ReflectUtil.newInstanceOf(o);
-                for (Field f : o.getDeclaredFields()) {
-                    mappedColumnIndices.add(tailSetFieldValue(currentRow, ins, f));
+                Class<?> fieldType = field.getType();
+                Object fieldInstance = ReflectUtil.newInstanceOf(fieldType);
+                for (Field fieldField : fieldType.getDeclaredFields()) {
+                    mappedColumnIndices.add(tailSetFieldValue(currentRow, fieldInstance, fieldField));
                 }
-                setFieldData(instance, field, ins);
-            } else if (excelUnknownCells != null) {
+                setFieldData(instance, field, fieldInstance);
+            } else if (field.getAnnotation(ExcelUnknownCells.class) != null) {
                 unknownCells.add(field);
             } else {
                 mappedColumnIndices.add(tailSetFieldValue(currentRow, instance, field));
@@ -169,7 +171,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
                 .filter(cell -> !mappedColumnIndices.contains(cell.getColumnIndex()))
                 .filter(cell -> !cell.toString().isEmpty())
                 .collect(Collectors.toMap(
-                        cell -> titlePerColumnIndex.get(cell.getColumnIndex()),
+                        cell -> caseSensitiveTitlePerColumnIndex.get(cell.getColumnIndex()),
                         Object::toString
                 ));
 
@@ -179,48 +181,53 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     }
 
     private <T> Integer tailSetFieldValue(Row currentRow, T instance, Field field) {
+        final Integer column = getFieldColumn(field);
+        if (column != null) {
+            constructTypeValue(currentRow, instance, field, column);
+        }
+        return column;
+    }
+
+    private Integer getFieldColumn(final Field field) {
         ExcelCell index = field.getAnnotation(ExcelCell.class);
+        Integer column = null;
         if (index != null) {
-            constructTypeValue(currentRow, instance, field, index.value());
-            return index.value();
+            column = index.value();
         } else {
             ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
             if (excelCellName != null) {
-                Integer titleColumn = columnIndexPerTitle.get(excelCellName.value());
-                if (titleColumn != null) {
-                    constructTypeValue(currentRow, instance, field, titleColumn);
-                    return titleColumn;
-                }
+                final String titleName = options.getCaseInsensitive()
+                    ? excelCellName.value().toLowerCase()
+                    : excelCellName.value();
+                column = columnIndexPerTitle.get(titleName);
             }
         }
-
-        return null;
+        return column;
     }
 
     private <T> void constructTypeValue(Row currentRow, T instance, Field field, int column) {
-        Class<?> fieldType = field.getType();
         Cell cell = currentRow.getCell(column);
 
         if (cell != null) {
             String value = dataFormatter.formatCellValue(cell);
-            Object o = casting.castValue(fieldType, value, currentRow.getRowNum(), column, options);
-            setFieldData(instance, field, o);
+            Object data = casting.castValue(field.getType(), value, currentRow.getRowNum(), column, options);
+            setFieldData(instance, field, data);
         }
     }
 
-    private <T> void setFieldData(T instance, Field field, Object o) {
+    private <T> void setFieldData(T instance, Field field, Object data) {
         try {
             field.setAccessible(true);
-            field.set(instance, o);
+            field.set(instance, data);
         } catch (IllegalAccessException e) {
-            throw new IllegalCastException("Unexpected cast type {" + o + "} of field" + field.getName());
+            throw new IllegalCastException("Unexpected cast type {" + data + "} of field" + field.getName());
         }
     }
 
-    private <T> T setFieldValue(Row currentRow, Class<? super T> subclass, T instance) {
+    private <T> T setFieldValuesFromRowIntoInstance(Row currentRow, Class<? super T> subclass, T instance) {
         return subclass == null
                 ? instance
-                : tailSetFieldValue(currentRow, subclass, setFieldValue(currentRow, subclass.getSuperclass(), instance));
+                : tailSetFieldValue(currentRow, subclass, setFieldValuesFromRowIntoInstance(currentRow, subclass.getSuperclass(), instance));
     }
 
     private boolean skip(final Row currentRow, int skip) {
