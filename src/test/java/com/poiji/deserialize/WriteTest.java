@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static java.time.ZoneOffset.UTC;
@@ -19,6 +20,7 @@ import static java.time.ZoneOffset.UTC;
 /**
  * For manual testing.
  */
+@Ignore
 public class WriteTest {
 
     @Test
