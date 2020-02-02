@@ -7,8 +7,8 @@ import com.poiji.exception.PoijiExcelType;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
+import com.poiji.save.FileSaverFactory;
 import com.poiji.util.Files;
-
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -207,15 +207,23 @@ public final class Poiji {
      * language access control and the underlying field is either inaccessible or final.
      * @see Poiji#fromExcel(File, Class)
      */
-    public static synchronized <T> void fromExcel(final InputStream inputStream,
-                                                  final PoijiExcelType excelType,
-                                                  final Class<T> type,
-                                                  final PoijiOptions options,
-                                                  final Consumer<? super T> consumer) {
+    public static synchronized <T> void fromExcel(final InputStream inputStream, final PoijiExcelType excelType,
+        final Class<T> type, final PoijiOptions options, final Consumer<? super T> consumer
+    ) {
         Objects.requireNonNull(excelType);
 
         final Unmarshaller unmarshaller = deserializer(inputStream, excelType, options);
         unmarshaller.unmarshal(type, consumer);
+    }
+
+    public static <T> void toExcel(final File file, final Class<T> clazz, final List<T> data) {
+        toExcel(file, clazz, data, PoijiOptionsBuilder.settings().build());
+    }
+
+    public static <T> void toExcel(
+        final File file, final Class<T> clazz, final List<T> data, final PoijiOptions options
+    ) {
+        new FileSaverFactory<>(clazz, options).toFile(file).save(data);
     }
 
     private static Unmarshaller deserializer(final File file, final PoijiOptions options) {
