@@ -11,6 +11,7 @@ import java.util.Objects;
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_FORMATTER;
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_PATTERN;
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_TIME_FORMATTER;
+import static com.poiji.util.PoijiConstants.DEFAULT_DATE_TIME_PATTERN;
 
 /**
  * Created by hakan on 17/01/2017.
@@ -24,6 +25,7 @@ public final class PoijiOptions {
     private String dateRegex;
     private String dateTimeRegex;
     private String datePattern;
+    private String dateTimePattern;
     private boolean dateLenient;
     private boolean trimCellValue;
     private boolean ignoreHiddenSheets;
@@ -58,6 +60,11 @@ public final class PoijiOptions {
         return this;
     }
 
+    public PoijiOptions setDateTimePattern(final String dateTimePattern) {
+        this.dateTimePattern = dateTimePattern;
+        return this;
+    }
+
     private PoijiOptions setDateFormatter(DateTimeFormatter dateFormatter) {
         this.dateFormatter = dateFormatter;
         return this;
@@ -84,6 +91,10 @@ public final class PoijiOptions {
 
     public String datePattern() {
         return datePattern;
+    }
+
+    public String getDateTimePattern() {
+        return dateTimePattern;
     }
 
     public DateTimeFormatter dateFormatter() {
@@ -209,6 +220,7 @@ public final class PoijiOptions {
         private boolean preferNullOverDefault;
         private String datePattern = DEFAULT_DATE_PATTERN;
         private DateTimeFormatter dateFormatter = DEFAULT_DATE_FORMATTER;
+        private String dateTimePattern = DEFAULT_DATE_TIME_PATTERN;
         private DateTimeFormatter dateTimeFormatter = DEFAULT_DATE_TIME_FORMATTER;
         private Casting casting = new DefaultCasting();
         private int headerStart = 0;
@@ -269,11 +281,23 @@ public final class PoijiOptions {
          * set date pattern, default date format is "dd/M/yyyy" for
          * java.util.Date
          *
-         * @param datePattern date time formatter
+         * @param datePattern date pattern
          * @return this
          */
         public PoijiOptionsBuilder datePattern(String datePattern) {
             this.datePattern = datePattern;
+            return this;
+        }
+
+        /**
+         * set date time pattern, default date time format is "dd/M/yyyy HH:mm:ss" for
+         * java.util.Date
+         *
+         * @param dateTimePattern date time pattern
+         * @return this
+         */
+        public PoijiOptionsBuilder dateTimePattern(String dateTimePattern) {
+            this.dateTimePattern = dateTimePattern;
             return this;
         }
 
@@ -295,6 +319,7 @@ public final class PoijiOptions {
                     .setPassword(password)
                     .setPreferNullOverDefault(preferNullOverDefault)
                     .setDatePattern(datePattern)
+                    .setDateTimePattern(dateTimePattern)
                     .setDateFormatter(dateFormatter)
                     .setDateTimeFormatter(dateTimeFormatter)
                     .setSheetIndex(sheetIndex)
