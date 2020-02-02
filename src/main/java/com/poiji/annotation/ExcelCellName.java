@@ -14,10 +14,19 @@ import java.lang.annotation.Target;
 @Documented
 public @interface ExcelCellName {
 
+    int ABSENT_ORDER = -1;
+
     /**
      * Specifies the column name where the corresponding value is mapped from the excel data
      *
      * @return column name
      */
     String value();
+
+    /**
+     * Specifies the column order in saved file
+     *
+     * @return column order
+     */
+    int order() default ABSENT_ORDER;
 }
