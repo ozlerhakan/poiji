@@ -20,4 +20,6 @@ public @interface ExcelCellName {
      * @return column name
      */
     String value();
+
+    String delimeter() default "";
 }

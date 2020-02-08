@@ -10,13 +10,6 @@ import com.poiji.config.Casting;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.ReflectUtil;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +21,12 @@ import java.util.Spliterators;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
 import static java.lang.String.valueOf;
 
@@ -196,13 +195,27 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
         } else {
             ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
             if (excelCellName != null) {
-                final String titleName = options.getCaseInsensitive()
-                    ? excelCellName.value().toLowerCase()
-                    : excelCellName.value();
-                column = columnIndexPerTitle.get(titleName);
+                column = getFieldColumnFromExcelCellName(excelCellName);
             }
         }
         return column;
+    }
+
+    private Integer getFieldColumnFromExcelCellName(final ExcelCellName excelCellName) {
+        final String titleName = options.getCaseInsensitive()
+            ? excelCellName.value().toLowerCase()
+            : excelCellName.value();
+        if (excelCellName.delimeter().isEmpty()) {
+            return columnIndexPerTitle.get(titleName);
+        } else {
+            final String[] possibleTitles = titleName.split(excelCellName.delimeter());
+            for (final String possibleTitle : possibleTitles) {
+                if (columnIndexPerTitle.containsKey(possibleTitle)) {
+                    return columnIndexPerTitle.get(possibleTitle);
+                }
+            }
+        }
+        return null;
     }
 
     private <T> void constructTypeValue(Row currentRow, T instance, Field field, int column) {

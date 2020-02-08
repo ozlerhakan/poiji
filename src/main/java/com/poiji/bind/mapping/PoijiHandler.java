@@ -9,15 +9,14 @@ import com.poiji.config.Casting;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.ReflectUtil;
-import org.apache.poi.ss.util.CellAddress;
-import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
-import org.apache.poi.xssf.usermodel.XSSFComment;
-
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+import org.apache.poi.ss.util.CellAddress;
+import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
+import org.apache.poi.xssf.usermodel.XSSFComment;
 
 import static java.lang.String.valueOf;
 
@@ -169,20 +168,33 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         } else {
             ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
             if (excelCellName != null) {
-                Class<?> fieldType = field.getType();
-                final String titleName = options.getCaseInsensitive()
-                    ? excelCellName.value().toLowerCase()
-                    : excelCellName.value();
-                final Integer titleColumn = columnIndexPerTitle.get(titleName);
+                final Integer titleColumn = getFieldColumnFromExcelCellName(excelCellName);
                 //Fix both columns mapped to name passing this condition below
-                if (titleColumn != null && titleColumn == column) {
-                    Object o = casting.castValue(fieldType, content, options);
+                if (titleColumn != null && titleColumn.equals(column)) {
+                    Object o = casting.castValue(field.getType(), content, options);
                     setFieldData(field, o, ins);
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    private Integer getFieldColumnFromExcelCellName(final ExcelCellName excelCellName) {
+        final String titleName = options.getCaseInsensitive()
+            ? excelCellName.value().toLowerCase()
+            : excelCellName.value();
+        if (excelCellName.delimeter().isEmpty()) {
+            return columnIndexPerTitle.get(titleName);
+        } else {
+            final String[] possibleTitles = titleName.split(excelCellName.delimeter());
+            for (final String possibleTitle : possibleTitles) {
+                if (columnIndexPerTitle.containsKey(possibleTitle)) {
+                    return columnIndexPerTitle.get(possibleTitle);
+                }
+            }
+        }
+        return null;
     }
 
     private void setFieldData(Field field, Object o, Object instance) {
