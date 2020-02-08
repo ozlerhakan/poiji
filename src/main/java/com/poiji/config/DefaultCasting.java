@@ -1,5 +1,7 @@
 package com.poiji.config;
 
+import com.poiji.option.PoijiOptions;
+import com.poiji.parser.Parsers;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,9 +14,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
-import com.poiji.option.PoijiOptions;
-import com.poiji.parser.Parsers;
 
 /**
  * Created by hakan on 22/01/2017.
@@ -222,8 +221,23 @@ public final class DefaultCasting implements Casting {
         } else if (fieldType == Float.class) {
             o = floatValue(value, sheetName, row, col, options);
 
-        } else if (fieldType == boolean.class || fieldType == Boolean.class) {
+        } else if (fieldType == boolean.class) {
             o = Boolean.valueOf(value);
+
+        } else if (fieldType == Boolean.class) {
+            o = value.isEmpty() ? options.preferNullOverDefault() ? null : false : Boolean.valueOf(value);
+
+        } else if (fieldType == byte.class) {
+            o = Byte.valueOf(value);
+
+        } else if (fieldType == Byte.class) {
+            o = value.isEmpty() ? options.preferNullOverDefault() ? null : (byte) 0 : Byte.valueOf(value);
+
+        } else if (fieldType == short.class) {
+            o = Short.valueOf(value);
+
+        } else if (fieldType == Short.class) {
+            o = value.isEmpty() ? options.preferNullOverDefault() ? null : (short) 0 : Short.valueOf(value);
 
         } else if (fieldType == Date.class) {
             o = dateValue(value, sheetName, row, col, options);
