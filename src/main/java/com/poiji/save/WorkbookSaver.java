@@ -16,14 +16,12 @@ public class WorkbookSaver {
 
     protected final PoijiOptions options;
     private final MappedFields mappedFields;
-    private final CellDataCasting cellDataCasting;
 
     public WorkbookSaver(
         final MappedFields mappedFields, final PoijiOptions options
     ) {
         this.mappedFields = mappedFields;
         this.options = options;
-        cellDataCasting = new CellDataCasting();
     }
 
     protected <T> void save(final List<T> data, final Workbook workbook, final OutputStream outputStream) {
@@ -50,10 +48,11 @@ public class WorkbookSaver {
     }
 
     private <T> void setValuesFromKnownFields(final Row row, final T instance) throws IllegalAccessException {
+        final CellCasting cellCasting = options.getCellCasting();
         for (Map.Entry<Field, Integer> orders : mappedFields.getOrders().entrySet()) {
             final Cell cell = row.createCell(orders.getValue());
             final Field field = orders.getKey();
-            cellDataCasting.forType(field.getType()).accept(cell, field.get(instance));
+            cellCasting.forType(field.getType()).accept(cell, field.get(instance));
         }
     }
 

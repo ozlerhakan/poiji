@@ -4,6 +4,7 @@ import com.poiji.annotation.ExcelCellName;
 import com.poiji.config.Casting;
 import com.poiji.config.DefaultCasting;
 import com.poiji.exception.PoijiException;
+import com.poiji.save.CellCasting;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
@@ -33,6 +34,7 @@ public final class PoijiOptions {
     private DateTimeFormatter dateFormatter;
     private DateTimeFormatter dateTimeFormatter;
     private Casting casting;
+    private CellCasting cellCasting;
     private int headerStart;
     private String sheetName;
     private boolean caseInsensitive;
@@ -154,6 +156,15 @@ public final class PoijiOptions {
         return this;
     }
 
+    public CellCasting getCellCasting() {
+        return cellCasting;
+    }
+
+    private PoijiOptions setCellCasting(final CellCasting cellCasting) {
+        this.cellCasting = cellCasting;
+        return this;
+    }
+
     private PoijiOptions setSheetIndex(int sheetIndex) {
         this.sheetIndex = sheetIndex;
         return this;
@@ -212,7 +223,7 @@ public final class PoijiOptions {
         return caseInsensitive;
     }
 
-    public PoijiOptions setCaseInsensitive(final boolean caseInsensitive) {
+    private PoijiOptions setCaseInsensitive(final boolean caseInsensitive) {
         this.caseInsensitive = caseInsensitive;
         return this;
     }
@@ -233,6 +244,7 @@ public final class PoijiOptions {
         private String localDateTimePattern = DEFAULT_DATE_TIME_PATTERN;
         private DateTimeFormatter dateTimeFormatter = DEFAULT_DATE_TIME_FORMATTER;
         private Casting casting = new DefaultCasting();
+        private CellCasting cellCasting = new CellCasting();
         private int headerStart = 0;
         private int skip = 0;
         private int limit = 0;
@@ -344,16 +356,17 @@ public final class PoijiOptions {
                 .setLocalDatePattern(localDatePattern)
                 .setLocalDateTimePattern(localDateTimePattern)
                     .setDateFormatter(dateFormatter)
-                    .setDateTimeFormatter(dateTimeFormatter)
-                    .setSheetIndex(sheetIndex)
-                    .setSheetName(sheetName)
-                    .setIgnoreHiddenSheets(ignoreHiddenSheets)
-                    .setTrimCellValue(trimCellValue)
-                    .setDateRegex(dateRegex)
-                    .setDateTimeRegex(dateTimeRegex)
-                    .setDateLenient(dateLenient)
-                    .setHeaderStart(headerStart)
-                    .setCasting(casting)
+                .setDateTimeFormatter(dateTimeFormatter)
+                .setSheetIndex(sheetIndex)
+                .setSheetName(sheetName)
+                .setIgnoreHiddenSheets(ignoreHiddenSheets)
+                .setTrimCellValue(trimCellValue)
+                .setDateRegex(dateRegex)
+                .setDateTimeRegex(dateTimeRegex)
+                .setDateLenient(dateLenient)
+                .setHeaderStart(headerStart)
+                .setCasting(casting)
+                .setCellCasting(cellCasting)
                     .setLimit(limit)
                     .setCaseInsensitive(caseInsensitive);
         }
@@ -493,6 +506,19 @@ public final class PoijiOptions {
             Objects.requireNonNull(casting);
 
             this.casting = casting;
+            return this;
+        }
+
+        /**
+         * Use a modified cell casting implementation
+         *
+         * @param cellCasting modified cell casting implementation
+         * @return this
+         */
+        public PoijiOptionsBuilder withCellCasting(CellCasting cellCasting) {
+            Objects.requireNonNull(cellCasting);
+
+            this.cellCasting = cellCasting;
             return this;
         }
 

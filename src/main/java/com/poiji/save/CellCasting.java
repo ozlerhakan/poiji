@@ -17,11 +17,11 @@ import static com.poiji.util.PoijiConstants.DATE_CELL_STYLE_INDEX_PROPERTY_NAME;
 import static com.poiji.util.PoijiConstants.LOCAL_DATE_CELL_STYLE_INDEX_PROPERTY_NAME;
 import static com.poiji.util.PoijiConstants.LOCAL_DATE_TIME_CELL_STYLE_INDEX_PROPERTY_NAME;
 
-public final class CellDataCasting {
+public final class CellCasting {
 
     private final Map<Class<?>, BiConsumer<Cell, Object>> consumers;
 
-    public CellDataCasting() {
+    public CellCasting() {
         consumers = new ConcurrentHashMap<>();
         consumers.put(Boolean.class, (Cell cell, Object fieldValue) -> {
             if (fieldValue != null) {
@@ -124,6 +124,11 @@ public final class CellDataCasting {
 
     public BiConsumer<Cell, Object> forType(final Class<?> type) {
         return consumers.getOrDefault(type, consumers.get(Object.class));
+    }
+
+    public CellCasting addCellCasting(final Class<?> type, final BiConsumer<Cell, Object> castingRule) {
+        consumers.put(type, castingRule);
+        return this;
     }
 
 }
