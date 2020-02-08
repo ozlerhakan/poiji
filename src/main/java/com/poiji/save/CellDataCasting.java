@@ -1,12 +1,8 @@
 package com.poiji.save;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.time.temporal.TemporalAccessor;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
@@ -18,13 +14,14 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import static com.poiji.util.PoijiConstants.DATE_CELL_STYLE_INDEX_PROPERTY_NAME;
-import static com.poiji.util.PoijiConstants.DATE_TIME_CELL_STYLE_INDEX_PROPERTY_NAME;
+import static com.poiji.util.PoijiConstants.LOCAL_DATE_CELL_STYLE_INDEX_PROPERTY_NAME;
+import static com.poiji.util.PoijiConstants.LOCAL_DATE_TIME_CELL_STYLE_INDEX_PROPERTY_NAME;
 
-public final class CellDataProvider {
+public final class CellDataCasting {
 
     private final Map<Class<?>, BiConsumer<Cell, Object>> consumers;
 
-    public CellDataProvider() {
+    public CellDataCasting() {
         consumers = new ConcurrentHashMap<>();
         consumers.put(Boolean.class, (Cell cell, Object fieldValue) -> {
             if (fieldValue != null) {
@@ -71,37 +68,31 @@ public final class CellDataProvider {
         consumers.put(java.util.Date.class, (Cell cell, Object fieldValue) -> {
             if (fieldValue != null) {
                 cell.setCellValue((java.util.Date) fieldValue);
-                setStyleInCell(cell, DATE_TIME_CELL_STYLE_INDEX_PROPERTY_NAME);
+                setStyleInCell(cell, DATE_CELL_STYLE_INDEX_PROPERTY_NAME);
             }
         });
         consumers.put(java.sql.Date.class, (Cell cell, Object fieldValue) -> {
             if (fieldValue != null) {
                 cell.setCellValue((java.util.Date) fieldValue);
-                setStyleInCell(cell, DATE_TIME_CELL_STYLE_INDEX_PROPERTY_NAME);
+                setStyleInCell(cell, DATE_CELL_STYLE_INDEX_PROPERTY_NAME);
             }
         });
         consumers.put(Calendar.class, (Cell cell, Object fieldValue) -> {
             if (fieldValue != null) {
                 cell.setCellValue((Calendar) fieldValue);
-                setStyleInCell(cell, DATE_TIME_CELL_STYLE_INDEX_PROPERTY_NAME);
+                setStyleInCell(cell, LOCAL_DATE_TIME_CELL_STYLE_INDEX_PROPERTY_NAME);
             }
         });
         consumers.put(LocalDateTime.class, (Cell cell, Object fieldValue) -> {
             if (fieldValue != null) {
                 cell.setCellValue(java.sql.Timestamp.valueOf((LocalDateTime) fieldValue));
-                setStyleInCell(cell, DATE_TIME_CELL_STYLE_INDEX_PROPERTY_NAME);
-            }
-        });
-        consumers.put(ZonedDateTime.class, (Cell cell, Object fieldValue) -> {
-            if (fieldValue != null) {
-                cell.setCellValue(Date.from(Instant.from((TemporalAccessor) fieldValue)));
-                setStyleInCell(cell, DATE_TIME_CELL_STYLE_INDEX_PROPERTY_NAME);
+                setStyleInCell(cell, LOCAL_DATE_TIME_CELL_STYLE_INDEX_PROPERTY_NAME);
             }
         });
         consumers.put(LocalDate.class, (Cell cell, Object fieldValue) -> {
             if (fieldValue != null) {
                 cell.setCellValue(java.sql.Date.valueOf((LocalDate) fieldValue));
-                setStyleInCell(cell, DATE_CELL_STYLE_INDEX_PROPERTY_NAME);
+                setStyleInCell(cell, LOCAL_DATE_CELL_STYLE_INDEX_PROPERTY_NAME);
             }
         });
         consumers.put(Object.class, (Cell cell, Object fieldValue) -> {

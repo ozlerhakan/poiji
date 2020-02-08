@@ -18,7 +18,7 @@ public final class FileSaverFactory<T> {
     }
 
     public FileSaver toFile(final File file) {
-        final MappedFields mappedFields = new MappedFields(entity).parseEntity();
+        final MappedFields mappedFields = new MappedFields(entity, options).parseEntity();
         if (file.toString().endsWith(XLSX_EXTENSION)) {
             return new XlsxFileSaver(file, mappedFields, options);
         } else if (file.toString().endsWith(XLS_EXTENSION)) {

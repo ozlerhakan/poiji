@@ -4,7 +4,6 @@ import com.poiji.annotation.ExcelCellName;
 import com.poiji.config.Casting;
 import com.poiji.config.DefaultCasting;
 import com.poiji.exception.PoijiException;
-
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
@@ -25,7 +24,8 @@ public final class PoijiOptions {
     private String dateRegex;
     private String dateTimeRegex;
     private String datePattern;
-    private String dateTimePattern;
+    private String localDatePattern;
+    private String localDateTimePattern;
     private boolean dateLenient;
     private boolean trimCellValue;
     private boolean ignoreHiddenSheets;
@@ -60,8 +60,12 @@ public final class PoijiOptions {
         return this;
     }
 
-    public PoijiOptions setDateTimePattern(final String dateTimePattern) {
-        this.dateTimePattern = dateTimePattern;
+    public String getLocalDatePattern() {
+        return localDatePattern;
+    }
+
+    private PoijiOptions setLocalDatePattern(final String localDatePattern) {
+        this.localDatePattern = localDatePattern;
         return this;
     }
 
@@ -93,8 +97,13 @@ public final class PoijiOptions {
         return datePattern;
     }
 
-    public String getDateTimePattern() {
-        return dateTimePattern;
+    public String getLocalDateTimePattern() {
+        return localDateTimePattern;
+    }
+
+    private PoijiOptions setLocalDateTimePattern(final String localDateTimePattern) {
+        this.localDateTimePattern = localDateTimePattern;
+        return this;
     }
 
     public DateTimeFormatter dateFormatter() {
@@ -220,7 +229,8 @@ public final class PoijiOptions {
         private boolean preferNullOverDefault;
         private String datePattern = DEFAULT_DATE_PATTERN;
         private DateTimeFormatter dateFormatter = DEFAULT_DATE_FORMATTER;
-        private String dateTimePattern = DEFAULT_DATE_TIME_PATTERN;
+        private String localDatePattern = DEFAULT_DATE_PATTERN;
+        private String localDateTimePattern = DEFAULT_DATE_TIME_PATTERN;
         private DateTimeFormatter dateTimeFormatter = DEFAULT_DATE_TIME_FORMATTER;
         private Casting casting = new DefaultCasting();
         private int headerStart = 0;
@@ -291,13 +301,25 @@ public final class PoijiOptions {
 
         /**
          * set date time pattern, default date time format is "dd/M/yyyy HH:mm:ss" for
-         * java.util.Date
+         * writing java.time.LocalDate into excel
          *
-         * @param dateTimePattern date time pattern
+         * @param localDatePattern date time pattern
          * @return this
          */
-        public PoijiOptionsBuilder dateTimePattern(String dateTimePattern) {
-            this.dateTimePattern = dateTimePattern;
+        public PoijiOptionsBuilder localDatePattern(String localDatePattern) {
+            this.localDatePattern = localDatePattern;
+            return this;
+        }
+
+        /**
+         * set date time pattern, default date time format is "dd/M/yyyy HH:mm:ss" for
+         * writing java.time.LocalDateTime into excel
+         *
+         * @param localDateTimePattern date time pattern
+         * @return this
+         */
+        public PoijiOptionsBuilder localDateTimePattern(String localDateTimePattern) {
+            this.localDateTimePattern = localDateTimePattern;
             return this;
         }
 
@@ -315,11 +337,12 @@ public final class PoijiOptions {
 
         public PoijiOptions build() {
             return new PoijiOptions()
-                    .setSkip(skip + headerStart + 1)
-                    .setPassword(password)
-                    .setPreferNullOverDefault(preferNullOverDefault)
-                    .setDatePattern(datePattern)
-                    .setDateTimePattern(dateTimePattern)
+                .setSkip(skip + headerStart + 1)
+                .setPassword(password)
+                .setPreferNullOverDefault(preferNullOverDefault)
+                .setDatePattern(datePattern)
+                .setLocalDatePattern(localDatePattern)
+                .setLocalDateTimePattern(localDateTimePattern)
                     .setDateFormatter(dateFormatter)
                     .setDateTimeFormatter(dateTimeFormatter)
                     .setSheetIndex(sheetIndex)

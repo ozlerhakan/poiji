@@ -11,7 +11,8 @@ import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import static com.poiji.util.PoijiConstants.DATE_CELL_STYLE_INDEX_PROPERTY_NAME;
-import static com.poiji.util.PoijiConstants.DATE_TIME_CELL_STYLE_INDEX_PROPERTY_NAME;
+import static com.poiji.util.PoijiConstants.LOCAL_DATE_CELL_STYLE_INDEX_PROPERTY_NAME;
+import static com.poiji.util.PoijiConstants.LOCAL_DATE_TIME_CELL_STYLE_INDEX_PROPERTY_NAME;
 
 public final class XlsxFileSaver extends FileWorkbookSaver implements FileSaver {
 
@@ -44,14 +45,17 @@ public final class XlsxFileSaver extends FileWorkbookSaver implements FileSaver 
         final CellStyle dateCellStyle = workbook.createCellStyle();
         final DataFormat dataFormat = workbook.createDataFormat();
         dateCellStyle.setDataFormat(dataFormat.getFormat(options.datePattern()));
-        final CellStyle dateTimeCellStyle = workbook.createCellStyle();
-        dateTimeCellStyle.setDataFormat(dataFormat.getFormat(options.getDateTimePattern()));
+        final CellStyle localDateCellStyle = workbook.createCellStyle();
+        localDateCellStyle.setDataFormat(dataFormat.getFormat(options.getLocalDatePattern()));
+        final CellStyle localDateTimeCellStyle = workbook.createCellStyle();
+        localDateTimeCellStyle.setDataFormat(dataFormat.getFormat(options.getLocalDateTimePattern()));
         final POIXMLProperties.CustomProperties customProperties = workbook
             .getXSSFWorkbook()
             .getProperties()
             .getCustomProperties();
         customProperties.addProperty(DATE_CELL_STYLE_INDEX_PROPERTY_NAME, dateCellStyle.getIndex());
-        customProperties.addProperty(DATE_TIME_CELL_STYLE_INDEX_PROPERTY_NAME, dateTimeCellStyle.getIndex());
+        customProperties.addProperty(LOCAL_DATE_CELL_STYLE_INDEX_PROPERTY_NAME, localDateCellStyle.getIndex());
+        customProperties.addProperty(LOCAL_DATE_TIME_CELL_STYLE_INDEX_PROPERTY_NAME, localDateTimeCellStyle.getIndex());
     }
 
 }

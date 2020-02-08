@@ -2,9 +2,10 @@ package com.poiji.save;
 
 import com.poiji.annotation.ExcelCell;
 import com.poiji.annotation.ExcelCellName;
-import com.poiji.annotation.ExcelSheet;
 import com.poiji.annotation.ExcelUnknownCells;
+import com.poiji.bind.mapping.SheetNameExtractor;
 import com.poiji.exception.PoijiException;
+import com.poiji.option.PoijiOptions;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,19 +25,19 @@ public final class MappedFields {
     private final Map<Field, String> names;
     private final List<Field> unknownCells;
     private final Map<String, Integer> unknownOrders;
+    private final PoijiOptions options;
 
-    public MappedFields(final Class<?> entity) {
+    public MappedFields(final Class<?> entity, final PoijiOptions options) {
         this.entity = entity;
         orders = new HashMap<>();
         names = new HashMap<>();
         unknownCells = new ArrayList<>();
         this.unknownOrders = new LinkedHashMap<>();
+        this.options = options;
     }
 
     public MappedFields parseEntity() {
-        if (entity.getAnnotation(ExcelSheet.class) != null) {
-            sheetName = entity.getAnnotation(ExcelSheet.class).value();
-        }
+        SheetNameExtractor.getSheetName(entity, options).ifPresent(sheetName -> this.sheetName = sheetName);
         final Field[] declaredFields = entity.getDeclaredFields();
         final List<Field> unordered = new ArrayList<>();
         for (Field field : declaredFields) {
