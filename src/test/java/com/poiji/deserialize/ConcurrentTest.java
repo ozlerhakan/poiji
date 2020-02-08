@@ -29,6 +29,16 @@ public class ConcurrentTest {
      * Written in 8761 ms
      * Read in 39167 ms
      * <p>
+     * Synchronized optimized read:
+     * Generated in 304 ms
+     * Written in 8887 ms
+     * Read in 28832 ms
+     * <p>
+     * Optimized read:
+     * Generated in 315 ms
+     * Written in 8708 ms
+     * Read in 18536 ms
+     * <p>
      * Synchronized write:
      * Generated in 309 ms
      * Written in 16225 ms

@@ -4,6 +4,12 @@ import com.poiji.bind.Unmarshaller;
 import com.poiji.exception.LimitCrossedException;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.poi.ooxml.util.SAXHelper;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -20,13 +26,6 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
 
 /**
  * Created by hakan on 22/10/2017
@@ -102,9 +101,16 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         DataFormatter formatter = new DataFormatter();
         InputSource sheetSource = new InputSource(sheetInputStream);
         try {
-            PoijiHandler<T> poijiHandler = new PoijiHandler<>(type, options, consumer);
-            ContentHandler contentHandler
-                    = new XSSFSheetXMLHandler(styles, null, readOnlySharedStringsTable, poijiHandler, formatter, false);
+            final ReadMappedFields mappedFields = new ReadMappedFields(type, options).parseEntity();
+            PoijiHandler<T> poijiHandler = new PoijiHandler<>(type, options, consumer, mappedFields);
+            ContentHandler contentHandler = new XSSFSheetXMLHandler(
+                styles,
+                null,
+                readOnlySharedStringsTable,
+                poijiHandler,
+                formatter,
+                false
+            );
             reader.setContentHandler(contentHandler);
             reader.parse(sheetSource);
         } catch (LimitCrossedException e) {
