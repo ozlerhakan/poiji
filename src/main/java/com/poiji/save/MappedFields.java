@@ -53,7 +53,10 @@ public final class MappedFields {
             } else {
                 final ExcelCellName annotation = field.getAnnotation(ExcelCellName.class);
                 if (annotation != null) {
-                    final String excelName = annotation.value();
+                    final String delimeter = annotation.delimeter();
+                    final String excelName = delimeter.isEmpty()
+                        ? annotation.value()
+                        : annotation.value().substring(0, annotation.value().indexOf(delimeter));
                     final int order = annotation.order();
                     if (order == ABSENT_ORDER) {
                         unordered.add(field);

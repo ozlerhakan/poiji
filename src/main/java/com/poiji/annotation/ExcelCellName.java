@@ -32,9 +32,11 @@ public @interface ExcelCellName {
 
     /**
      * Delimeter for column multiname.
-     *
+     * <p>
      * Example: @ExcelCellName(value = "id,identifier", delimerer = ",")
-     * means that column with name 'id' will be mapped, or if no column 'id', then column 'identifier' will be mapped to this field.
+     * reading: column with name 'id' will be mapped into field, or if no column 'id',
+     * then column 'identifier' will be mapped into field.
+     * writing: field will be saved into column 'id'
      *
      * @return delimeter for column multiname.
      */

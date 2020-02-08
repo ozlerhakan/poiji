@@ -13,7 +13,7 @@ public final class ConcurrentEntity {
 
     @ExcelCell(0)
     private long primitiveLong;
-    @ExcelCellName(value = "TexT")
+    @ExcelCellName(value = "TexT,other", delimeter = ",")
     private String text;
 
 }
