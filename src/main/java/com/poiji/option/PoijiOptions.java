@@ -4,13 +4,14 @@ import com.poiji.annotation.ExcelCellName;
 import com.poiji.config.Casting;
 import com.poiji.config.DefaultCasting;
 import com.poiji.exception.PoijiException;
-
+import com.poiji.save.CellCasting;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_FORMATTER;
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_PATTERN;
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_TIME_FORMATTER;
+import static com.poiji.util.PoijiConstants.DEFAULT_DATE_TIME_PATTERN;
 
 /**
  * Created by hakan on 17/01/2017.
@@ -24,6 +25,8 @@ public final class PoijiOptions {
     private String dateRegex;
     private String dateTimeRegex;
     private String datePattern;
+    private String localDatePattern;
+    private String localDateTimePattern;
     private boolean dateLenient;
     private boolean trimCellValue;
     private boolean ignoreHiddenSheets;
@@ -31,6 +34,7 @@ public final class PoijiOptions {
     private DateTimeFormatter dateFormatter;
     private DateTimeFormatter dateTimeFormatter;
     private Casting casting;
+    private CellCasting cellCasting;
     private int headerStart;
     private String sheetName;
     private boolean caseInsensitive;
@@ -55,6 +59,15 @@ public final class PoijiOptions {
 
     private PoijiOptions setDatePattern(String datePattern) {
         this.datePattern = datePattern;
+        return this;
+    }
+
+    public String getLocalDatePattern() {
+        return localDatePattern;
+    }
+
+    private PoijiOptions setLocalDatePattern(final String localDatePattern) {
+        this.localDatePattern = localDatePattern;
         return this;
     }
 
@@ -84,6 +97,15 @@ public final class PoijiOptions {
 
     public String datePattern() {
         return datePattern;
+    }
+
+    public String getLocalDateTimePattern() {
+        return localDateTimePattern;
+    }
+
+    private PoijiOptions setLocalDateTimePattern(final String localDateTimePattern) {
+        this.localDateTimePattern = localDateTimePattern;
+        return this;
     }
 
     public DateTimeFormatter dateFormatter() {
@@ -131,6 +153,15 @@ public final class PoijiOptions {
 
     public PoijiOptions setCasting(Casting casting) {
         this.casting = casting;
+        return this;
+    }
+
+    public CellCasting getCellCasting() {
+        return cellCasting;
+    }
+
+    private PoijiOptions setCellCasting(final CellCasting cellCasting) {
+        this.cellCasting = cellCasting;
         return this;
     }
 
@@ -192,7 +223,7 @@ public final class PoijiOptions {
         return caseInsensitive;
     }
 
-    public PoijiOptions setCaseInsensitive(final boolean caseInsensitive) {
+    private PoijiOptions setCaseInsensitive(final boolean caseInsensitive) {
         this.caseInsensitive = caseInsensitive;
         return this;
     }
@@ -209,8 +240,11 @@ public final class PoijiOptions {
         private boolean preferNullOverDefault;
         private String datePattern = DEFAULT_DATE_PATTERN;
         private DateTimeFormatter dateFormatter = DEFAULT_DATE_FORMATTER;
+        private String localDatePattern = DEFAULT_DATE_PATTERN;
+        private String localDateTimePattern = DEFAULT_DATE_TIME_PATTERN;
         private DateTimeFormatter dateTimeFormatter = DEFAULT_DATE_TIME_FORMATTER;
         private Casting casting = new DefaultCasting();
+        private CellCasting cellCasting = new CellCasting();
         private int headerStart = 0;
         private int skip = 0;
         private int limit = 0;
@@ -269,11 +303,35 @@ public final class PoijiOptions {
          * set date pattern, default date format is "dd/M/yyyy" for
          * java.util.Date
          *
-         * @param datePattern date time formatter
+         * @param datePattern date pattern
          * @return this
          */
         public PoijiOptionsBuilder datePattern(String datePattern) {
             this.datePattern = datePattern;
+            return this;
+        }
+
+        /**
+         * set date time pattern, default date time format is "dd/M/yyyy HH:mm:ss" for
+         * writing java.time.LocalDate into excel
+         *
+         * @param localDatePattern date time pattern
+         * @return this
+         */
+        public PoijiOptionsBuilder localDatePattern(String localDatePattern) {
+            this.localDatePattern = localDatePattern;
+            return this;
+        }
+
+        /**
+         * set date time pattern, default date time format is "dd/M/yyyy HH:mm:ss" for
+         * writing java.time.LocalDateTime into excel
+         *
+         * @param localDateTimePattern date time pattern
+         * @return this
+         */
+        public PoijiOptionsBuilder localDateTimePattern(String localDateTimePattern) {
+            this.localDateTimePattern = localDateTimePattern;
             return this;
         }
 
@@ -291,23 +349,26 @@ public final class PoijiOptions {
 
         public PoijiOptions build() {
             return new PoijiOptions()
-                    .setSkip(skip + headerStart + 1)
-                    .setPassword(password)
-                    .setPreferNullOverDefault(preferNullOverDefault)
-                    .setDatePattern(datePattern)
-                    .setDateFormatter(dateFormatter)
-                    .setDateTimeFormatter(dateTimeFormatter)
-                    .setSheetIndex(sheetIndex)
-                    .setSheetName(sheetName)
-                    .setIgnoreHiddenSheets(ignoreHiddenSheets)
-                    .setTrimCellValue(trimCellValue)
-                    .setDateRegex(dateRegex)
-                    .setDateTimeRegex(dateTimeRegex)
-                    .setDateLenient(dateLenient)
-                    .setHeaderStart(headerStart)
-                    .setCasting(casting)
-                    .setLimit(limit)
-                    .setCaseInsensitive(caseInsensitive);
+                .setSkip(skip + headerStart + 1)
+                .setPassword(password)
+                .setPreferNullOverDefault(preferNullOverDefault)
+                .setDatePattern(datePattern)
+                .setLocalDatePattern(localDatePattern)
+                .setLocalDateTimePattern(localDateTimePattern)
+                .setDateFormatter(dateFormatter)
+                .setDateTimeFormatter(dateTimeFormatter)
+                .setSheetIndex(sheetIndex)
+                .setSheetName(sheetName)
+                .setIgnoreHiddenSheets(ignoreHiddenSheets)
+                .setTrimCellValue(trimCellValue)
+                .setDateRegex(dateRegex)
+                .setDateTimeRegex(dateTimeRegex)
+                .setDateLenient(dateLenient)
+                .setHeaderStart(headerStart)
+                .setCasting(casting)
+                .setCellCasting(cellCasting)
+                .setLimit(limit)
+                .setCaseInsensitive(caseInsensitive);
         }
 
         /**
@@ -445,6 +506,19 @@ public final class PoijiOptions {
             Objects.requireNonNull(casting);
 
             this.casting = casting;
+            return this;
+        }
+
+        /**
+         * Use a modified cell casting implementation
+         *
+         * @param cellCasting modified cell casting implementation
+         * @return this
+         */
+        public PoijiOptionsBuilder withCellCasting(CellCasting cellCasting) {
+            Objects.requireNonNull(cellCasting);
+
+            this.cellCasting = cellCasting;
             return this;
         }
 

@@ -14,6 +14,8 @@ import java.lang.annotation.Target;
 @Documented
 public @interface ExcelCellName {
 
+    int ABSENT_ORDER = -1;
+
     /**
      * Specifies the column name where the corresponding value is mapped from the excel data
      *
@@ -21,5 +23,20 @@ public @interface ExcelCellName {
      */
     String value();
 
+    /**
+     * Specifies the column order in saved file
+     *
+     * @return column order
+     */
+    int order() default ABSENT_ORDER;
+
+    /**
+     * Delimeter for column multiname.
+     *
+     * Example: @ExcelCellName(value = "id,identifier", delimerer = ",")
+     * means that column with name 'id' will be mapped, or if no column 'id', then column 'identifier' will be mapped to this field.
+     *
+     * @return delimeter for column multiname.
+     */
     String delimeter() default "";
 }
