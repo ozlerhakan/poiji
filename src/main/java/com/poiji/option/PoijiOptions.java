@@ -355,7 +355,7 @@ public final class PoijiOptions {
                 .setDatePattern(datePattern)
                 .setLocalDatePattern(localDatePattern)
                 .setLocalDateTimePattern(localDateTimePattern)
-                    .setDateFormatter(dateFormatter)
+                .setDateFormatter(dateFormatter)
                 .setDateTimeFormatter(dateTimeFormatter)
                 .setSheetIndex(sheetIndex)
                 .setSheetName(sheetName)
@@ -367,8 +367,8 @@ public final class PoijiOptions {
                 .setHeaderStart(headerStart)
                 .setCasting(casting)
                 .setCellCasting(cellCasting)
-                    .setLimit(limit)
-                    .setCaseInsensitive(caseInsensitive);
+                .setLimit(limit)
+                .setCaseInsensitive(caseInsensitive);
         }
 
         /**
