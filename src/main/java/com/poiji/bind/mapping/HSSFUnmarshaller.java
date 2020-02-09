@@ -16,6 +16,7 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.util.IOUtils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -59,25 +60,29 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     @Override
     public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
         Workbook workbook = workbook();
-        Optional<String> maybeSheetName = SheetNameExtractor.getSheetName(type, options);
+        try {
+            Optional<String> maybeSheetName = SheetNameExtractor.getSheetName(type, options);
 
-        Sheet sheet = this.getSheetToProcess(workbook, options, maybeSheetName.orElse(null));
+            Sheet sheet = this.getSheetToProcess(workbook, options, maybeSheetName.orElse(null));
 
-        int skip = options.skip();
-        int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
+            int skip = options.skip();
+            int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
 
-        loadColumnTitles(sheet, maxPhysicalNumberOfRows);
+            loadColumnTitles(sheet, maxPhysicalNumberOfRows);
 
-        for (Row currentRow : sheet) {
-            if (!skip(currentRow, skip) && !isRowEmpty(currentRow)) {
-                internalCount += 1;
+            for (Row currentRow : sheet) {
+                if (!skip(currentRow, skip) && !isRowEmpty(currentRow)) {
+                    internalCount += 1;
 
-                if (limit != 0 && internalCount > limit)
-                    return;
+                    if (limit != 0 && internalCount > limit)
+                        return;
 
-                T instance = deserializeRowToInstance(currentRow, type);
-                consumer.accept(instance);
+                    T instance = deserializeRowToInstance(currentRow, type);
+                    consumer.accept(instance);
+                }
             }
+        } finally {
+            IOUtils.closeQuietly(workbook);
         }
     }
 
