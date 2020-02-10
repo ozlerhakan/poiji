@@ -8,8 +8,10 @@ import com.poiji.annotation.ExcelUnknownCells;
 import com.poiji.bind.Unmarshaller;
 import com.poiji.config.Casting;
 import com.poiji.exception.IllegalCastException;
+import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.ReflectUtil;
+import java.io.IOException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -57,27 +59,28 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     }
 
     @Override
-    public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
-        Workbook workbook = workbook();
-        Optional<String> maybeSheetName = SheetNameExtractor.getSheetName(type, options);
+    public <T> void unmarshal(final Class<T> type, final Consumer<? super T> consumer) {
+        try(final Workbook workbook = workbook()) {
+            final Optional<String> maybeSheetName = SheetNameExtractor.getSheetName(type, options);
 
-        Sheet sheet = this.getSheetToProcess(workbook, options, maybeSheetName.orElse(null));
+            final Sheet sheet = this.getSheetToProcess(workbook, options, maybeSheetName.orElse(null));
 
-        int skip = options.skip();
-        int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
+            final int skip = options.skip();
+            final int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
 
-        loadColumnTitles(sheet, maxPhysicalNumberOfRows);
+            loadColumnTitles(sheet, maxPhysicalNumberOfRows);
 
-        for (Row currentRow : sheet) {
-            if (!skip(currentRow, skip) && !isRowEmpty(currentRow)) {
-                internalCount += 1;
+            for (final Row currentRow : sheet) {
+                if (!skip(currentRow, skip) && !isRowEmpty(currentRow)) {
+                    internalCount += 1;
 
-                if (limit != 0 && internalCount > limit)
-                    return;
+                    if (limit != 0 && internalCount > limit) return;
 
-                T instance = deserializeRowToInstance(currentRow, type);
-                consumer.accept(instance);
+                    consumer.accept(deserializeRowToInstance(currentRow, type));
+                }
             }
+        } catch (final IOException e) {
+            throw new PoijiException("Problem occurred while closing HSSFWorkbook", e);
         }
     }
 
