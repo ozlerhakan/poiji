@@ -20,7 +20,7 @@ import static com.poiji.annotation.ExcelCellName.ABSENT_ORDER;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
-public final class ReadMappedFields {
+public class ReadMappedFields {
 
     private final Class<?> entity;
     private final Map<Integer, Field> orderedFields;
