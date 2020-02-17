@@ -12,9 +12,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-public class WorkbookSaver {
+public abstract class WorkbookSaver {
 
-    protected final PoijiOptions options;
+    private final PoijiOptions options;
     private final MappedFields mappedFields;
 
     public WorkbookSaver(
@@ -23,6 +23,8 @@ public class WorkbookSaver {
         this.mappedFields = mappedFields;
         this.options = options;
     }
+
+    protected abstract <T> void save(final List<T> data, final Workbook workbook);
 
     protected <T> void save(final List<T> data, final Workbook workbook, final OutputStream outputStream) {
         try {

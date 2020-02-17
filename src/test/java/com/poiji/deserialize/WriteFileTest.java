@@ -21,11 +21,11 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 @RunWith(Parameterized.class)
-public class WriteTest {
+public class WriteFileTest {
 
     private final String path;
 
-    public WriteTest(String path) {
+    public WriteFileTest(String path) {
         this.path = path;
     }
 

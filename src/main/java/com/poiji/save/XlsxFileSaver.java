@@ -14,12 +14,14 @@ import static com.poiji.util.PoijiConstants.DATE_CELL_STYLE_INDEX_PROPERTY_NAME;
 import static com.poiji.util.PoijiConstants.LOCAL_DATE_CELL_STYLE_INDEX_PROPERTY_NAME;
 import static com.poiji.util.PoijiConstants.LOCAL_DATE_TIME_CELL_STYLE_INDEX_PROPERTY_NAME;
 
-public final class XlsxFileSaver extends FileWorkbookSaver implements FileSaver {
+public final class XlsxFileSaver implements FileSaver {
 
-    public XlsxFileSaver(
-        final File file, final MappedFields mappedFields, final PoijiOptions options
-    ) {
-        super(file, mappedFields, options);
+    private final WorkbookSaver workbookSaver;
+    private final PoijiOptions options;
+
+    public XlsxFileSaver(final WorkbookSaver workbookSaver, final PoijiOptions options) {
+        this.workbookSaver = workbookSaver;
+        this.options = options;
     }
 
     @Override
@@ -28,7 +30,7 @@ public final class XlsxFileSaver extends FileWorkbookSaver implements FileSaver 
             workbook.setCompressTempFiles(true);
             addStyles(workbook);
             try {
-                save(data, workbook);
+                workbookSaver.save(data, workbook);
             } finally {
                 if (!workbook.dispose()) {
                     System.out.println("Warning! SXSSFWorkbook wasn't disposed correctly. See " + System.getProperty(

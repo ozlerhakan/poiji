@@ -2,7 +2,6 @@ package com.poiji.save;
 
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import org.apache.poi.hpsf.CustomProperties;
@@ -14,19 +13,21 @@ import static com.poiji.util.PoijiConstants.DATE_CELL_STYLE_INDEX_PROPERTY_NAME;
 import static com.poiji.util.PoijiConstants.LOCAL_DATE_CELL_STYLE_INDEX_PROPERTY_NAME;
 import static com.poiji.util.PoijiConstants.LOCAL_DATE_TIME_CELL_STYLE_INDEX_PROPERTY_NAME;
 
-public final class XlsFileSaver extends FileWorkbookSaver implements FileSaver {
+public final class XlsFileSaver implements FileSaver {
 
-    public XlsFileSaver(
-        final File file, final MappedFields mappedFields, final PoijiOptions options
-    ) {
-        super(file, mappedFields, options);
+    private final WorkbookSaver workbookSaver;
+    private final PoijiOptions options;
+
+    public XlsFileSaver(final WorkbookSaver workbookSaver, final PoijiOptions options) {
+        this.workbookSaver = workbookSaver;
+        this.options = options;
     }
 
     @Override
     public <T> void save(final List<T> data) {
         try (final HSSFWorkbook workbook = new HSSFWorkbook()) {
             addStyles(workbook);
-            save(data, workbook);
+            workbookSaver.save(data, workbook);
         } catch (IOException e) {
             throw new PoijiException(e.getMessage(), e);
         }
