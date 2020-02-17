@@ -11,6 +11,7 @@ import com.poiji.save.FileSaverFactory;
 import com.poiji.util.Files;
 import java.io.File;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -224,6 +225,18 @@ public final class Poiji {
         final File file, final Class<T> clazz, final List<T> data, final PoijiOptions options
     ) {
         new FileSaverFactory<>(clazz, options).toFile(file).save(data);
+    }
+
+    public static <T> void toExcel(
+        final OutputStream outputStream, final PoijiExcelType excelType, final Class<T> clazz, final List<T> data
+    ) {
+        toExcel(outputStream, excelType, clazz, data, PoijiOptionsBuilder.settings().build());
+    }
+
+    public static <T> void toExcel(
+        final OutputStream outputStream, final PoijiExcelType excelType, final Class<T> clazz, final List<T> data, final PoijiOptions options
+    ) {
+        new FileSaverFactory<>(clazz, options).toOutputStream(outputStream, excelType).save(data);
     }
 
     private static Unmarshaller deserializer(final File file, final PoijiOptions options) {
