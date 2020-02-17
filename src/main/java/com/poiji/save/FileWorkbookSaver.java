@@ -21,6 +21,7 @@ public class FileWorkbookSaver extends WorkbookSaver {
         this.file = file;
     }
 
+    @Override
     protected <T> void save(final List<T> data, final Workbook workbook) {
         createFile();
         writeInFile(data, workbook);
@@ -28,7 +29,7 @@ public class FileWorkbookSaver extends WorkbookSaver {
 
     private <T> void writeInFile(final List<T> data, final Workbook workbook) {
         try (final FileOutputStream outputStream = new FileOutputStream(file)) {
-            save(data, workbook, outputStream);
+            super.save(data, workbook, outputStream);
         } catch (IOException e) {
             throw new PoijiException(e.getMessage(), e);
         }

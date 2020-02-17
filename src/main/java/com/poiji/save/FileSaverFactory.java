@@ -20,9 +20,9 @@ public final class FileSaverFactory<T> {
     public FileSaver toFile(final File file) {
         final MappedFields mappedFields = new MappedFields(entity, options).parseEntity();
         if (file.toString().endsWith(XLSX_EXTENSION)) {
-            return new XlsxFileSaver(file, mappedFields, options);
+            return new XlsxFileSaver(new FileWorkbookSaver(file, mappedFields, options), options);
         } else if (file.toString().endsWith(XLS_EXTENSION)) {
-            return new XlsFileSaver(file, mappedFields, options);
+            return new XlsFileSaver(new FileWorkbookSaver(file, mappedFields, options), options);
         } else {
             throw new InvalidExcelFileExtension(file.getName() + " has unsupported extension. 'xlsx' and 'xls' are supported only.");
         }
