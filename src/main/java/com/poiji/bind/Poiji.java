@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -218,24 +219,24 @@ public final class Poiji {
         unmarshaller.unmarshal(type, consumer);
     }
 
-    public static <T> void toExcel(final File file, final Class<T> clazz, final List<T> data) {
+    public static <T> void toExcel(final File file, final Class<T> clazz, final Collection<T> data) {
         toExcel(file, clazz, data, PoijiOptionsBuilder.settings().build());
     }
 
     public static <T> void toExcel(
-        final File file, final Class<T> clazz, final List<T> data, final PoijiOptions options
+        final File file, final Class<T> clazz, final Collection<T> data, final PoijiOptions options
     ) {
         new FileSaverFactory<>(clazz, options).toFile(file).save(data);
     }
 
     public static <T> void toExcel(
-        final OutputStream outputStream, final PoijiExcelType excelType, final Class<T> clazz, final List<T> data
+        final OutputStream outputStream, final PoijiExcelType excelType, final Class<T> clazz, final Collection<T> data
     ) {
         toExcel(outputStream, excelType, clazz, data, PoijiOptionsBuilder.settings().build());
     }
 
     public static <T> void toExcel(
-        final OutputStream outputStream, final PoijiExcelType excelType, final Class<T> clazz, final List<T> data, final PoijiOptions options
+        final OutputStream outputStream, final PoijiExcelType excelType, final Class<T> clazz, final Collection<T> data, final PoijiOptions options
     ) {
         new FileSaverFactory<>(clazz, options).toOutputStream(outputStream, excelType).save(data);
     }

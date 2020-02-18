@@ -3,7 +3,7 @@ package com.poiji.save;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Stream;
 import org.apache.poi.hpsf.CustomProperties;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -25,7 +25,7 @@ public final class XlsFileSaver implements FileSaver {
     }
 
     @Override
-    public <T> void save(final List<T> data) {
+    public <T> void save(final Collection<T> data) {
         try (final HSSFWorkbook workbook = new HSSFWorkbook()) {
             addStyles(workbook);
             workbookSaver.save(data, workbook);
