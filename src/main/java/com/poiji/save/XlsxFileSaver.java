@@ -4,7 +4,7 @@ import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Stream;
 import org.apache.poi.ooxml.POIXMLProperties;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -26,7 +26,7 @@ public final class XlsxFileSaver implements FileSaver {
     }
 
     @Override
-    public <T> void save(final List<T> data) {
+    public <T> void save(final Collection<T> data) {
         try (final SXSSFWorkbook workbook = new SXSSFWorkbook()) {
             workbook.setCompressTempFiles(true);
             addStyles(workbook);
