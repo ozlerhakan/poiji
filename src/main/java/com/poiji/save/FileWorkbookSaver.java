@@ -8,9 +8,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.stream.Stream;
 import org.apache.poi.ss.usermodel.Workbook;
 
-public class FileWorkbookSaver extends WorkbookSaver {
+public class FileWorkbookSaver extends AbstractWorkbookSaver implements WorkbookSaver{
 
     private final File file;
 
@@ -22,7 +23,21 @@ public class FileWorkbookSaver extends WorkbookSaver {
     }
 
     @Override
-    protected <T> void save(final Collection<T> data, final Workbook workbook) {
+    public <T> void save(final Stream<T> data, final Workbook workbook) {
+        createFile();
+        writeInFile(data, workbook);
+    }
+
+    private <T> void writeInFile(final Stream<T> data, final Workbook workbook) {
+        try (final FileOutputStream outputStream = new FileOutputStream(file)) {
+            super.save(data, workbook, outputStream);
+        } catch (IOException e) {
+            throw new PoijiException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public <T> void save(final Collection<T> data, final Workbook workbook) {
         createFile();
         writeInFile(data, workbook);
     }
