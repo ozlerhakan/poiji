@@ -5,7 +5,7 @@ import com.poiji.option.PoijiOptions;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -24,9 +24,9 @@ public abstract class WorkbookSaver {
         this.options = options;
     }
 
-    protected abstract <T> void save(final List<T> data, final Workbook workbook);
+    protected abstract <T> void save(final Collection<T> data, final Workbook workbook);
 
-    protected <T> void save(final List<T> data, final Workbook workbook, final OutputStream outputStream) {
+    protected <T> void save(final Collection<T> data, final Workbook workbook, final OutputStream outputStream) {
         try {
             mappedFields.addUnknownColumnNamesFromData(data);
             final Sheet sheet = mappedFields.getSheetName() == null

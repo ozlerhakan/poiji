@@ -69,11 +69,11 @@ public final class MappedFields {
         return this;
     }
 
-    public <T> void addUnknownColumnNamesFromData(final List<T> data) {
+    public <T> void addUnknownColumnNamesFromData(final Collection<T> data) {
         unknownOrders.putAll(extractUnknownColumnNamesFromData(data));
     }
 
-    private <T> Map<String, Integer> extractUnknownColumnNamesFromData(final List<T> data) {
+    private <T> Map<String, Integer> extractUnknownColumnNamesFromData(final Collection<T> data) {
         final Collection<java.lang.String> unknownNames = new HashSet<>();
         for (final Field unknownCell : unknownCells) {
             for (T instance : data) {

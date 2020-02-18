@@ -2,7 +2,7 @@ package com.poiji.save;
 
 import com.poiji.option.PoijiOptions;
 import java.io.OutputStream;
-import java.util.List;
+import java.util.Collection;
 import org.apache.poi.ss.usermodel.Workbook;
 
 public class OutputStreamWorkbookSaver extends WorkbookSaver {
@@ -17,7 +17,7 @@ public class OutputStreamWorkbookSaver extends WorkbookSaver {
     }
 
     @Override
-    protected <T> void save(final List<T> data, final Workbook workbook) {
+    protected <T> void save(final Collection<T> data, final Workbook workbook) {
         super.save(data, workbook, outputStream);
     }
 

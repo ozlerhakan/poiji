@@ -7,7 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Collection;
 import org.apache.poi.ss.usermodel.Workbook;
 
 public class FileWorkbookSaver extends WorkbookSaver {
@@ -22,12 +22,12 @@ public class FileWorkbookSaver extends WorkbookSaver {
     }
 
     @Override
-    protected <T> void save(final List<T> data, final Workbook workbook) {
+    protected <T> void save(final Collection<T> data, final Workbook workbook) {
         createFile();
         writeInFile(data, workbook);
     }
 
-    private <T> void writeInFile(final List<T> data, final Workbook workbook) {
+    private <T> void writeInFile(final Collection<T> data, final Workbook workbook) {
         try (final FileOutputStream outputStream = new FileOutputStream(file)) {
             super.save(data, workbook, outputStream);
         } catch (IOException e) {
