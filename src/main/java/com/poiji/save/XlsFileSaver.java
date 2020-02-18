@@ -4,6 +4,7 @@ import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Stream;
 import org.apache.poi.hpsf.CustomProperties;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -32,6 +33,16 @@ public final class XlsFileSaver implements FileSaver {
             throw new PoijiException(e.getMessage(), e);
         }
 
+    }
+
+    @Override
+    public <T> void save(final Stream<T> data) {
+        try (final HSSFWorkbook workbook = new HSSFWorkbook()) {
+            addStyles(workbook);
+            workbookSaver.save(data, workbook);
+        } catch (IOException e) {
+            throw new PoijiException(e.getMessage(), e);
+        }
     }
 
     private void addStyles(final HSSFWorkbook workbook) {

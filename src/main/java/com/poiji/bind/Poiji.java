@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static com.poiji.util.PoijiConstants.XLSX_EXTENSION;
 import static com.poiji.util.PoijiConstants.XLS_EXTENSION;
@@ -235,6 +236,28 @@ public final class Poiji {
 
     public static <T> void toExcel(
         final OutputStream outputStream, final PoijiExcelType excelType, final Class<T> clazz, final List<T> data, final PoijiOptions options
+    ) {
+        new FileSaverFactory<>(clazz, options).toOutputStream(outputStream, excelType).save(data);
+    }
+
+    public static <T> void toExcel(final File file, final Class<T> clazz, final Stream<T> data) {
+        toExcel(file, clazz, data, PoijiOptionsBuilder.settings().build());
+    }
+
+    public static <T> void toExcel(
+        final File file, final Class<T> clazz, final Stream<T> data, final PoijiOptions options
+    ) {
+        new FileSaverFactory<>(clazz, options).toFile(file).save(data);
+    }
+
+    public static <T> void toExcel(
+        final OutputStream outputStream, final PoijiExcelType excelType, final Class<T> clazz, final Stream<T> data
+    ) {
+        toExcel(outputStream, excelType, clazz, data, PoijiOptionsBuilder.settings().build());
+    }
+
+    public static <T> void toExcel(
+        final OutputStream outputStream, final PoijiExcelType excelType, final Class<T> clazz, final Stream<T> data, final PoijiOptions options
     ) {
         new FileSaverFactory<>(clazz, options).toOutputStream(outputStream, excelType).save(data);
     }
