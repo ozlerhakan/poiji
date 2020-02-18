@@ -1,6 +1,7 @@
 package com.poiji.bind.mapping;
 
 import com.poiji.option.PoijiOptions;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 
@@ -32,7 +33,10 @@ public final class HSSFReadMappedFields extends ReadMappedFields{
 
     public void parseColumnNames(final Row row) {
         for (short columnOrder = row.getFirstCellNum(); columnOrder < row.getLastCellNum(); columnOrder++) {
-            parseColumnName(columnOrder, row.getCell(columnOrder).getStringCellValue());
+            final Cell cell = row.getCell(columnOrder);
+            if (cell != null){
+                parseColumnName(columnOrder, cell.getStringCellValue());
+            }
         }
     }
 

@@ -5,6 +5,7 @@ import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelCellRange;
 import com.poiji.annotation.ExcelRow;
 import com.poiji.annotation.ExcelUnknownCells;
+import com.poiji.annotation.ExcelWriteOnly;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.ReflectUtil;
@@ -51,7 +52,8 @@ public class ReadMappedFields {
             superClassFields = new ReadMappedFields(superclass, options).parseEntity();
         }
         final List<Field> declaredFields = asList(entity.getDeclaredFields());
-        final List<Field> withoutExcelRange = parseExcelCellRange(declaredFields);
+        final List<Field> withoutWriteOnly = parseExcelWriteOnly(declaredFields);
+        final List<Field> withoutExcelRange = parseExcelCellRange(withoutWriteOnly);
         final List<Field> withoutExcelCell = parseExcelCell(withoutExcelRange);
         final List<Field> withoutUnknownCells = parseUnknownCells(withoutExcelCell);
         final List<Field> withoutExcelCellName = parseExcelCellName(withoutUnknownCells);
@@ -59,8 +61,18 @@ public class ReadMappedFields {
         return this;
     }
 
+    private List<Field> parseExcelWriteOnly(final List<Field> fields) {
+        final List<Field> withoutWriteOnly = new ArrayList<>(fields.size());
+        for (final Field field : fields) {
+            if (field.getAnnotation(ExcelWriteOnly.class) == null){
+                withoutWriteOnly.add(field);
+            }
+        }
+        return withoutWriteOnly;
+    }
+
     private List<Field> parseExcelRow(final List<Field> fields) {
-        final List<Field> rest = new ArrayList<>();
+        final List<Field> rest = new ArrayList<>(fields.size());
         for (final Field field : fields) {
             final ExcelRow annotation = field.getAnnotation(ExcelRow.class);
             if (annotation != null) {
@@ -73,9 +85,9 @@ public class ReadMappedFields {
         return rest;
     }
 
-    private List<Field> parseExcelCellName(final List<Field> withoutUnknownCells) {
-        final List<Field> rest = new ArrayList<>();
-        for (final Field field : withoutUnknownCells) {
+    private List<Field> parseExcelCellName(final List<Field> fields) {
+        final List<Field> rest = new ArrayList<>(fields.size());
+        for (final Field field : fields) {
             final ExcelCellName annotation = field.getAnnotation(ExcelCellName.class);
             if (annotation != null) {
                 final List<String> possibleFieldNames = getPossibleFieldNames(annotation);
@@ -103,7 +115,7 @@ public class ReadMappedFields {
     }
 
     private List<Field> parseUnknownCells(final List<Field> fields) {
-        final List<Field> rest = new ArrayList<>();
+        final List<Field> rest = new ArrayList<>(fields.size());
         for (final Field field : fields) {
             if (field.getAnnotation(ExcelUnknownCells.class) != null) {
                 unknownFields.add(field);
@@ -115,9 +127,9 @@ public class ReadMappedFields {
         return rest;
     }
 
-    private List<Field> parseExcelCellRange(final List<Field> declaredFields) {
-        final List<Field> rest = new ArrayList<>();
-        for (final Field field : declaredFields) {
+    private List<Field> parseExcelCellRange(final List<Field> fields) {
+        final List<Field> rest = new ArrayList<>(fields.size());
+        for (final Field field : fields) {
             if (field.getAnnotation(ExcelCellRange.class) != null) {
                 rangeFields.put(field, new ReadMappedFields(field.getType(), options).parseEntity());
                 field.setAccessible(true);
@@ -128,9 +140,9 @@ public class ReadMappedFields {
         return rest;
     }
 
-    private List<Field> parseExcelCell(final List<Field> declaredFields) {
-        final List<Field> rest = new ArrayList<>();
-        for (final Field field : declaredFields) {
+    private List<Field> parseExcelCell(final List<Field> fields) {
+        final List<Field> rest = new ArrayList<>(fields.size());
+        for (final Field field : fields) {
             if (field.getAnnotation(ExcelCell.class) != null) {
                 final Integer excelOrder = field.getAnnotation(ExcelCell.class).value();
                 orderedFields.put(excelOrder, field);

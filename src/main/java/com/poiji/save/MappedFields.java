@@ -2,6 +2,7 @@ package com.poiji.save;
 
 import com.poiji.annotation.ExcelCell;
 import com.poiji.annotation.ExcelCellName;
+import com.poiji.annotation.ExcelReadOnly;
 import com.poiji.annotation.ExcelUnknownCells;
 import com.poiji.bind.mapping.SheetNameExtractor;
 import com.poiji.exception.PoijiException;
@@ -40,31 +41,33 @@ public final class MappedFields {
         SheetNameExtractor.getSheetName(entity, options).ifPresent(sheetName -> this.sheetName = sheetName);
         final Field[] declaredFields = entity.getDeclaredFields();
         final List<Field> unordered = new ArrayList<>();
-        for (Field field : declaredFields) {
-            if (field.getAnnotation(ExcelCell.class) != null) {
-                final Integer excelOrder = field.getAnnotation(ExcelCell.class).value();
-                final String name = field.getName();
-                orders.put(field, excelOrder);
-                names.put(field, name);
-                field.setAccessible(true);
-            } else if (field.getAnnotation(ExcelUnknownCells.class) != null) {
-                unknownCells.add(field);
-                field.setAccessible(true);
-            } else {
-                final ExcelCellName annotation = field.getAnnotation(ExcelCellName.class);
-                if (annotation != null) {
-                    final String delimeter = annotation.delimeter();
-                    final String excelName = delimeter.isEmpty()
-                        ? annotation.value()
-                        : annotation.value().substring(0, annotation.value().indexOf(delimeter));
-                    final int order = annotation.order();
-                    if (order == ABSENT_ORDER) {
-                        unordered.add(field);
-                    } else {
-                        orders.put(field, order);
-                    }
-                    names.put(field, excelName);
+        for (final Field field : declaredFields) {
+            if (field.getAnnotation(ExcelReadOnly.class) == null){
+                if (field.getAnnotation(ExcelCell.class) != null) {
+                    final Integer excelOrder = field.getAnnotation(ExcelCell.class).value();
+                    final String name = field.getName();
+                    orders.put(field, excelOrder);
+                    names.put(field, name);
                     field.setAccessible(true);
+                } else if (field.getAnnotation(ExcelUnknownCells.class) != null) {
+                    unknownCells.add(field);
+                    field.setAccessible(true);
+                } else {
+                    final ExcelCellName annotation = field.getAnnotation(ExcelCellName.class);
+                    if (annotation != null) {
+                        final String delimeter = annotation.delimeter();
+                        final String excelName = delimeter.isEmpty()
+                            ? annotation.value()
+                            : annotation.value().substring(0, annotation.value().indexOf(delimeter));
+                        final int order = annotation.order();
+                        if (order == ABSENT_ORDER) {
+                            unordered.add(field);
+                        } else {
+                            orders.put(field, order);
+                        }
+                        names.put(field, excelName);
+                        field.setAccessible(true);
+                    }
                 }
             }
         }
