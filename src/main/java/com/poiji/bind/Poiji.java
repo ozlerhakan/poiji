@@ -64,7 +64,7 @@ public final class Poiji {
      *
      * @see Poiji#fromExcel(File, Class, PoijiOptions)
      */
-    public static synchronized <T> List<T> fromExcel(final File file, final Class<T> type) {
+    public static <T> List<T> fromExcel(final File file, final Class<T> type) {
         final ArrayList<T> list = new ArrayList<>();
         fromExcel(file, type, list::add);
         return list;
@@ -85,7 +85,7 @@ public final class Poiji {
      *
      * @see Poiji#fromExcel(File, Class, PoijiOptions)
      */
-    public static synchronized <T> void fromExcel(final File file, final Class<T> type, final Consumer<? super T> consumer) {
+    public static <T> void fromExcel(final File file, final Class<T> type, final Consumer<? super T> consumer) {
         final Unmarshaller unmarshaller = deserializer(file, PoijiOptionsBuilder.settings().build());
         unmarshaller.unmarshal(type, consumer);
     }
@@ -103,9 +103,9 @@ public final class Poiji {
      * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
      * @see Poiji#fromExcel(File, Class, PoijiOptions)
      */
-    public static synchronized <T> List<T> fromExcel(final InputStream inputStream,
-                                                     PoijiExcelType excelType,
-                                                     final Class<T> type) {
+    public static <T> List<T> fromExcel(
+        final InputStream inputStream, PoijiExcelType excelType, final Class<T> type
+    ) {
         final ArrayList<T> list = new ArrayList<>();
         fromExcel(inputStream, excelType, type, list::add);
         return list;
@@ -124,10 +124,9 @@ public final class Poiji {
      * @throws IllegalCastException if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
      * @see Poiji#fromExcel(File, Class, PoijiOptions)
      */
-    public static synchronized <T> void fromExcel(final InputStream inputStream,
-                                                  PoijiExcelType excelType,
-                                                  final Class<T> type,
-                                                  final Consumer<? super T> consumer) {
+    public static <T> void fromExcel(
+        final InputStream inputStream, PoijiExcelType excelType, final Class<T> type, final Consumer<? super T> consumer
+    ) {
         Objects.requireNonNull(excelType);
 
         final Unmarshaller unmarshaller = deserializer(inputStream, excelType, PoijiOptionsBuilder.settings().build());
@@ -147,9 +146,9 @@ public final class Poiji {
      * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
      * @see Poiji#fromExcel(File, Class)
      */
-    public static synchronized <T> List<T> fromExcel(final File file, final Class<T> type, final PoijiOptions options) {
+    public static <T> List<T> fromExcel(final File file, final Class<T> type, final PoijiOptions options) {
         final ArrayList<T> list = new ArrayList<>();
-        fromExcel(file, type, options,list::add);
+        fromExcel(file, type, options, list::add);
         return list;
     }
 
@@ -166,7 +165,9 @@ public final class Poiji {
      * @throws IllegalCastException if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
      * @see Poiji#fromExcel(File, Class)
      */
-    public static synchronized <T> void fromExcel(final File file, final Class<T> type, final PoijiOptions options, final Consumer<? super T> consumer) {
+    public static <T> void fromExcel(
+        final File file, final Class<T> type, final PoijiOptions options, final Consumer<? super T> consumer
+    ) {
         final Unmarshaller unmarshaller = deserializer(file, options);
         unmarshaller.unmarshal(type, consumer);
     }
@@ -185,13 +186,12 @@ public final class Poiji {
      * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
      * @see Poiji#fromExcel(File, Class)
      */
-    public static synchronized <T> List<T> fromExcel(final InputStream inputStream,
-                                                     final PoijiExcelType excelType,
-                                                     final Class<T> type,
-                                                     final PoijiOptions options) {
+    public static <T> List<T> fromExcel(
+        final InputStream inputStream, final PoijiExcelType excelType, final Class<T> type, final PoijiOptions options
+    ) {
         Objects.requireNonNull(excelType);
         final ArrayList<T> list = new ArrayList<>();
-        fromExcel(inputStream, excelType,type, options, list::add);
+        fromExcel(inputStream, excelType, type, options, list::add);
         return list;
     }
 
@@ -210,7 +210,7 @@ public final class Poiji {
      * language access control and the underlying field is either inaccessible or final.
      * @see Poiji#fromExcel(File, Class)
      */
-    public static synchronized <T> void fromExcel(final InputStream inputStream, final PoijiExcelType excelType,
+    public static  <T> void fromExcel(final InputStream inputStream, final PoijiExcelType excelType,
         final Class<T> type, final PoijiOptions options, final Consumer<? super T> consumer
     ) {
         Objects.requireNonNull(excelType);
