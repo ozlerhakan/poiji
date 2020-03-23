@@ -117,7 +117,7 @@ public class ReadMappedFields {
     private List<Field> parseUnknownCells(final List<Field> fields) {
         final List<Field> rest = new ArrayList<>(fields.size());
         for (final Field field : fields) {
-            if (field.getAnnotation(ExcelUnknownCells.class) != null) {
+            if (field.getAnnotation(ExcelUnknownCells.class) != null && field.getType().isAssignableFrom(Map.class)) {
                 unknownFields.add(field);
                 field.setAccessible(true);
             } else {
