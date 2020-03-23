@@ -6,7 +6,7 @@
 
     <groupId>com.github.ozlerhakan</groupId>
     <artifactId>poiji</artifactId>
-    <version>2.5.0</version>
+    <version>2.6.0</version>
     <packaging>jar</packaging>
 
     <name>poiji</name>
@@ -96,7 +96,19 @@
                     <argLine>-Djava.awt.headless=true</argLine>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>fully.qualified.MainClass</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -213,7 +225,7 @@
             <properties>
                 <!-- we need to open a specific package of a platform module to the unnamed module that uses deep reflection at runtime,
                      currently this is allowed but deep reflection in the unnamed module will not be validated in a future release of JDK at runtime -->
-                <add.opens>--add-opens java.base/java.io=ALL-UNNAMED --add-opens java.xml/com.sun.org.apache.xerces.internal.util=ALL-UNNAMED</add.opens>
+                <!--                <add.opens>&#45;&#45;add-opens java.base/java.io=ALL-UNNAMED &#45;&#45;add-opens java.xml/com.sun.org.apache.xerces.internal.util=ALL-UNNAMED</add.opens>-->
             </properties>
         </profile>
         <profile>
