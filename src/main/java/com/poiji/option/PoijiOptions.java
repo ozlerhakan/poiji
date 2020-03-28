@@ -4,7 +4,7 @@ import com.poiji.annotation.ExcelCellName;
 import com.poiji.config.Casting;
 import com.poiji.config.DefaultCasting;
 import com.poiji.exception.PoijiException;
-import com.poiji.save.CellCasting;
+import com.poiji.save.ToCellCasting;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
@@ -34,7 +34,7 @@ public final class PoijiOptions {
     private DateTimeFormatter dateFormatter;
     private DateTimeFormatter dateTimeFormatter;
     private Casting casting;
-    private CellCasting cellCasting;
+    private ToCellCasting toCellCasting;
     private int headerStart;
     private String sheetName;
     private boolean caseInsensitive;
@@ -156,12 +156,12 @@ public final class PoijiOptions {
         return this;
     }
 
-    public CellCasting getCellCasting() {
-        return cellCasting;
+    public ToCellCasting getToCellCasting() {
+        return toCellCasting;
     }
 
-    private PoijiOptions setCellCasting(final CellCasting cellCasting) {
-        this.cellCasting = cellCasting;
+    private PoijiOptions setToCellCasting(final ToCellCasting toCellCasting) {
+        this.toCellCasting = toCellCasting;
         return this;
     }
 
@@ -244,7 +244,7 @@ public final class PoijiOptions {
         private String localDateTimePattern = DEFAULT_DATE_TIME_PATTERN;
         private DateTimeFormatter dateTimeFormatter = DEFAULT_DATE_TIME_FORMATTER;
         private Casting casting = new DefaultCasting();
-        private CellCasting cellCasting = new CellCasting();
+        private ToCellCasting toCellCasting = new ToCellCasting();
         private int headerStart = 0;
         private int skip = 0;
         private int limit = 0;
@@ -366,7 +366,7 @@ public final class PoijiOptions {
                 .setDateLenient(dateLenient)
                 .setHeaderStart(headerStart)
                 .setCasting(casting)
-                .setCellCasting(cellCasting)
+                .setToCellCasting(toCellCasting)
                 .setLimit(limit)
                 .setCaseInsensitive(caseInsensitive);
         }
@@ -512,13 +512,13 @@ public final class PoijiOptions {
         /**
          * Use a modified cell casting implementation
          *
-         * @param cellCasting modified cell casting implementation
+         * @param toCellCasting modified cell casting implementation
          * @return this
          */
-        public PoijiOptionsBuilder withCellCasting(CellCasting cellCasting) {
-            Objects.requireNonNull(cellCasting);
+        public PoijiOptionsBuilder withCellCasting(ToCellCasting toCellCasting) {
+            Objects.requireNonNull(toCellCasting);
 
-            this.cellCasting = cellCasting;
+            this.toCellCasting = toCellCasting;
             return this;
         }
 

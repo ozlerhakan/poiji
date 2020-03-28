@@ -81,11 +81,16 @@ public abstract class AbstractWorkbookSaver {
     }
 
     private <T> void setValuesFromKnownFields(final Row row, final T instance) throws IllegalAccessException {
-        final CellCasting cellCasting = options.getCellCasting();
+        final ToCellCasting toCellCasting = options.getToCellCasting();
         for (Map.Entry<Field, Integer> orders : mappedFields.getOrders().entrySet()) {
             final Cell cell = row.createCell(orders.getValue());
             final Field field = orders.getKey();
-            cellCasting.forType(field.getType()).accept(cell, field.get(instance));
+            final Class<?> type = field.getType();
+            if (type.isPrimitive()){
+                toCellCasting.forType(type).accept(cell, field.get(instance));
+            } else {
+                toCellCasting.forType(type).accept(cell, type.cast(field.get(instance)));
+            }
         }
     }
 

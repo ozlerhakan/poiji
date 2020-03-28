@@ -1,6 +1,6 @@
 package com.poiji.option;
 
-import com.poiji.save.CellCasting;
+import com.poiji.save.ToCellCasting;
 import java.time.format.DateTimeFormatter;
 import org.junit.Test;
 
@@ -33,9 +33,9 @@ public final class PoijiOptionsTest {
 
     @Test
     public void getCellCasting() {
-        final CellCasting expected = new CellCasting();
+        final ToCellCasting expected = new ToCellCasting();
         final PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().withCellCasting(expected).build();
-        assertThat(expected, equalTo(options.getCellCasting()));
+        assertThat(expected, equalTo(options.getToCellCasting()));
     }
 
     @Test
