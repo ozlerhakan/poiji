@@ -55,7 +55,7 @@ public final class MappedFields {
                 } else {
                     final ExcelCellName annotation = field.getAnnotation(ExcelCellName.class);
                     if (annotation != null) {
-                        final String delimeter = annotation.columnNameDelimeter();
+                        final String delimeter = annotation.columnNameDelimiter();
                         final String excelName = delimeter.isEmpty()
                             ? annotation.value()
                             : annotation.value().substring(0, annotation.value().indexOf(delimeter));

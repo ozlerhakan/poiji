@@ -31,14 +31,14 @@ public @interface ExcelCellName {
     int order() default ABSENT_ORDER;
 
     /**
-     * Delimeter for column multiname.
+     * Delimiter for column multiname.
      * <p>
-     * Example: @ExcelCellName(value = "id,identifier", columnNameDelimeter = ",")
+     * Example: @ExcelCellName(value = "id,identifier", columnNameDelimiter = ",")
      * reading: column with name 'id' will be mapped into field, or if no column 'id',
      * then column 'identifier' will be mapped into field.
      * writing: field will be saved into column 'id'
      *
-     * @return delimeter for column multiname.
+     * @return delimiter for column multiname.
      */
-    String columnNameDelimeter() default "";
+    String columnNameDelimiter() default "";
 }

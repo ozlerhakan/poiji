@@ -110,7 +110,7 @@ public class ReadMappedFields {
     }
 
     private List<String> getPossibleFieldNames(final ExcelCellName annotation) {
-        final String delimeter = annotation.columnNameDelimeter();
+        final String delimeter = annotation.columnNameDelimiter();
         return delimeter.isEmpty() ? singletonList(annotation.value()) : asList(annotation.value().split(delimeter));
     }
 
