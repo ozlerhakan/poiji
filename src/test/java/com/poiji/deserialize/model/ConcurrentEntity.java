@@ -11,7 +11,7 @@ public final class ConcurrentEntity {
 
     @ExcelCell(0)
     private long primitiveLong;
-    @ExcelCellName(value = "TexT,other", delimeter = ",")
+    @ExcelCellName(value = "TexT,other", columnNameDelimeter = ",")
     private String text;
 
     public long getPrimitiveLong() {
