@@ -28,16 +28,13 @@ import static java.lang.String.valueOf;
  * Created by hakan on 22/10/2017
  */
 final class PoijiHandler<T> implements SheetContentsHandler {
-
     private T instance;
     private Consumer<? super T> consumer;
     private int internalRow;
     private int internalCount;
     private int limit;
-
     private Class<T> type;
     private PoijiOptions options;
-
     private final Casting casting;
     private Map<String, Integer> columnIndexPerTitle;
     private Map<Integer, String> titlePerColumnIndex;
@@ -51,7 +48,6 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         this.options = options;
         this.consumer = consumer;
         this.limit = options.getLimit();
-
         casting = options.getCasting();
         columnIndexPerTitle = new HashMap<>();
         titlePerColumnIndex = new HashMap<>();
@@ -64,7 +60,6 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             if (setValue(content, subclass, column)) {
                 return;
             }
-
             setFieldValue(content, subclass.getSuperclass(), column);
         }
     }
@@ -84,14 +79,12 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     }
 
     private boolean setValue(String content, Class<? super T> type, int column) {
-
-
         Stream.of(type.getDeclaredFields())
                 .filter(field -> field.getAnnotation(ExcelUnknownCells.class) == null)
                 .forEach(field -> {
                     ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
                     if (excelRow != null) {
-                        Object o = casting.castValue(field.getType(), valueOf(internalRow), -1, -1, options);
+                        Object o = casting.castValue(field.getType(), valueOf(internalRow), internalRow, column, options);
                         setFieldData(field, o, instance);
                         columnToField.put(-1, field);
                     }
@@ -112,7 +105,6 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                         }
                     }
                 });
-
         Stream.of(type.getDeclaredFields())
                 .filter(field -> field.getAnnotation(ExcelUnknownCells.class) != null)
                 .forEach(field -> {
@@ -126,33 +118,28 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                             } else {
                                 excelUnknownCellsMap = (Map) field.get(instance);
                             }
-
                             excelUnknownCellsMap.put(titlePerColumnIndex.get(column), content);
                         } catch (IllegalAccessException e) {
                             throw new IllegalCastException("Could not read content of field " + field.getName() + " on Object {" + instance + "}");
                         }
                     }
                 });
-
         // For ExcelRow annotation
         if (columnToField.containsKey(-1)) {
             Field field = columnToField.get(-1);
-            Object o = casting.castValue(field.getType(), valueOf(internalRow), -1, -1, options);
+            Object o = casting.castValue(field.getType(), valueOf(internalRow), internalRow, column, options);
             setFieldData(field, o, instance);
         }
-        if (columnToField.containsKey(column)) {
+        if (columnToField.containsKey(column) && columnToSuperClassField.containsKey(column)) {
             Field field = columnToField.get(column);
-            if (columnToSuperClassField.containsKey(column)) {
-                Object ins;
-                ins = getInstance(columnToSuperClassField.get(column));
-                if (setValue(field, column, content, ins)) {
-                    setFieldData(columnToSuperClassField.get(column), ins, instance);
-                    return true;
-                }
+            Object ins;
+            ins = getInstance(columnToSuperClassField.get(column));
+            if (setValue(field, column, content, ins)) {
+                setFieldData(columnToSuperClassField.get(column), ins, instance);
+                return true;
             }
             return setValue(field, column, content, instance);
         }
-
         return false;
     }
 
@@ -204,7 +191,6 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     @Override
     public void endRow(int rowNum) {
-
         if (internalRow != rowNum)
             return;
 
@@ -217,29 +203,22 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     public void cell(String cellReference, String formattedValue, XSSFComment comment) {
         CellAddress cellAddress = new CellAddress(cellReference);
         int row = cellAddress.getRow();
-
         int headers = options.getHeaderStart();
         int column = cellAddress.getColumn();
-
         if (row <= headers) {
             columnIndexPerTitle.put(
                     options.getCaseInsensitive() ? formattedValue.toLowerCase() : formattedValue,
                     column
             );
-
             titlePerColumnIndex.put(column, getTitleNameForMap(formattedValue, column));
         }
-
         if (row + 1 <= options.skip()) {
             return;
         }
-
         if (limit != 0 && internalCount > limit) {
             return;
         }
-
         internalRow = row;
-
         setFieldValue(formattedValue, type, column);
     }
 
