@@ -61,16 +61,17 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     private void setFieldValue(String content, Class<? super T> subclass, int column) {
         if (subclass != Object.class) {
-            if(setValue(content, subclass, column)) {
+            if (setValue(content, subclass, column)) {
                 return;
             }
 
             setFieldValue(content, subclass.getSuperclass(), column);
         }
     }
+
     /**
-     *  Using this to hold inner objects that will be mapped to the main object
-     * **/
+     * Using this to hold inner objects that will be mapped to the main object
+     **/
     private Object getInstance(Field field) {
         Object ins = null;
         if (fieldInstances.containsKey(field.getName())) {
@@ -90,7 +91,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                 .forEach(field -> {
                     ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
                     if (excelRow != null) {
-                        Object o = casting.castValue(field.getType(), valueOf(internalRow), options);
+                        Object o = casting.castValue(field.getType(), valueOf(internalRow), -1, -1, options);
                         setFieldData(field, o, instance);
                         columnToField.put(-1, field);
                     }
@@ -103,13 +104,11 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                                 setFieldData(field, ins, instance);
                                 columnToField.put(column, f);
                                 columnToSuperClassField.put(column, field);
-//                        return true;
                             }
                         }
                     } else {
-                        if(setValue(field, column, content, instance)) {
+                        if (setValue(field, column, content, instance)) {
                             columnToField.put(column, field);
-//                    return true;
                         }
                     }
                 });
@@ -136,12 +135,12 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                 });
 
         // For ExcelRow annotation
-        if(columnToField.containsKey(-1)) {
+        if (columnToField.containsKey(-1)) {
             Field field = columnToField.get(-1);
-            Object o = casting.castValue(field.getType(), valueOf(internalRow), options);
+            Object o = casting.castValue(field.getType(), valueOf(internalRow), -1, -1, options);
             setFieldData(field, o, instance);
         }
-        if(columnToField.containsKey(column)) {
+        if (columnToField.containsKey(column)) {
             Field field = columnToField.get(column);
             if (columnToSuperClassField.containsKey(column)) {
                 Object ins;
@@ -162,7 +161,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         if (index != null) {
             Class<?> fieldType = field.getType();
             if (column == index.value()) {
-                Object o = casting.castValue(fieldType, content, options);
+                Object o = casting.castValue(fieldType, content, internalRow, column, options);
                 setFieldData(field, o, ins);
                 return true;
             }
@@ -171,12 +170,12 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             if (excelCellName != null) {
                 Class<?> fieldType = field.getType();
                 final String titleName = options.getCaseInsensitive()
-                    ? excelCellName.value().toLowerCase()
-                    : excelCellName.value();
+                        ? excelCellName.value().toLowerCase()
+                        : excelCellName.value();
                 final Integer titleColumn = columnIndexPerTitle.get(titleName);
                 //Fix both columns mapped to name passing this condition below
                 if (titleColumn != null && titleColumn == column) {
-                    Object o = casting.castValue(fieldType, content, options);
+                    Object o = casting.castValue(fieldType, content, internalRow, column, options);
                     setFieldData(field, o, ins);
                     return true;
                 }
@@ -207,7 +206,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     public void endRow(int rowNum) {
 
         if (internalRow != rowNum)
-			return;
+            return;
 
         if (rowNum + 1 > options.skip()) {
             consumer.accept(instance);
@@ -224,8 +223,8 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
         if (row <= headers) {
             columnIndexPerTitle.put(
-                options.getCaseInsensitive() ? formattedValue.toLowerCase() : formattedValue,
-                column
+                    options.getCaseInsensitive() ? formattedValue.toLowerCase() : formattedValue,
+                    column
             );
 
             titlePerColumnIndex.put(column, getTitleNameForMap(formattedValue, column));

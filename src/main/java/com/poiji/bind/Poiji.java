@@ -43,22 +43,13 @@ public final class Poiji {
     /**
      * converts excel rows into a list of objects
      *
-     * @param file
-     *         excel file ending with .xls or .xlsx.
-     * @param type
-     *         type of the root object.
-     * @param <T>
-     *         type of the root object.
-     * @return
-     *         the newly created a list of objects
-     *
-     * @throws PoijiException
-     *          if an internal exception occurs during the mapping process.
-     * @throws InvalidExcelFileExtension
-     *          if the specified excel file extension is invalid.
-     * @throws IllegalCastException
-     *          if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
-     *
+     * @param file excel file ending with .xls or .xlsx.
+     * @param type type of the root object.
+     * @param <T>  type of the root object.
+     * @return the newly created a list of objects
+     * @throws PoijiException            if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
      * @see Poiji#fromExcel(File, Class, PoijiOptions)
      */
     public static synchronized <T> List<T> fromExcel(final File file, final Class<T> type) {
@@ -70,16 +61,15 @@ public final class Poiji {
     /**
      * converts excel rows into a list of objects
      *
-     * @param file excel file ending with .xls or .xlsx.
-     * @param type type of the root object.
-     * @param <T> type of the root object.
+     * @param file     excel file ending with .xls or .xlsx.
+     * @param type     type of the root object.
+     * @param <T>      type of the root object.
      * @param consumer output retrieves records
-     * @throws PoijiException if an internal exception occurs during the mapping
-     * process.
+     * @throws PoijiException            if an internal exception occurs during the mapping
+     *                                   process.
      * @throws InvalidExcelFileExtension if the specified excel file extension
-     * is invalid.
-     * @throws IllegalCastException if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
-     *
+     *                                   is invalid.
+     * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
      * @see Poiji#fromExcel(File, Class, PoijiOptions)
      */
     public static synchronized <T> void fromExcel(final File file, final Class<T> type, final Consumer<? super T> consumer) {
@@ -112,13 +102,13 @@ public final class Poiji {
      * converts excel rows into a list of objects
      *
      * @param inputStream excel file stream
-     * @param excelType type of the excel file, xls or xlsx
-     * @param type type of the root object.
-     * @param <T> type of the root object.
-     * @param consumer represents an operation that accepts the type argument
-     * @throws PoijiException if an internal exception occurs during the mapping process.
+     * @param excelType   type of the excel file, xls or xlsx
+     * @param type        type of the root object.
+     * @param <T>         type of the root object.
+     * @param consumer    represents an operation that accepts the type argument
+     * @throws PoijiException            if an internal exception occurs during the mapping process.
      * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
-     * @throws IllegalCastException if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
      * @see Poiji#fromExcel(File, Class, PoijiOptions)
      */
     public static synchronized <T> void fromExcel(final InputStream inputStream,
@@ -146,21 +136,21 @@ public final class Poiji {
      */
     public static synchronized <T> List<T> fromExcel(final File file, final Class<T> type, final PoijiOptions options) {
         final ArrayList<T> list = new ArrayList<>();
-        fromExcel(file, type, options,list::add);
+        fromExcel(file, type, options, list::add);
         return list;
     }
 
     /**
      * converts excel rows into a list of objects
      *
-     * @param file excel file ending with .xls or .xlsx.
-     * @param type type of the root object.
-     * @param <T> type of the root object.
-     * @param options specifies to change the default behaviour of the poiji.
+     * @param file     excel file ending with .xls or .xlsx.
+     * @param type     type of the root object.
+     * @param <T>      type of the root object.
+     * @param options  specifies to change the default behaviour of the poiji.
      * @param consumer represents an operation that accepts the type argument
-     * @throws PoijiException if an internal exception occurs during the mapping process.
+     * @throws PoijiException            if an internal exception occurs during the mapping process.
      * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
-     * @throws IllegalCastException if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
      * @see Poiji#fromExcel(File, Class)
      */
     public static synchronized <T> void fromExcel(final File file, final Class<T> type, final PoijiOptions options, final Consumer<? super T> consumer) {
@@ -188,7 +178,7 @@ public final class Poiji {
                                                      final PoijiOptions options) {
         Objects.requireNonNull(excelType);
         final ArrayList<T> list = new ArrayList<>();
-        fromExcel(inputStream, excelType,type, options, list::add);
+        fromExcel(inputStream, excelType, type, options, list::add);
         return list;
     }
 
@@ -196,15 +186,15 @@ public final class Poiji {
      * converts excel rows into a list of objects
      *
      * @param inputStream excel file stream
-     * @param excelType type of the excel file, xls or xlsx
-     * @param type type of the root object.
-     * @param <T> type of the root object.
-     * @param options specifies to change the default behaviour of the poiji.
-     * @param consumer represents an operation that accepts the type argument
-     * @throws PoijiException if an internal exception occurs during the mapping process.
+     * @param excelType   type of the excel file, xls or xlsx
+     * @param type        type of the root object.
+     * @param <T>         type of the root object.
+     * @param options     specifies to change the default behaviour of the poiji.
+     * @param consumer    represents an operation that accepts the type argument
+     * @throws PoijiException            if an internal exception occurs during the mapping process.
      * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
-     * @throws IllegalCastException if this Field object is enforcing Java
-     * language access control and the underlying field is either inaccessible or final.
+     * @throws IllegalCastException      if this Field object is enforcing Java
+     *                                   language access control and the underlying field is either inaccessible or final.
      * @see Poiji#fromExcel(File, Class)
      */
     public static synchronized <T> void fromExcel(final InputStream inputStream,

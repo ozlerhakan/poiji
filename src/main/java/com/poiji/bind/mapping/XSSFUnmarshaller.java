@@ -53,44 +53,49 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         reader.parse(is);
 
         WorkBookContentHandler wbch = (WorkBookContentHandler) reader.getContentHandler();
-	    List<WorkBookSheet> sheets = wbch.getSheets();
-	    SheetIterator iter = (SheetIterator) workbookReader.getSheetsData();
-	    int sheetCounter = 0;
+        List<WorkBookSheet> sheets = wbch.getSheets();
+        int sheetSize = sheets.size();
+        if (sheetSize == 0) {
+            throw new PoijiException("no excel sheets found");
+        }
 
-	    Optional<String> maybeSheetName = SheetNameExtractor.getSheetName(type, options);
+        SheetIterator iter = (SheetIterator) workbookReader.getSheetsData();
+        int sheetCounter = 0;
 
-	    if (!maybeSheetName.isPresent()) {
-	      int requestedIndex = options.sheetIndex();
-	      int nonHiddenSheetIndex = 0;
-	      while (iter.hasNext()) {
-	        try (InputStream stream = iter.next()) {
-	          WorkBookSheet wbs = sheets.get(sheetCounter);
-	          if (wbs.getState().equals("visible")) {
-	            if (nonHiddenSheetIndex == requestedIndex) {
-	              processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
-	              return;
-	            }
-	            nonHiddenSheetIndex++;
-	          }
-	        }
-	        sheetCounter++;
-	      }
-	    } else {
-	      String sheetName = maybeSheetName.get();
-	      while (iter.hasNext()) {
-	        try (InputStream stream = iter.next()) {
-	          WorkBookSheet wbs = sheets.get(sheetCounter);
-	          if (wbs.getState().equals("visible")) {
-	            if (iter.getSheetName().equalsIgnoreCase(sheetName)) {
-	              processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
-	              return;
-	            }
-	          }
-	        }
-	        sheetCounter++;
-	      }
-	    }
-	  }
+        Optional<String> maybeSheetName = SheetNameExtractor.getSheetName(type, options);
+
+        if (!maybeSheetName.isPresent()) {
+            int requestedIndex = options.sheetIndex();
+            int nonHiddenSheetIndex = 0;
+            while (iter.hasNext()) {
+                try (InputStream stream = iter.next()) {
+                    WorkBookSheet wbs = sheets.get(sheetCounter);
+                    if (wbs.getState().equals("visible")) {
+                        if (nonHiddenSheetIndex == requestedIndex) {
+                            processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
+                            return;
+                        }
+                        nonHiddenSheetIndex++;
+                    }
+                }
+                sheetCounter++;
+            }
+        } else {
+            String sheetName = maybeSheetName.get();
+            while (iter.hasNext()) {
+                try (InputStream stream = iter.next()) {
+                    WorkBookSheet wbs = sheets.get(sheetCounter);
+                    if (wbs.getState().equals("visible")) {
+                        if (iter.getSheetName().equalsIgnoreCase(sheetName)) {
+                            processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
+                            return;
+                        }
+                    }
+                }
+                sheetCounter++;
+            }
+        }
+    }
 
     private <T> void processSheet(StylesTable styles,
                                   XMLReader reader,
@@ -108,9 +113,9 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
             reader.setContentHandler(contentHandler);
             reader.parse(sheetSource);
         } catch (LimitCrossedException e) {
-			IOUtils.closeQuietly(sheetInputStream);
-			// swallowing the exception for good :)
-		} catch (SAXException | IOException e) {
+            IOUtils.closeQuietly(sheetInputStream);
+            // swallowing the exception for good :)
+        } catch (SAXException | IOException e) {
             throw new PoijiException("Problem occurred while reading data", e);
         }
     }
