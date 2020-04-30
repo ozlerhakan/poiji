@@ -579,6 +579,39 @@ This is the excel file we want to parse:
 The object corresponding to the first row of the excel sheet then has a map with `{ENCODING=mp3, BITRATE=256}`
 and the one for the second row has `{ENCODING=flac, BITRATE=1500}`.
 
+=== Example 9
+
+Poiji 2.6.0 introduced the Option `namedHeaderMandatory`. If set to true, Poiji will check that all field annotated with `@ExcelCellName` must have a corresponding column in the Excel sheet. If any column is missing a `HeaderMissingException` will be thrown.
+
+[source,java]
+----
+public class MusicTrack {
+
+    @ExcelCellName("ID")
+    private String employeeId;
+
+    @ExcelCellName("AUTHOR")
+    private String author;
+
+}
+----
+
+This is the excel file we want to parse:
+
+|===
+|ID | Artist
+
+|123923
+|Joe Doe
+
+|56437
+|Jane Doe
+|===
+
+In the default setting of Poiji (`namedHeaderMandatory=false`), the author field will be null for both objects.
+With `namedHeaderMandatory=true`, a `HeaderMissingException` will be thrown.
+
+
 == Try with JShell
 
 Since we have a new pedagogic tool, Java 9 REPL, you can try Poiji in JShell. Clone the repo and follow the steps below. JShell should open up a new jshell session once loading the startup scripts and the specified jars that must be in the classpath. You must first import and create related packages and classes before using Poiji. We are able to use directly Poiji and Employee classes because they are already imported from `jshell/snippets` with `try-with-jshell.sh`.
