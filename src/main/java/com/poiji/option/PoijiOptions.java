@@ -34,6 +34,7 @@ public final class PoijiOptions {
     private int headerStart;
     private String sheetName;
     private boolean caseInsensitive;
+    private boolean namedHeaderMandatory;
 
     private PoijiOptions() {
         super();
@@ -197,6 +198,15 @@ public final class PoijiOptions {
         return this;
     }
 
+    public boolean getNamedHeaderMandatory() {
+        return namedHeaderMandatory;
+    }
+
+    public PoijiOptions setNamedHeaderMandatory(boolean namedHeaderMandatory) {
+        this.namedHeaderMandatory = namedHeaderMandatory;
+        return this;
+    }
+
     public static class PoijiOptionsBuilder {
 
         private int sheetIndex;
@@ -216,6 +226,7 @@ public final class PoijiOptions {
         private int limit = 0;
         private String sheetName;
         private boolean caseInsensitive;
+        private boolean namedHeaderMandatory;
 
         private PoijiOptionsBuilder() {
         }
@@ -307,7 +318,8 @@ public final class PoijiOptions {
                     .setHeaderStart(headerStart)
                     .setCasting(casting)
                     .setLimit(limit)
-                    .setCaseInsensitive(caseInsensitive);
+                    .setCaseInsensitive(caseInsensitive)
+                    .setNamedHeaderMandatory(namedHeaderMandatory);
         }
 
         /**
@@ -472,6 +484,11 @@ public final class PoijiOptions {
          */
         public PoijiOptionsBuilder caseInsensitive(final boolean caseInsensitive) {
             this.caseInsensitive = caseInsensitive;
+            return this;
+        }
+
+        public PoijiOptionsBuilder namedHeaderMandatory(boolean namedHeaderMandatory) {
+            this.namedHeaderMandatory = namedHeaderMandatory;
             return this;
         }
     }

@@ -5,6 +5,7 @@ import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelCellRange;
 import com.poiji.annotation.ExcelRow;
 import com.poiji.annotation.ExcelUnknownCells;
+import com.poiji.bind.Poiji;
 import com.poiji.config.Casting;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
@@ -15,7 +16,9 @@ import org.apache.poi.xssf.usermodel.XSSFComment;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -42,6 +45,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     private Map<String, Object> fieldInstances;
     private Map<Integer, Field> columnToField;
     private Map<Integer, Field> columnToSuperClassField;
+    private Set<ExcelCellName> excelCellNames;
 
     PoijiHandler(Class<T> type, PoijiOptions options, Consumer<? super T> consumer) {
         this.type = type;
@@ -53,6 +57,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         titlePerColumnIndex = new HashMap<>();
         columnToField = new HashMap<>();
         columnToSuperClassField = new HashMap<>();
+        excelCellNames = new HashSet<>();
     }
 
     private void setFieldValue(String content, Class<? super T> subclass, int column) {
@@ -155,6 +160,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         } else {
             ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
             if (excelCellName != null) {
+                excelCellNames.add(excelCellName);
                 Class<?> fieldType = field.getType();
                 final String titleName = options.getCaseInsensitive()
                         ? excelCellName.value().toLowerCase()
@@ -236,5 +242,10 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     @Override
     public void headerFooter(String text, boolean isHeader, String tagName) {
         //no-op
+    }
+
+    @Override
+    public void endSheet() {
+        Poiji.validateMandatoryNameColumns(options, type, columnIndexPerTitle.keySet());
     }
 }
