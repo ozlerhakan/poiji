@@ -38,6 +38,7 @@ public final class PoijiOptions {
     private boolean caseInsensitive;
     private PoijiLogCellFormat poijiLogCellFormat;
     private PoijiNumberFormat numberFormat;
+    private boolean namedHeaderMandatory;
 
     public PoijiNumberFormat getPoijiNumberFormat() {
         return numberFormat;
@@ -214,8 +215,17 @@ public final class PoijiOptions {
         return caseInsensitive;
     }
 
-    public PoijiOptions setCaseInsensitive(final boolean caseInsensitive) {
+    private PoijiOptions setCaseInsensitive(final boolean caseInsensitive) {
         this.caseInsensitive = caseInsensitive;
+        return this;
+    }
+
+    public boolean getNamedHeaderMandatory() {
+        return namedHeaderMandatory;
+    }
+
+    private PoijiOptions setNamedHeaderMandatory(boolean namedHeaderMandatory) {
+        this.namedHeaderMandatory = namedHeaderMandatory;
         return this;
     }
 
@@ -240,6 +250,7 @@ public final class PoijiOptions {
         private int limit = 0;
         private String sheetName;
         private boolean caseInsensitive;
+        private boolean namedHeaderMandatory;
 
         private PoijiOptionsBuilder() {
         }
@@ -333,7 +344,8 @@ public final class PoijiOptions {
                     .setLimit(limit)
                     .setPoijiLogCellFormat(cellFormat)
                     .setPoijiNumberFormat(numberFormat)
-                    .setCaseInsensitive(caseInsensitive);
+                    .setCaseInsensitive(caseInsensitive)
+                    .setNamedHeaderMandatory(namedHeaderMandatory);
         }
 
         /**
@@ -519,6 +531,11 @@ public final class PoijiOptions {
          */
         public PoijiOptionsBuilder poijiNumberFormat(final PoijiNumberFormat numberFormat) {
             this.numberFormat = numberFormat;
+            return this;
+        }
+
+        public PoijiOptionsBuilder namedHeaderMandatory(boolean namedHeaderMandatory) {
+            this.namedHeaderMandatory = namedHeaderMandatory;
             return this;
         }
     }

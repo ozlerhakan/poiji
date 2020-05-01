@@ -5,6 +5,7 @@ import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelCellRange;
 import com.poiji.annotation.ExcelRow;
 import com.poiji.annotation.ExcelUnknownCells;
+import com.poiji.bind.Poiji;
 import com.poiji.bind.Unmarshaller;
 import com.poiji.config.Casting;
 import com.poiji.exception.IllegalCastException;
@@ -67,6 +68,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
         int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
 
         loadColumnTitles(sheet, maxPhysicalNumberOfRows);
+        Poiji.validateMandatoryNameColumns(options, type, columnIndexPerTitle.keySet());
 
         for (Row currentRow : sheet) {
             if (!skip(currentRow, skip) && !isRowEmpty(currentRow)) {
