@@ -623,7 +623,7 @@ As of 2.7.0, we can observe each cell format of a given excel file. Assume that 
 |12/31/2020 12.00 AM
 |===
 
-We can get all list of cell formats using `PoijiLogCellFormat` with `PoijiOptions`:
+We can get all the list of cell formats using `PoijiLogCellFormat` with `PoijiOptions`:
 
 ----
 PoijiLogCellFormat log = new PoijiLogCellFormat();
@@ -641,11 +641,11 @@ Hmm, It looks like we did not achieve the correct date format when we get the da
 
 ----
 List<InternalCellFormat> formats = log.formats();
-InternalCellFormat cell00 = formats.get(0);
+InternalCellFormat cell10 = formats.get(1);
 
-cell00.getFormatString()
+cell10.getFormatString()
 // mm:ss.0
-cell00.getFormatIndex()
+cell10.getFormatIndex()
 // 47
 ----
 
@@ -653,7 +653,7 @@ Now that we know the reason of why we don't see the expected date value, it's be
 
 === Feature 11
 
-Using 2.7.0, we can change the default format of a cell using `PoijiNumberFormat`. Recall `feature 10`, we are unable to see the correct cell format besides the excel file uses another format which we do not want to.
+Using 2.7.0, we can change the default format of a cell using `PoijiNumberFormat`. Recall `feature 10`, we are unable to see the correct cell format what's more the excel file uses another format which we do not want to.
 
 |===
 |Date

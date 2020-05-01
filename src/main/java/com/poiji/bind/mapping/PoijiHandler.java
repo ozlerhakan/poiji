@@ -5,10 +5,10 @@ import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelCellRange;
 import com.poiji.annotation.ExcelRow;
 import com.poiji.annotation.ExcelUnknownCells;
-import com.poiji.bind.Poiji;
 import com.poiji.config.Casting;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
+import com.poiji.util.AnnotationUtil;
 import com.poiji.util.ReflectUtil;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
@@ -246,6 +246,6 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     @Override
     public void endSheet() {
-        Poiji.validateMandatoryNameColumns(options, type, columnIndexPerTitle.keySet());
+        AnnotationUtil.validateMandatoryNameColumns(options, type, columnIndexPerTitle.keySet());
     }
 }
