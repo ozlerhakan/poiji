@@ -1,7 +1,6 @@
 package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
-import com.poiji.bind.mapping.PoijiLogCellFormat;
 import com.poiji.bind.mapping.PoijiNumberFormat;
 import com.poiji.deserialize.model.byname.DateExcelColumn;
 import com.poiji.exception.PoijiExcelType;
@@ -51,7 +50,6 @@ public class DeserializerCaseDateTest {
             numberFormat.putNumberFormat((short) 22, "mm/dd/yyyy hh.mm aa");
 
             PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
-                    .poijiCellFormat(new PoijiLogCellFormat())
                     .poijiNumberFormat(numberFormat)
                     .build();
 
@@ -64,7 +62,6 @@ public class DeserializerCaseDateTest {
 
             assertThat(numberFormat.getNumberFormatAt((short) 47), is("mm/dd/yyyy hh.mm aa"));
             assertThat(numberFormat.getNumberFormatAt((short) 22), is("mm/dd/yyyy hh.mm aa"));
-            System.out.println(options.getPoijiCellFormat().formats());
         } catch (IOException e) {
             fail(e.getMessage());
         }

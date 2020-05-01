@@ -614,6 +614,71 @@ This is the excel file we want to parse:
 In the default setting of Poiji (`namedHeaderMandatory=false`), the author field will be null for both objects.
 With `namedHeaderMandatory=true`, a `HeaderMissingException` will be thrown.
 
+=== Feature 10
+
+As of 2.7.0, we can observe each cell format of a given excel file. Assume that we have an excel file like below:
+
+|===
+|Date
+|12/31/2020 12.00 AM
+|===
+
+We can get all list of cell formats using `PoijiLogCellFormat` with `PoijiOptions`:
+
+----
+PoijiLogCellFormat log = new PoijiLogCellFormat();
+PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+        .poijiCellFormat(log)
+        .build();
+List<Model> dates = Poiji.fromExcel(stream, poijiExcelType, Model.class, options);
+
+Model model = rows.get(0)
+model.getDate();
+// 12.00
+----
+
+Hmm, It looks like we did not achieve the correct date format when we get the date value (`12.00`). Let's see how internally the excel file parses the value of the cell via `PoijiLogCellFormat`:
+
+----
+List<InternalCellFormat> formats = log.formats();
+InternalCellFormat cell00 = formats.get(0);
+
+cell00.getFormatString()
+// mm:ss.0
+cell00.getFormatIndex()
+// 47
+----
+
+Now that we know the reason of why we don't see the expected date value, it's because the default format of the date cell is the `mm:ss.0` format with a given index 47, we need to change the default format of index (i.e. `47`). This format was automatically assigned to the cell having a number, but almost certainly with a special style or format. Note that this option should be used for debugging purpose only.
+
+=== Feature 11
+
+Using 2.7.0, we can change the default format of a cell using `PoijiNumberFormat`. Recall `feature 10`, we are unable to see the correct cell format besides the excel file uses another format which we do not want to.
+
+|===
+|Date
+|12/31/2020 12.00 AM
+|===
+
+Using `PoijiNumberFormat` option, we are able to change the behavior of the format of a specific index:
+
+----
+PoijiNumberFormat numberFormat = new PoijiNumberFormat();
+numberFormat.putNumberFormat((short) 47, "mm/dd/yyyy hh.mm aa");
+
+PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+        .poijiNumberFormat(numberFormat)
+        .build();
+
+List<Model> rows = Poiji.fromExcel(stream, poijiExcelType, Model.class, options);
+
+Model model = rows.get(0)
+model.getDate();
+// 12/31/2020 12.00 AM  <1>
+----
+1. Voila!
+
+We know that the index 47 uses the format `mm:ss.0` by default in the given excel file, thus we're able to override its format with `mm/dd/yyyy hh.mm aa` using the `putNumberFormat` method.
 
 == Try with JShell
 
