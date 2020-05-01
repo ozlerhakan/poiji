@@ -1,5 +1,5 @@
 = Poiji
-:version: v2.6.0
+:version: v2.7.0
 
 image:https://travis-ci.org/ozlerhakan/poiji.svg?branch=master["Build Status", link="https://travis-ci.org/ozlerhakan/poiji"] image:https://api.codacy.com/project/badge/Grade/6587e90886184da29a1b7c5634695c9d["Codacy code quality", link="https://www.codacy.com/app/ozlerhakan/poiji?utm_source=github.com&utm_medium=referral&utm_content=ozlerhakan/poiji&utm_campaign=Badge_Grade"] image:https://coveralls.io/repos/github/ozlerhakan/poiji/badge.svg?branch=master["Coverage Status", link="https://coveralls.io/github/ozlerhakan/poiji?branch=master"] image:https://img.shields.io/badge/apache.poi-4.1.2-brightgreen.svg[] image:https://img.shields.io/badge/gitter-join%20chat-blue.svg["Gitter", link="https://gitter.im/poiji/Lobby"] image:https://img.shields.io/badge/license-MIT-blue.svg[]
 
@@ -15,7 +15,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 <dependency>
   <groupId>com.github.ozlerhakan</groupId>
   <artifactId>poiji</artifactId>
-  <version>2.6.0</version>
+  <version>2.7.0</version>
 </dependency>
 ----
 
@@ -23,7 +23,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    compile 'com.github.ozlerhakan:poiji:2.6.0'
+    compile 'com.github.ozlerhakan:poiji:2.7.0'
 }
 ----
 
@@ -60,9 +60,12 @@ com.poiji.option.PoijiOptions.PoijiOptionsBuilder#trimCellValue(boolean)
 com.poiji.option.PoijiOptions.PoijiOptionsBuilder#headerStart(int)
 com.poiji.option.PoijiOptions.PoijiOptionsBuilder#withCasting(Casting)
 com.poiji.option.PoijiOptions.PoijiOptionsBuilder#caseInsensitive(boolean)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#namedHeaderMandatory(boolean)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#poijiNumberFormat(PoijiNumberFormat)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#poijiCellFormat(PoijiLogCellFormat)
 ----
 
-=== Example 1
+=== Feature 1
 
 Create your object model:
 
@@ -183,7 +186,7 @@ PoijiOptions options = PoijiOptionsBuilder.settings()
 ----
 1. a field that is of type either `java.util.Date`, `Float`, `Double`, `Integer`, `Long` or `String` will have a `null` value.
 
-=== Example 2
+=== Feature 2
 Poiji allows specifying the sheet name using annotation
 
 [source,java]
@@ -224,7 +227,7 @@ PoijiOptions options = PoijiOptionsBuilder.settings()
 List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class, options);
 ----
 
-=== Example 3
+=== Feature 3
 
 The version `1.11` introduces a new annotation called `ExcelCellName` so that we can read the values by column names directly.
 
@@ -298,7 +301,7 @@ public class Person {
 }
 ----
 
-=== Example 4
+=== Feature 4
 
 Your object model may be derived from a super class:
 
@@ -347,7 +350,7 @@ Car car = cars.get(0);
 // 4
 ----
 
-=== Example 5
+=== Feature 5
 
 Consider you have a table like below:
 
@@ -441,7 +444,7 @@ GroupA firstRowPerson1 = firstRowGroups.getGroupA();
 GroupB secondRowPerson2 = firstRowGroups.getGroupB();
 ----
 
-=== Example 6
+=== Feature 6
 
 As of 1.14, Poiji supports Consumer Interface. As https://github.com/ozlerhakan/poiji/pull/39#issuecomment-409521808[@fmarazita] explained the usage, there are several benefits of having a Consumer:
 
@@ -494,7 +497,7 @@ private void dbInsertion(Calculation siCalculation) {
 }
 ----
 
-=== Example 7
+=== Feature 7
 
 Since Poiji 1.19.1, you can create your own casting implementation without relying on the default Poiji casting configuration using the `Casting` interface.
 
@@ -532,7 +535,7 @@ Then you can add your custom implementation with the `withCasting` method:
 List<Person> people = Poiji.fromExcel(excel, Person.class, options);
 ----
 
-=== Example 8
+=== Feature 8
 
 Since Poiji 2.3.0, you can annotate a `Map<String, String>` with `@ExcelUnknownCells` to parse all entries,
 which are not mapped in any other way (for example by index or by name).
@@ -579,9 +582,9 @@ This is the excel file we want to parse:
 The object corresponding to the first row of the excel sheet then has a map with `{ENCODING=mp3, BITRATE=256}`
 and the one for the second row has `{ENCODING=flac, BITRATE=1500}`.
 
-=== Example 9
+=== Feature 9
 
-Poiji 2.6.0 introduced the Option `namedHeaderMandatory`. If set to true, Poiji will check that all field annotated with `@ExcelCellName` must have a corresponding column in the Excel sheet. If any column is missing a `HeaderMissingException` will be thrown.
+Poiji 2.7.0 introduced the Option `namedHeaderMandatory`. If set to true, Poiji will check that all field annotated with `@ExcelCellName` must have a corresponding column in the Excel sheet. If any column is missing a `HeaderMissingException` will be thrown.
 
 [source,java]
 ----

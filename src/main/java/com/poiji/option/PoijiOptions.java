@@ -534,6 +534,11 @@ public final class PoijiOptions {
             return this;
         }
 
+        /**
+         * Set true if all headers named in {@link ExcelCellName} are mandatory, otherwise false
+         *
+         * @param namedHeaderMandatory fieldas are mandatory or not
+         */
         public PoijiOptionsBuilder namedHeaderMandatory(boolean namedHeaderMandatory) {
             this.namedHeaderMandatory = namedHeaderMandatory;
             return this;
