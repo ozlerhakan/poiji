@@ -1,6 +1,8 @@
 package com.poiji.option;
 
 import com.poiji.annotation.ExcelCellName;
+import com.poiji.bind.mapping.PoijiLogCellFormat;
+import com.poiji.bind.mapping.PoijiNumberFormat;
 import com.poiji.config.Casting;
 import com.poiji.config.DefaultCasting;
 import com.poiji.exception.PoijiException;
@@ -34,6 +36,27 @@ public final class PoijiOptions {
     private int headerStart;
     private String sheetName;
     private boolean caseInsensitive;
+    private PoijiLogCellFormat poijiLogCellFormat;
+    private PoijiNumberFormat numberFormat;
+    private boolean namedHeaderMandatory;
+
+    public PoijiNumberFormat getPoijiNumberFormat() {
+        return numberFormat;
+    }
+
+    private PoijiOptions setPoijiNumberFormat(PoijiNumberFormat numberFormat) {
+        this.numberFormat = numberFormat;
+        return this;
+    }
+
+    public PoijiLogCellFormat getPoijiCellFormat() {
+        return poijiLogCellFormat;
+    }
+
+    private PoijiOptions setPoijiLogCellFormat(PoijiLogCellFormat poijiLogCellFormat) {
+        this.poijiLogCellFormat = poijiLogCellFormat;
+        return this;
+    }
 
     private PoijiOptions() {
         super();
@@ -192,8 +215,17 @@ public final class PoijiOptions {
         return caseInsensitive;
     }
 
-    public PoijiOptions setCaseInsensitive(final boolean caseInsensitive) {
+    private PoijiOptions setCaseInsensitive(final boolean caseInsensitive) {
         this.caseInsensitive = caseInsensitive;
+        return this;
+    }
+
+    public boolean getNamedHeaderMandatory() {
+        return namedHeaderMandatory;
+    }
+
+    private PoijiOptions setNamedHeaderMandatory(boolean namedHeaderMandatory) {
+        this.namedHeaderMandatory = namedHeaderMandatory;
         return this;
     }
 
@@ -211,11 +243,14 @@ public final class PoijiOptions {
         private DateTimeFormatter dateFormatter = DEFAULT_DATE_FORMATTER;
         private DateTimeFormatter dateTimeFormatter = DEFAULT_DATE_TIME_FORMATTER;
         private Casting casting = new DefaultCasting();
+        private PoijiLogCellFormat cellFormat;
+        private PoijiNumberFormat numberFormat;
         private int headerStart = 0;
         private int skip = 0;
         private int limit = 0;
         private String sheetName;
         private boolean caseInsensitive;
+        private boolean namedHeaderMandatory;
 
         private PoijiOptionsBuilder() {
         }
@@ -307,7 +342,10 @@ public final class PoijiOptions {
                     .setHeaderStart(headerStart)
                     .setCasting(casting)
                     .setLimit(limit)
-                    .setCaseInsensitive(caseInsensitive);
+                    .setPoijiLogCellFormat(cellFormat)
+                    .setPoijiNumberFormat(numberFormat)
+                    .setCaseInsensitive(caseInsensitive)
+                    .setNamedHeaderMandatory(namedHeaderMandatory);
         }
 
         /**
@@ -472,6 +510,37 @@ public final class PoijiOptions {
          */
         public PoijiOptionsBuilder caseInsensitive(final boolean caseInsensitive) {
             this.caseInsensitive = caseInsensitive;
+            return this;
+        }
+
+        /**
+         * Add cell format option to see each internal cell's excel format for files ending with xlsx format.
+         * This option should be enabled for debugging purpose.
+         *
+         * @param cellFormat poiji cell format instance
+         */
+        public PoijiOptionsBuilder poijiCellFormat(final PoijiLogCellFormat cellFormat) {
+            this.cellFormat = cellFormat;
+            return this;
+        }
+
+        /**
+         * Change the default cell formats of an excel file by overriding
+         *
+         * @param numberFormat poiji number format instance
+         */
+        public PoijiOptionsBuilder poijiNumberFormat(final PoijiNumberFormat numberFormat) {
+            this.numberFormat = numberFormat;
+            return this;
+        }
+
+        /**
+         * Set true if all headers named in {@link ExcelCellName} are mandatory, otherwise false
+         *
+         * @param namedHeaderMandatory fieldas are mandatory or not
+         */
+        public PoijiOptionsBuilder namedHeaderMandatory(boolean namedHeaderMandatory) {
+            this.namedHeaderMandatory = namedHeaderMandatory;
             return this;
         }
     }

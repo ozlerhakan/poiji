@@ -53,9 +53,9 @@ final class WorkBookContentHandler implements ContentHandler {
     @Override
     public void startElement(String uri, String localName, String qName, Attributes atts) {
 
-        //there are multipel elements to an excel xml layout
+        //there are multiple elements to an excel xml layout
         //we only care about the sheet infor
-        if ("sheet".equals(qName)) {
+        if ("x:sheet".equals(qName) || "sheet".equals(qName)) {
             individualSheet = new WorkBookSheet();
 
             //loop throught all the attributes and add to the new sheet
@@ -86,7 +86,7 @@ final class WorkBookContentHandler implements ContentHandler {
 
         //onces finished reading the element, if end of sheet, add to array of work books sheets so can loop them later
         //set this sheet to null as its not needed any more
-        if ("sheet".equals(qName)) {
+        if ("x:sheet".equals(qName) || "sheet".equals(qName)) {
             sheets.add(individualSheet);
             individualSheet = null;
         }

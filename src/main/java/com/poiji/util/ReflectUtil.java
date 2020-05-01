@@ -1,8 +1,14 @@
 package com.poiji.util;
 
-import java.lang.reflect.Constructor;
-
+import com.poiji.annotation.ExcelCellRange;
 import com.poiji.exception.PoijiInstantiationException;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class ReflectUtil {
     public static <T> T newInstanceOf(Class<T> type) {
@@ -18,5 +24,29 @@ public class ReflectUtil {
         }
 
         return obj;
+    }
+
+    /**
+     * Finds a particular annotation on a class and checks subtypes marked with ExcelCellRange recursively.
+     * <p>
+     * Recursively does not refer to super classes.
+     */
+    public static <T, A extends Annotation> Collection<A> findRecursivePoijiAnnotations(Class<T> typeToInspect,
+                                                                                        Class<A> annotationType) {
+        List<A> annotations = new ArrayList<>();
+
+        for (Field field : typeToInspect.getDeclaredFields()) {
+            Annotation excelCellRange = field.getAnnotation(ExcelCellRange.class);
+            if (excelCellRange != null) {
+                annotations.addAll(findRecursivePoijiAnnotations(field.getType(), annotationType));
+            } else {
+                A fieldAnnotation = field.getAnnotation(annotationType);
+                if (fieldAnnotation != null) {
+                    annotations.add(fieldAnnotation);
+                }
+            }
+        }
+
+        return annotations;
     }
 }

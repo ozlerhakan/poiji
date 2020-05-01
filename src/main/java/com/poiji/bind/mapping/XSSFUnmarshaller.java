@@ -4,17 +4,16 @@ import com.poiji.bind.Unmarshaller;
 import com.poiji.exception.LimitCrossedException;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
-import org.apache.poi.ooxml.util.SAXHelper;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.util.IOUtils;
+import org.apache.poi.util.XMLHelper;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFReader.SheetIterator;
-import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.model.StylesTable;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -45,8 +44,12 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         ReadOnlySharedStringsTable readOnlySharedStringsTable = new ReadOnlySharedStringsTable(open);
         XSSFReader workbookReader = new XSSFReader(open);
         StylesTable styles = workbookReader.getStylesTable();
-        XMLReader reader = SAXHelper.newXMLReader();
 
+        PoijiNumberFormat poijiNumberFormat = options.getPoijiNumberFormat();
+        if (poijiNumberFormat != null)
+            poijiNumberFormat.overrideExcelNumberFormats(styles);
+
+        XMLReader reader = XMLHelper.newXMLReader();
         InputSource is = new InputSource(workbookReader.getWorkbookData());
 
         reader.setContentHandler(new WorkBookContentHandler(options));
@@ -54,11 +57,6 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
 
         WorkBookContentHandler wbch = (WorkBookContentHandler) reader.getContentHandler();
         List<WorkBookSheet> sheets = wbch.getSheets();
-        int sheetSize = sheets.size();
-        if (sheetSize == 0) {
-            throw new PoijiException("no excel sheets found");
-        }
-
         SheetIterator iter = (SheetIterator) workbookReader.getSheetsData();
         int sheetCounter = 0;
 
@@ -109,7 +107,13 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         try {
             PoijiHandler<T> poijiHandler = new PoijiHandler<>(type, options, consumer);
             ContentHandler contentHandler
-                    = new XSSFSheetXMLHandler(styles, null, readOnlySharedStringsTable, poijiHandler, formatter, false);
+                    = new XSSFSheetXMLPoijiHandler(styles,
+                    null,
+                    readOnlySharedStringsTable,
+                    poijiHandler,
+                    formatter,
+                    false,
+                    options);
             reader.setContentHandler(contentHandler);
             reader.parse(sheetSource);
         } catch (LimitCrossedException e) {
