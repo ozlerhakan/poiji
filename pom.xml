@@ -94,6 +94,7 @@
                 <configuration>
                     <argLine>${add.opens}</argLine>
                     <argLine>-Djava.awt.headless=true</argLine>
+                    <argLine>-Duser.language=en -Duser.region=US</argLine>
                 </configuration>
             </plugin>
 

@@ -70,7 +70,10 @@ public final class PropertyHandler {
                 ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getRevision(), targetObject);
                 break;
             default:
-                ReflectUtil.setFieldData(targetField, poixmlProperties.getCustomProperties().getProperty(propertyName).getLpwstr(), targetObject);
+                if (poixmlProperties.getCustomProperties().getProperty(propertyName) != null) {
+                    ReflectUtil.setFieldData(targetField, poixmlProperties.getCustomProperties().getProperty(propertyName).getLpwstr(), targetObject);
+                }
+
                 break;
         }
     }
