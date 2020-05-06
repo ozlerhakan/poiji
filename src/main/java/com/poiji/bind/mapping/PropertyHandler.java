@@ -7,7 +7,23 @@ import org.apache.poi.ooxml.POIXMLProperties;
 import java.lang.reflect.Field;
 import java.util.stream.Stream;
 
+import static com.poiji.util.DefaultExcelProperties.CATEGORY;
+import static com.poiji.util.DefaultExcelProperties.CONTENT_STATUS;
+import static com.poiji.util.DefaultExcelProperties.CREATED;
+import static com.poiji.util.DefaultExcelProperties.CREATOR;
+import static com.poiji.util.DefaultExcelProperties.DESCRIPTION;
+import static com.poiji.util.DefaultExcelProperties.KEYWORDS;
+import static com.poiji.util.DefaultExcelProperties.LAST_PRINTED;
+import static com.poiji.util.DefaultExcelProperties.MODIFIED;
+import static com.poiji.util.DefaultExcelProperties.REVISION;
+import static com.poiji.util.DefaultExcelProperties.SUBJECT;
+import static com.poiji.util.DefaultExcelProperties.TITLE;
+
 public final class PropertyHandler {
+
+    private PropertyHandler() {
+
+    }
 
     public static <T> T unmarshal(Class<T> type, POIXMLProperties poixmlProperties) {
 
@@ -36,37 +52,37 @@ public final class PropertyHandler {
 
     private static void setPropertyValueOnTarget(String propertyName, POIXMLProperties poixmlProperties, Field targetField, Object targetObject) {
         switch (propertyName) {
-            case "category":
+            case CATEGORY:
                 ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getCategory(), targetObject);
                 break;
-            case "contentStatus":
+            case CONTENT_STATUS:
                 ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getContentStatus(), targetObject);
                 break;
-            case "created":
+            case CREATED:
                 ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getCreated(), targetObject);
                 break;
-            case "creator":
+            case CREATOR:
                 ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getCreator(), targetObject);
                 break;
-            case "description":
+            case DESCRIPTION:
                 ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getDescription(), targetObject);
                 break;
-            case "keywords":
+            case KEYWORDS:
                 ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getKeywords(), targetObject);
                 break;
-            case "lastPrinted":
+            case LAST_PRINTED:
                 ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getLastPrinted(), targetObject);
                 break;
-            case "modified":
+            case MODIFIED:
                 ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getModified(), targetObject);
                 break;
-            case "subject":
+            case SUBJECT:
                 ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getSubject(), targetObject);
                 break;
-            case "title":
+            case TITLE:
                 ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getTitle(), targetObject);
                 break;
-            case "revision":
+            case REVISION:
                 ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getRevision(), targetObject);
                 break;
             default:

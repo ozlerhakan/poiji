@@ -4,7 +4,7 @@ import com.poiji.annotation.ExcelProperty;
 
 import java.util.Date;
 
-public class CorePropertyEntity {
+public class PropertyEntity {
 
     @ExcelProperty
     private String title;

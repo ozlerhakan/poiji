@@ -1,7 +1,7 @@
 package com.poiji.deserialize.property;
 
 import com.poiji.bind.Poiji;
-import com.poiji.deserialize.property.model.CorePropertyEntity;
+import com.poiji.deserialize.property.model.PropertyEntity;
 import com.poiji.exception.InvalidExcelFileExtension;
 import com.poiji.exception.PoijiExcelType;
 import com.poiji.option.PoijiOptions;
@@ -20,19 +20,19 @@ public class PropertyTest {
 
     @Test
     public void readProperties() {
-        CorePropertyEntity deserializedProperties = Poiji.fromExcelProperties(
+        PropertyEntity deserializedProperties = Poiji.fromExcelProperties(
                 new File("src/test/resources/core_properties_set.xlsx"),
-                CorePropertyEntity.class);
+                PropertyEntity.class);
 
         assertExcelProperties(deserializedProperties, 1588771680000L);
     }
 
     @Test
     public void readPropertiesInputStream() throws FileNotFoundException {
-        CorePropertyEntity deserializedProperties = Poiji.fromExcelProperties(new FileInputStream(
+        PropertyEntity deserializedProperties = Poiji.fromExcelProperties(new FileInputStream(
                 new File("src/test/resources/core_properties_set.xlsx")),
                 PoijiExcelType.XLSX,
-                CorePropertyEntity.class);
+                PropertyEntity.class);
 
         assertExcelProperties(deserializedProperties, 1588771680000L);
     }
@@ -40,9 +40,9 @@ public class PropertyTest {
     @Test
     public void readCorePropertiesWithPassword() {
         PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().password("testPassword").build();
-        CorePropertyEntity deserializedProperties = Poiji.fromExcelProperties(
+        PropertyEntity deserializedProperties = Poiji.fromExcelProperties(
                 new File("src/test/resources/core_properties_set_password.xlsx"),
-                CorePropertyEntity.class, options);
+                PropertyEntity.class, options);
 
         assertExcelProperties(deserializedProperties, 1588772003000L);
     }
@@ -50,10 +50,10 @@ public class PropertyTest {
     @Test
     public void readCorePropertiesInputStreamWithPassword() throws FileNotFoundException {
         PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().password("testPassword").build();
-        CorePropertyEntity deserializedProperties = Poiji.fromExcelProperties(new FileInputStream(
+        PropertyEntity deserializedProperties = Poiji.fromExcelProperties(new FileInputStream(
                 new File("src/test/resources/core_properties_set_password.xlsx")),
                 PoijiExcelType.XLSX,
-                CorePropertyEntity.class, options);
+                PropertyEntity.class, options);
 
         assertExcelProperties(deserializedProperties, 1588772003000L);
     }
@@ -62,7 +62,7 @@ public class PropertyTest {
     public void readPropertiesXls() {
         Poiji.fromExcelProperties(
                 new File("src/test/resources/cars.xls"),
-                CorePropertyEntity.class);
+                PropertyEntity.class);
     }
 
     @Test(expected = InvalidExcelFileExtension.class)
@@ -70,17 +70,17 @@ public class PropertyTest {
         Poiji.fromExcelProperties(
                 new FileInputStream(new File("src/test/resources/cars.xls")),
                 PoijiExcelType.XLS,
-                CorePropertyEntity.class);
+                PropertyEntity.class);
     }
 
     @Test(expected = InvalidExcelFileExtension.class)
     public void readPropertiesInvalidType() {
         Poiji.fromExcelProperties(
                 new File("src/test/resources/cars.xl"),
-                CorePropertyEntity.class);
+                PropertyEntity.class);
     }
 
-    private void assertExcelProperties(CorePropertyEntity deserializedProperties, long modified) {
+    private void assertExcelProperties(PropertyEntity deserializedProperties, long modified) {
         assertThat(deserializedProperties.getTitle(), is("TestTitle"));
         assertThat(deserializedProperties.getCategory(), is("TestCategory"));
         assertThat(deserializedProperties.getContentStatus(), is("TestStatus"));

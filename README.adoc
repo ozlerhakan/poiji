@@ -680,6 +680,32 @@ model.getDate();
 
 We know that the index 47 uses the format `mm:ss.0` by default in the given excel file, thus we're able to override its format with `mm/dd/yyyy hh.mm aa` using the `putNumberFormat` method.
 
+=== Feature 12
+
+Since Poiji 2.8.0, it is possible to read excel properties from xlsx files.
+To achieve that, create a class with fields annotated with `@ExcelProperty`.
+
+Example:
+
+[source,java]
+----
+public class ExcelProperties {
+    @ExcelProperty
+    private String title;
+
+    @ExcelProperty
+    private String customProperty;
+}
+----
+
+The field name corresponds to the name of the property inside the Excel file.
+To use a different one than the field name, you can specify a `propertyName` (e.g. `@ExcelProperty(propertyName = "customPropertyName")`)
+
+The list of built-in (e.g. non-custom) properties in an Excel file, which can be read by Poiji can be found in the class `DefaultExcelProperties`.
+
+Poiji can only read Text properties from an Excel file, so you have to use a `String` to read them.
+This does not apply to "modified", "lastPrinted" and "created", which are deserialized into a `Date`.
+
 == Try with JShell
 
 Since we have a new pedagogic tool, Java 9 REPL, you can try Poiji in JShell. Clone the repo and follow the steps below. JShell should open up a new jshell session once loading the startup scripts and the specified jars that must be in the classpath. You must first import and create related packages and classes before using Poiji. We are able to use directly Poiji and Employee classes because they are already imported from `jshell/snippets` with `try-with-jshell.sh`.
