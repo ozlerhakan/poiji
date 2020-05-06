@@ -25,6 +25,13 @@ public final class PropertyHandler {
 
     }
 
+    /**
+     * Creates an instance of {@code type} and deserializes the {@code poixmlProperties} into the fields annotated with {@link ExcelProperty}
+     * @param type              The type to deserialize into
+     * @param poixmlProperties  The properties to read from
+     * @param <T>               The type to deserialize into
+     * @return                  An instance of {@code type}
+     */
     public static <T> T unmarshal(Class<T> type, POIXMLProperties poixmlProperties) {
 
         T unmarshalledObject = ReflectUtil.newInstanceOf(type);
@@ -89,7 +96,6 @@ public final class PropertyHandler {
                 if (poixmlProperties.getCustomProperties().getProperty(propertyName) != null) {
                     ReflectUtil.setFieldData(targetField, poixmlProperties.getCustomProperties().getProperty(propertyName).getLpwstr(), targetObject);
                 }
-
                 break;
         }
     }
