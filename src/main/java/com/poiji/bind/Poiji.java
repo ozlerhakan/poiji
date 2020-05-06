@@ -1,5 +1,6 @@
 package com.poiji.bind;
 
+import com.poiji.bind.mapping.PropertyHandler;
 import com.poiji.bind.mapping.UnmarshallerHelper;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.InvalidExcelFileExtension;
@@ -7,9 +8,13 @@ import com.poiji.exception.PoijiExcelType;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
+import com.poiji.util.ExcelFileOpenUtil;
 import com.poiji.util.Files;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +43,57 @@ public final class Poiji {
     private static final Files files = Files.getInstance();
 
     private Poiji() {
+    }
+
+    public static <T> T fromExcelProperties(final File file, final Class<T> type) {
+        return fromExcelProperties(file, type, PoijiOptionsBuilder.settings().build());
+    }
+
+    public static <T> T fromExcelProperties(final InputStream inputStream,
+                                            PoijiExcelType excelType,
+                                            final Class<T> type) {
+        return fromExcelProperties(inputStream, excelType, type, PoijiOptionsBuilder.settings().build());
+    }
+
+    public static <T> T fromExcelProperties(final File file, final Class<T> type, final PoijiOptions options) {
+        String extension = files.getExtension(file.getName());
+
+        if (XLSX_EXTENSION.equals(extension)) {
+            try (OPCPackage open = ExcelFileOpenUtil.openXlsxFile(file, options);
+                 XSSFWorkbook xssfWorkbook = new XSSFWorkbook(open)) {
+
+                return PropertyHandler.unmarshal(type, xssfWorkbook.getProperties());
+
+            } catch (IOException e) {
+                throw new PoijiException("Problem occurred while reading data", e);
+            }
+        } else if (XLS_EXTENSION.equals(extension)) {
+            throw new InvalidExcelFileExtension("Reading metadata from (" + extension + "), is not supported");
+        } else {
+            throw new InvalidExcelFileExtension("Invalid file extension (" + extension + "), expected .xlsx");
+        }
+    }
+
+    public static <T> T fromExcelProperties(final InputStream inputStream,
+                                            PoijiExcelType excelType,
+                                            final Class<T> type,
+                                            PoijiOptions options) {
+        Objects.requireNonNull(excelType);
+
+        if (excelType == PoijiExcelType.XLSX) {
+            try (OPCPackage open = ExcelFileOpenUtil.openXlsxFile(inputStream, options);
+                 XSSFWorkbook xssfWorkbook = new XSSFWorkbook(open)) {
+
+                return PropertyHandler.unmarshal(type, xssfWorkbook.getProperties());
+
+            } catch (IOException e) {
+                throw new PoijiException("Problem occurred while reading data", e);
+            }
+        } else if (excelType == PoijiExcelType.XLS) {
+            throw new InvalidExcelFileExtension("Reading metadata from (" + excelType + "), is not supported");
+        } else {
+            throw new InvalidExcelFileExtension("Invalid file extension (" + excelType + "), expected .xlsx");
+        }
     }
 
     /**
@@ -218,7 +274,7 @@ public final class Poiji {
         } else if (XLSX_EXTENSION.equals(extension)) {
             return UnmarshallerHelper.XSSFInstance(poijiFile, options);
         } else {
-            throw new InvalidExcelFileExtension("Invalid file extension (" + extension + "), excepted .xls or .xlsx");
+            throw new InvalidExcelFileExtension("Invalid file extension (" + extension + "), expected .xls or .xlsx");
         }
     }
 
@@ -230,7 +286,7 @@ public final class Poiji {
         } else if (excelType == PoijiExcelType.XLSX) {
             return UnmarshallerHelper.XSSFInstance(poijiInputStream, options);
         } else {
-            throw new InvalidExcelFileExtension("Invalid file extension (" + excelType + "), excepted .xls or .xlsx");
+            throw new InvalidExcelFileExtension("Invalid file extension (" + excelType + "), expected .xls or .xlsx");
         }
     }
 

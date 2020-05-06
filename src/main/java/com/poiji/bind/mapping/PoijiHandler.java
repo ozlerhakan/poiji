@@ -90,7 +90,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                     ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
                     if (excelRow != null) {
                         Object o = casting.castValue(field.getType(), valueOf(internalRow), internalRow, column, options);
-                        setFieldData(field, o, instance);
+                        ReflectUtil.setFieldData(field, o, instance);
                         columnToField.put(-1, field);
                     }
                     ExcelCellRange range = field.getAnnotation(ExcelCellRange.class);
@@ -99,7 +99,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                         ins = getInstance(field);
                         for (Field f : field.getType().getDeclaredFields()) {
                             if (setValue(f, column, content, ins)) {
-                                setFieldData(field, ins, instance);
+                                ReflectUtil.setFieldData(field, ins, instance);
                                 columnToField.put(column, f);
                                 columnToSuperClassField.put(column, field);
                             }
@@ -119,7 +119,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                             field.setAccessible(true);
                             if (field.get(instance) == null) {
                                 excelUnknownCellsMap = new HashMap<>();
-                                setFieldData(field, excelUnknownCellsMap, instance);
+                                ReflectUtil.setFieldData(field, excelUnknownCellsMap, instance);
                             } else {
                                 excelUnknownCellsMap = (Map) field.get(instance);
                             }
@@ -133,14 +133,14 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         if (columnToField.containsKey(-1)) {
             Field field = columnToField.get(-1);
             Object o = casting.castValue(field.getType(), valueOf(internalRow), internalRow, column, options);
-            setFieldData(field, o, instance);
+            ReflectUtil.setFieldData(field, o, instance);
         }
         if (columnToField.containsKey(column) && columnToSuperClassField.containsKey(column)) {
             Field field = columnToField.get(column);
             Object ins;
             ins = getInstance(columnToSuperClassField.get(column));
             if (setValue(field, column, content, ins)) {
-                setFieldData(columnToSuperClassField.get(column), ins, instance);
+                ReflectUtil.setFieldData(columnToSuperClassField.get(column), ins, instance);
                 return true;
             }
             return setValue(field, column, content, instance);
@@ -154,7 +154,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             Class<?> fieldType = field.getType();
             if (column == index.value()) {
                 Object o = casting.castValue(fieldType, content, internalRow, column, options);
-                setFieldData(field, o, ins);
+                ReflectUtil.setFieldData(field, o, ins);
                 return true;
             }
         } else {
@@ -169,21 +169,12 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                 //Fix both columns mapped to name passing this condition below
                 if (titleColumn != null && titleColumn == column) {
                     Object o = casting.castValue(fieldType, content, internalRow, column, options);
-                    setFieldData(field, o, ins);
+                    ReflectUtil.setFieldData(field, o, ins);
                     return true;
                 }
             }
         }
         return false;
-    }
-
-    private void setFieldData(Field field, Object o, Object instance) {
-        try {
-            field.setAccessible(true);
-            field.set(instance, o);
-        } catch (IllegalAccessException e) {
-            throw new IllegalCastException("Unexpected cast type {" + o + "} of field" + field.getName());
-        }
     }
 
     @Override

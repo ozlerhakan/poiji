@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 /**
  * This annotations allows you to put every unknown cell (neither mapped by name, nor by index) into a {@code Map<String,String>}
  *
- * @author Pascal Breuer
+ * @author breucode
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

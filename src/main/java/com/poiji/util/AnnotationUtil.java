@@ -12,8 +12,10 @@ import java.util.stream.Collectors;
 /**
  * Created by hakan on 2.05.2020
  */
-public class AnnotationUtil {
+public final class AnnotationUtil {
 
+    private AnnotationUtil() {
+    }
 
     /**
      * Validate that all headers specified via @ExcelCellName annotations are present in the list of header names.
