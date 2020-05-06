@@ -1,7 +1,8 @@
-package com.poiji.deserialize.metadata;
+package com.poiji.deserialize.property;
 
 import com.poiji.bind.Poiji;
-import com.poiji.deserialize.metadata.model.CorePropertyEntity;
+import com.poiji.deserialize.property.model.CorePropertyEntity;
+import com.poiji.exception.InvalidExcelFileExtension;
 import com.poiji.exception.PoijiExcelType;
 import com.poiji.option.PoijiOptions;
 import org.junit.Test;
@@ -55,6 +56,28 @@ public class PropertyTest {
                 CorePropertyEntity.class, options);
 
         assertExcelProperties(deserializedProperties, 1588772003000L);
+    }
+
+    @Test(expected = InvalidExcelFileExtension.class)
+    public void readPropertiesXls() {
+        Poiji.fromExcelProperties(
+                new File("src/test/resources/cars.xls"),
+                CorePropertyEntity.class);
+    }
+
+    @Test(expected = InvalidExcelFileExtension.class)
+    public void readPropertiesInputStreamXls() throws FileNotFoundException {
+        Poiji.fromExcelProperties(
+                new FileInputStream(new File("src/test/resources/cars.xls")),
+                PoijiExcelType.XLS,
+                CorePropertyEntity.class);
+    }
+
+    @Test(expected = InvalidExcelFileExtension.class)
+    public void readPropertiesInvalidType() {
+        Poiji.fromExcelProperties(
+                new File("src/test/resources/cars.xl"),
+                CorePropertyEntity.class);
     }
 
     private void assertExcelProperties(CorePropertyEntity deserializedProperties, long modified) {

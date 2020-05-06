@@ -1,4 +1,4 @@
-package com.poiji.deserialize.metadata.model;
+package com.poiji.deserialize.property.model;
 
 import com.poiji.annotation.ExcelProperty;
 

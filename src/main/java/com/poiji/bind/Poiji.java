@@ -89,10 +89,9 @@ public final class Poiji {
             } catch (IOException e) {
                 throw new PoijiException("Problem occurred while reading data", e);
             }
-        } else if (excelType == PoijiExcelType.XLS) {
-            throw new InvalidExcelFileExtension("Reading metadata from (" + excelType + "), is not supported");
         } else {
-            throw new InvalidExcelFileExtension("Invalid file extension (" + excelType + "), expected .xlsx");
+            //Must be PoijiExcelType.XLS in this case
+            throw new InvalidExcelFileExtension("Reading metadata from (" + excelType + "), is not supported");
         }
     }
 
