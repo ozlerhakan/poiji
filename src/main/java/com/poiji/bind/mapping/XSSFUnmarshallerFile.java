@@ -3,10 +3,9 @@ package com.poiji.bind.mapping;
 import com.poiji.bind.PoijiFile;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
+import com.poiji.util.ExcelFileOpenUtil;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.openxml4j.opc.PackageAccess;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -28,16 +27,12 @@ final class XSSFUnmarshallerFile extends XSSFUnmarshaller {
     @Override
     public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
 
-        if (options.getPassword() != null) {
-            returnFromEncryptedFile(type, consumer);
-            return;
-        }
-        returnFromExcelFile(type,consumer);
+        returnFromExcelFile(type, consumer);
     }
 
     public <T> void returnFromExcelFile(Class<T> type, Consumer<? super T> consumer) {
 
-        try (OPCPackage open = OPCPackage.open(poijiFile.file(), PackageAccess.READ)) {
+        try (OPCPackage open = ExcelFileOpenUtil.openXlsxFile(poijiFile.file(), options)) {
 
             unmarshal0(type, consumer, open);
 
@@ -45,16 +40,4 @@ final class XSSFUnmarshallerFile extends XSSFUnmarshaller {
             throw new PoijiException("Problem occurred while reading data", e);
         }
     }
-
-    public <T> void returnFromEncryptedFile(Class<T> type, Consumer<? super T> consumer) {
-
-        try (POIFSFileSystem fs = new POIFSFileSystem(poijiFile.file(), true)) {
-
-            listOfEncryptedItems(type, consumer, fs);
-
-        } catch (IOException e) {
-            throw new PoijiException("Problem occurred while reading data", e);
-        }
-    }
-
 }
