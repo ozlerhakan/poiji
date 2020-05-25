@@ -21,10 +21,6 @@ import static com.poiji.util.DefaultExcelProperties.TITLE;
 
 public final class PropertyHandler {
 
-    private PropertyHandler() {
-
-    }
-
     /**
      * Creates an instance of {@code type} and deserializes the {@code poixmlProperties} into the fields annotated with {@link ExcelProperty}
      * @param type              The type to deserialize into
@@ -32,7 +28,7 @@ public final class PropertyHandler {
      * @param <T>               The type to deserialize into
      * @return                  An instance of {@code type}
      */
-    public static <T> T unmarshal(Class<T> type, POIXMLProperties poixmlProperties) {
+    <T> T unmarshal(Class<T> type, POIXMLProperties poixmlProperties) {
 
         T unmarshalledObject = ReflectUtil.newInstanceOf(type);
 
@@ -47,7 +43,7 @@ public final class PropertyHandler {
         return unmarshalledObject;
     }
 
-    private static String getPropertyName(Field excelPropertyField) {
+    private String getPropertyName(Field excelPropertyField) {
         String propertyName = excelPropertyField.getAnnotation(ExcelProperty.class).propertyName();
 
         if (propertyName.isEmpty()) {
@@ -57,7 +53,7 @@ public final class PropertyHandler {
         return propertyName;
     }
 
-    private static void setPropertyValueOnTarget(String propertyName, POIXMLProperties poixmlProperties, Field targetField, Object targetObject) {
+    private void setPropertyValueOnTarget(String propertyName, POIXMLProperties poixmlProperties, Field targetField, Object targetObject) {
         switch (propertyName) {
             case CATEGORY:
                 ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getCategory(), targetObject);

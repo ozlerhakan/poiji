@@ -1,15 +1,14 @@
 package com.poiji.util;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assume.assumeTrue;
-
-import java.lang.reflect.ReflectPermission;
-
+import com.poiji.exception.PoijiExcelType;
+import com.poiji.exception.PoijiInstantiationException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.poiji.exception.PoijiExcelType;
-import com.poiji.exception.PoijiInstantiationException;
+import java.lang.reflect.ReflectPermission;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
 
 public class ReflectUtilTest {
 

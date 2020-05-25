@@ -1,6 +1,8 @@
 package com.poiji.bind;
 
-import com.poiji.bind.mapping.PropertyHandler;
+import com.poiji.bind.mapping.HSSFPropertyFile;
+import com.poiji.bind.mapping.HSSFPropertyStream;
+import com.poiji.bind.mapping.PoijiPropertyHelper;
 import com.poiji.bind.mapping.UnmarshallerHelper;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.InvalidExcelFileExtension;
@@ -8,13 +10,9 @@ import com.poiji.exception.PoijiExcelType;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
-import com.poiji.util.ExcelFileOpenUtil;
 import com.poiji.util.Files;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,21 +92,26 @@ public final class Poiji {
      * @see Poiji#fromExcelProperties(File, Class)
      */
     public static <T> T fromExcelProperties(final File file, final Class<T> type, final PoijiOptions options) {
+        HSSFPropertyFile hssfPropertyFile = deserializerPropertyFile(file, options);
+        return hssfPropertyFile.unmarshal(type);
+    }
+
+    private static HSSFPropertyFile deserializerPropertyFile(final File file, PoijiOptions options) {
         String extension = files.getExtension(file.getName());
-
         if (XLSX_EXTENSION.equals(extension)) {
-            try (OPCPackage open = ExcelFileOpenUtil.openXlsxFile(file, options);
-                 XSSFWorkbook xssfWorkbook = new XSSFWorkbook(open)) {
-
-                return PropertyHandler.unmarshal(type, xssfWorkbook.getProperties());
-
-            } catch (IOException e) {
-                throw new PoijiException("Problem occurred while reading data", e);
-            }
+            return PoijiPropertyHelper.createPoijiPropertyFile(file, options);
         } else if (XLS_EXTENSION.equals(extension)) {
             throw new InvalidExcelFileExtension("Reading metadata from (" + extension + "), is not supported");
         } else {
             throw new InvalidExcelFileExtension("Invalid file extension (" + extension + "), expected .xlsx");
+        }
+    }
+
+    private static HSSFPropertyStream deserializerPropertyStream(PoijiExcelType excelType, InputStream inputStream, PoijiOptions options) {
+        if (excelType == PoijiExcelType.XLSX) {
+            return PoijiPropertyHelper.createPoijiPropertyStream(inputStream, options);
+        } else {
+            throw new InvalidExcelFileExtension("Reading metadata from (" + excelType + "), is not supported");
         }
     }
 
@@ -131,20 +134,8 @@ public final class Poiji {
                                             final Class<T> type,
                                             PoijiOptions options) {
         Objects.requireNonNull(excelType);
-
-        if (excelType == PoijiExcelType.XLSX) {
-            try (OPCPackage open = ExcelFileOpenUtil.openXlsxFile(inputStream, options);
-                 XSSFWorkbook xssfWorkbook = new XSSFWorkbook(open)) {
-
-                return PropertyHandler.unmarshal(type, xssfWorkbook.getProperties());
-
-            } catch (IOException e) {
-                throw new PoijiException("Problem occurred while reading data", e);
-            }
-        } else {
-            //Must be PoijiExcelType.XLS in this case
-            throw new InvalidExcelFileExtension("Reading metadata from (" + excelType + "), is not supported");
-        }
+        HSSFPropertyStream hssfPropertyStream = deserializerPropertyStream(excelType, inputStream, options);
+        return hssfPropertyStream.unmarshal(type);
     }
 
     /**

@@ -6,6 +6,8 @@ import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.XMLHelper;
@@ -58,7 +60,7 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         SheetIterator iter = (SheetIterator) workbookReader.getSheetsData();
         int sheetCounter = 0;
 
-        Optional<String> maybeSheetName = SheetNameExtractor.getSheetName(type, options);
+        Optional<String> maybeSheetName = this.getSheetName(type, options);
 
         if (!maybeSheetName.isPresent()) {
             int requestedIndex = options.sheetIndex();
@@ -122,5 +124,19 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         }
     }
 
+    <T> void listOfEncryptedItems(Class<T> type, Consumer<? super T> consumer, POIFSFileSystem fs) throws IOException {
+        InputStream stream = DocumentFactoryHelper.getDecryptedStream(fs, options.getPassword());
+
+        try (OPCPackage open = OPCPackage.open(stream)) {
+            unmarshal0(type, consumer, open);
+
+        } catch (ParserConfigurationException | SAXException | IOException | OpenXML4JException e) {
+            IOUtils.closeQuietly(fs);
+            throw new PoijiException("Problem occurred while reading data", e);
+        }
+    }
+
     protected abstract <T> void returnFromExcelFile(Class<T> type, Consumer<? super T> consumer);
+
+    protected abstract <T> void returnFromEncryptedFile(Class<T> type, Consumer<? super T> consumer);
 }

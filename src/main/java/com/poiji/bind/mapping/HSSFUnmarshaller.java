@@ -36,7 +36,7 @@ import static java.lang.String.valueOf;
  * This is the main class that converts the excel sheet fromExcel Java object
  * Created by hakan on 16/01/2017.
  */
-abstract class HSSFUnmarshaller implements Unmarshaller {
+abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
 
     private final DataFormatter dataFormatter;
     protected final PoijiOptions options;
@@ -60,7 +60,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     @Override
     public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
         Workbook workbook = workbook();
-        Optional<String> maybeSheetName = SheetNameExtractor.getSheetName(type, options);
+        Optional<String> maybeSheetName = this.getSheetName(type, options);
 
         Sheet sheet = this.getSheetToProcess(workbook, options, maybeSheetName.orElse(null));
 
@@ -120,8 +120,8 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
                 final int columnIndex = cell.getColumnIndex();
                 caseSensitiveTitlePerColumnIndex.put(columnIndex, getTitleNameForMap(cell.getStringCellValue(), columnIndex));
                 final String titleName = options.getCaseInsensitive()
-                    ? cell.getStringCellValue().toLowerCase()
-                    : cell.getStringCellValue();
+                        ? cell.getStringCellValue().toLowerCase()
+                        : cell.getStringCellValue();
                 columnIndexPerTitle.put(titleName, columnIndex);
                 titlePerColumnIndex.put(columnIndex, getTitleNameForMap(titleName, columnIndex));
             }
@@ -199,8 +199,8 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
             ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
             if (excelCellName != null) {
                 final String titleName = options.getCaseInsensitive()
-                    ? excelCellName.value().toLowerCase()
-                    : excelCellName.value();
+                        ? excelCellName.value().toLowerCase()
+                        : excelCellName.value();
                 column = columnIndexPerTitle.get(titleName);
             }
         }
@@ -246,5 +246,4 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
         return true;
     }
 
-    protected abstract Workbook workbook();
 }

@@ -1,17 +1,16 @@
 package com.poiji.util;
 
 
-import java.io.InputStream;
-import java.util.List;
-import java.util.Locale;
-
-import org.junit.After;
-import org.junit.Test;
-
 import com.poiji.annotation.ExcelCellName;
 import com.poiji.bind.Poiji;
 import com.poiji.exception.PoijiExcelType;
 import com.poiji.option.PoijiOptions;
+import org.junit.After;
+import org.junit.Test;
+
+import java.io.InputStream;
+import java.util.List;
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
