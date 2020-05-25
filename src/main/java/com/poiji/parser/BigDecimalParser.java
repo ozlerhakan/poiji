@@ -14,13 +14,9 @@ public class BigDecimalParser implements Parser<BigDecimal> {
 
     private DecimalFormat getDecimalFormatInstance() {
         NumberFormat numberFormat = NumberFormat.getInstance();
-        if (numberFormat instanceof DecimalFormat) {
-            DecimalFormat decimalFormat = (DecimalFormat) numberFormat;
-            decimalFormat.setParseBigDecimal(true);
-            return decimalFormat;
-        } else {
-            throw new IllegalStateException(numberFormat.getClass().getName());
-        }
+        DecimalFormat decimalFormat = (DecimalFormat) numberFormat;
+        decimalFormat.setParseBigDecimal(true);
+        return decimalFormat;
     }
 
     @Override

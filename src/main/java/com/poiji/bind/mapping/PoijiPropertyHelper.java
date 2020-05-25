@@ -8,10 +8,7 @@ import java.io.InputStream;
 /**
  * Created by hakan on 24.05.2020
  */
-public class PoijiPropertyHelper {
-
-    private PoijiPropertyHelper() {
-    }
+public final class PoijiPropertyHelper {
 
     public static HSSFPropertyFile createPoijiPropertyFile(File file, PoijiOptions options) {
         return new HSSFPropertyFile(file, options);

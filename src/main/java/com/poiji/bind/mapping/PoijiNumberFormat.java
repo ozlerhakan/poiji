@@ -23,10 +23,6 @@ public final class PoijiNumberFormat {
         return numberFormats.get(fmtId);
     }
 
-    public int size() {
-        return numberFormats.size();
-    }
-
     void overrideExcelNumberFormats(final StylesTable styles) {
         for (Short fmtId : numberFormats.keySet()) {
             String format = numberFormats.get(fmtId);
