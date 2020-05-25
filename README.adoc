@@ -1,5 +1,5 @@
 = Poiji
-:version: v2.7.0
+:version: v2.8.0
 
 image:https://travis-ci.org/ozlerhakan/poiji.svg?branch=master["Build Status", link="https://travis-ci.org/ozlerhakan/poiji"] image:https://api.codacy.com/project/badge/Grade/6587e90886184da29a1b7c5634695c9d["Codacy code quality", link="https://www.codacy.com/app/ozlerhakan/poiji?utm_source=github.com&utm_medium=referral&utm_content=ozlerhakan/poiji&utm_campaign=Badge_Grade"] image:https://coveralls.io/repos/github/ozlerhakan/poiji/badge.svg?branch=master["Coverage Status", link="https://coveralls.io/github/ozlerhakan/poiji?branch=master"] image:https://img.shields.io/badge/apache.poi-4.1.2-brightgreen.svg[] image:https://img.shields.io/badge/gitter-join%20chat-blue.svg["Gitter", link="https://gitter.im/poiji/Lobby"] image:https://img.shields.io/badge/license-MIT-blue.svg[]
 
@@ -15,7 +15,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 <dependency>
   <groupId>com.github.ozlerhakan</groupId>
   <artifactId>poiji</artifactId>
-  <version>2.7.0</version>
+  <version>2.8.0</version>
 </dependency>
 ----
 
@@ -23,7 +23,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    compile 'com.github.ozlerhakan:poiji:2.7.0'
+    compile 'com.github.ozlerhakan:poiji:2.8.0'
 }
 ----
 
@@ -39,6 +39,11 @@ com.poiji.bind.Poiji#fromExcel(java.io.InputStream, com.poiji.exception.PoijiExc
 com.poiji.bind.Poiji#fromExcel(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>, java.util.function.Consumer<? super T>)
 com.poiji.bind.Poiji#fromExcel(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>, com.poiji.option.PoijiOptions)
 com.poiji.bind.Poiji#fromExcel(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>, com.poiji.option.PoijiOptions, java.util.function.Consumer<? super T>)
+
+com.poiji.bind.Poiji#fromExcelProperties(java.io.File, java.lang.Class<T>)
+com.poiji.bind.Poiji#fromExcelProperties(java.io.File, java.lang.Class<T>, com.poiji.option.PoijiOptions)
+com.poiji.bind.Poiji#fromExcelProperties(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>)
+com.poiji.bind.Poiji#fromExcelProperties(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>, com.poiji.option.PoijiOptions)
 ----
 
 .`PoijiOptions.PoijiOptionsBuilder` Structure
