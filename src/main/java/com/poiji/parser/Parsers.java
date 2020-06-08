@@ -29,4 +29,7 @@ public class Parsers {
         return new NumberParser(NumberFormat.getInstance());
     }
 
+    public static BooleanParser booleans() {
+        return new BooleanParser();
+    }
 }

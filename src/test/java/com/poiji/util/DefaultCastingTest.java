@@ -100,11 +100,35 @@ public class DefaultCastingTest {
     }
 
     @Test
-    public void castBoolean() {
+    public void castBooleanTrue() {
 
         Boolean testVal = (Boolean) casting.castValue(boolean.class, "True", options);
 
         assertEquals(true, testVal);
+    }
+
+    @Test
+    public void castBooleanLibreOfficeTrue() {
+
+        Boolean testVal = (Boolean) casting.castValue(boolean.class, "1 ", options);
+
+        assertEquals(true, testVal);
+    }
+
+    @Test
+    public void castBooleanFalse() {
+
+        Boolean testVal = (Boolean) casting.castValue(boolean.class, " False", options);
+
+        assertEquals(false, testVal);
+    }
+
+    @Test
+    public void castBooleanLibreOfficeFalse() {
+
+        Boolean testVal = (Boolean) casting.castValue(boolean.class, "0", options);
+
+        assertEquals(false, testVal);
     }
 
     @Test

@@ -4,13 +4,13 @@ import com.poiji.config.DefaultCasting;
 import com.poiji.config.DefaultCastingError;
 import com.poiji.option.PoijiOptions;
 import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
+import com.poiji.parser.BooleanParser;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
@@ -367,6 +367,56 @@ public class DefaultCastingWithErrorLoggingTest {
         assertSingleCastingErrorPresent(sheetName, row, col, value, null, NumberFormatException.class);
     }
 
+    @Test
+    public void castPrimitiveBooleanExceptionWithLogging() {
+
+        PoijiOptions options = PoijiOptionsBuilder.settings()
+                .sheetName(sheetName)
+                .build();
+
+        String value = "not an boolean";
+
+        Boolean expectedDefault = false;
+
+        Boolean testVal = (Boolean) casting.castValue(boolean.class, value, row, col, options);
+
+        assertEquals(expectedDefault, testVal);
+        assertSingleCastingErrorPresent(sheetName, row, col, value, expectedDefault, BooleanParser.BooleanParseException.class);
+    }
+
+    @Test
+    public void castBooleanDefaultExceptionWithLogging() {
+
+        PoijiOptions options = PoijiOptionsBuilder.settings()
+                .sheetName(sheetName)
+                .build();
+
+        String value = "not an Boolean";
+
+        Boolean expectedDefault = false;
+
+        Boolean testVal = (Boolean) casting.castValue(Boolean.class, value, row, col, options);
+
+        assertEquals(expectedDefault, testVal);
+        assertSingleCastingErrorPresent(sheetName, row, col, value, expectedDefault, BooleanParser.BooleanParseException.class);
+    }
+
+    @Test
+    public void castBooleanNullExceptionWithLogging() {
+
+        PoijiOptions options = PoijiOptionsBuilder.settings()
+                .sheetName(sheetName)
+                .preferNullOverDefault(true)
+                .build();
+
+        String value = "not a Boolean";
+
+        Boolean testVal = (Boolean) casting.castValue(Boolean.class, value, row, col, options);
+
+        assertNull(testVal);
+        assertSingleCastingErrorPresent(sheetName, row, col, value, null, BooleanParser.BooleanParseException.class);
+    }
+
     // Float
     @Test
     public void castPrimitiveFloatExceptionWithoutLogging() {
@@ -551,7 +601,7 @@ public class DefaultCastingWithErrorLoggingTest {
         Date testVal = (Date) casting.castValue(Date.class, value, options);
 
         assertNull(testVal);
-        assertSingleCastingErrorPresent(sheetName, EMPTY_ROW, EMPTY_COL, value, null, ParseException.class);
+        assertSingleCastingErrorPresent(sheetName, EMPTY_ROW, EMPTY_COL, value, null, java.text.ParseException.class);
     }
 
     @Test
@@ -567,7 +617,7 @@ public class DefaultCastingWithErrorLoggingTest {
         Date testVal = (Date) casting.castValue(Date.class, value, row, col, options);
 
         assertNull(testVal);
-        assertSingleCastingErrorPresent(sheetName, row, col, value, null, ParseException.class);
+        assertSingleCastingErrorPresent(sheetName, row, col, value, null, java.text.ParseException.class);
     }
 
     // LocalDate
