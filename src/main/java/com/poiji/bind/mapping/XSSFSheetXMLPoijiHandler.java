@@ -11,13 +11,14 @@ import org.apache.poi.xssf.model.Styles;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.ext.Attributes2Impl;
 
 import static org.apache.poi.xssf.usermodel.XSSFRelation.NS_SPREADSHEETML;
 
 /**
  * Created by hakan on 26.04.2020
  */
-public final class XSSFSheetXMLPoijiHandler extends XSSFSheetXMLHandler {
+class XSSFSheetXMLPoijiHandler extends XSSFSheetXMLHandler {
 
     private final Styles stylesTable;
     private final PoijiOptions poijiOptions;
@@ -39,7 +40,34 @@ public final class XSSFSheetXMLPoijiHandler extends XSSFSheetXMLHandler {
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
-        super.startElement(uri, localName, qName, attributes);
+        Attributes2Impl attributes2 = new Attributes2Impl(attributes);
+
+        if (!"oddHeader".equals(localName) &&
+                !"evenHeader".equals(localName) &&
+                !"firstHeader".equals(localName) &&
+                !"firstFooter".equals(localName) &&
+                !"oddFooter".equals(localName) &&
+                !"evenFooter".equals(localName)) {
+            if ("c".equals(localName)) {
+                String cellType = attributes.getValue("t");
+                String cellStyleStr = attributes.getValue("s");
+                if (!"b".equals(cellType) &&
+                        !"e".equals(cellType) &&
+                        !"inlineStr".equals(cellType) &&
+                        !"s".equals(cellType) &&
+                        !"str".equals(cellType)) {
+                    if (cellStyleStr != null) {
+                        int styleIndex = Integer.parseInt(cellStyleStr);
+
+                        if (poijiOptions.isDisableXLSXNumberCellFormat()) {
+                            attributes2.removeAttribute(styleIndex);
+                        }
+                    }
+                }
+            }
+        }
+
+        super.startElement(uri, localName, qName, attributes2);
 
         if (this.cellFormat == null) {
             return;
@@ -84,4 +112,8 @@ public final class XSSFSheetXMLPoijiHandler extends XSSFSheetXMLHandler {
         }
     }
 
+    @Override
+    public void endElement(String uri, String localName, String qName) throws SAXException {
+        super.endElement(uri, localName, qName);
+    }
 }

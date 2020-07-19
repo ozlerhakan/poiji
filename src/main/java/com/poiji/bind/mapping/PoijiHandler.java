@@ -1,5 +1,6 @@
 package com.poiji.bind.mapping;
 
+import com.poiji.annotation.DisableCellFormatXLS;
 import com.poiji.annotation.ExcelCell;
 import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelCellRange;
@@ -150,6 +151,12 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     private boolean setValue(Field field, int column, String content, Object ins) {
         ExcelCell index = field.getAnnotation(ExcelCell.class);
+        DisableCellFormatXLS disableCellFormat = field.getAnnotation(DisableCellFormatXLS.class);
+        boolean isCloseCellFormat = false;
+        if (disableCellFormat != null) {
+            isCloseCellFormat = disableCellFormat.value();
+        }
+
         if (index != null) {
             Class<?> fieldType = field.getType();
             if (column == index.value()) {
@@ -198,11 +205,11 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     @Override
     public void cell(String cellReference, String formattedValue, XSSFComment comment) {
-        CellAddress cellAddress = new CellAddress(cellReference);
+        final CellAddress cellAddress = new CellAddress(cellReference);
         int row = cellAddress.getRow();
-        int headers = options.getHeaderStart();
+        int header = options.getHeaderStart();
         int column = cellAddress.getColumn();
-        if (row <= headers) {
+        if (row == header) {
             columnIndexPerTitle.put(
                     options.getCaseInsensitive() ? formattedValue.toLowerCase() : formattedValue,
                     column

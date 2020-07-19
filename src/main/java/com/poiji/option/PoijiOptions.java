@@ -39,6 +39,7 @@ public final class PoijiOptions {
     private PoijiLogCellFormat poijiLogCellFormat;
     private PoijiNumberFormat numberFormat;
     private boolean namedHeaderMandatory;
+    private boolean disableXLSXNumberCellFormat;
 
     public PoijiNumberFormat getPoijiNumberFormat() {
         return numberFormat;
@@ -229,6 +230,15 @@ public final class PoijiOptions {
         return this;
     }
 
+    private PoijiOptions disableXLSXNumberCellFormat(boolean disableXLSXNumberCellFormat) {
+        this.disableXLSXNumberCellFormat = disableXLSXNumberCellFormat;
+        return this;
+    }
+
+    public boolean isDisableXLSXNumberCellFormat() {
+        return disableXLSXNumberCellFormat;
+    }
+
     public static class PoijiOptionsBuilder {
 
         private int sheetIndex;
@@ -246,11 +256,12 @@ public final class PoijiOptions {
         private PoijiLogCellFormat cellFormat;
         private PoijiNumberFormat numberFormat;
         private int headerStart = 0;
-        private int skip = 0;
+        private int skip = 1;
         private int limit = 0;
         private String sheetName;
         private boolean caseInsensitive;
         private boolean namedHeaderMandatory;
+        private boolean disabledXLSXNumberCellFormat;
 
         private PoijiOptionsBuilder() {
         }
@@ -266,10 +277,10 @@ public final class PoijiOptions {
          * @return builder itself
          */
         public static PoijiOptionsBuilder settings(int skip) {
-            if (skip < 0) {
-                throw new PoijiException("Skip index must be greater than or equal to 0");
+            if (skip <= 0) {
+                throw new PoijiException("Poiji already skips the header. Skip index must be greater than 1");
             }
-            return new PoijiOptionsBuilder(skip);
+            return new PoijiOptionsBuilder(skip + 1);
         }
 
         public static PoijiOptionsBuilder settings() {
@@ -326,7 +337,7 @@ public final class PoijiOptions {
 
         public PoijiOptions build() {
             return new PoijiOptions()
-                    .setSkip(skip + headerStart + 1)
+                    .setSkip(skip + headerStart)
                     .setPassword(password)
                     .setPreferNullOverDefault(preferNullOverDefault)
                     .setDatePattern(datePattern)
@@ -345,7 +356,8 @@ public final class PoijiOptions {
                     .setPoijiLogCellFormat(cellFormat)
                     .setPoijiNumberFormat(numberFormat)
                     .setCaseInsensitive(caseInsensitive)
-                    .setNamedHeaderMandatory(namedHeaderMandatory);
+                    .setNamedHeaderMandatory(namedHeaderMandatory)
+                    .disableXLSXNumberCellFormat(disabledXLSXNumberCellFormat);
         }
 
         /**
@@ -380,10 +392,10 @@ public final class PoijiOptions {
          * @return this
          */
         public PoijiOptionsBuilder skip(int skip) {
-            if (skip < 0) {
-                throw new PoijiException("Skip index must be greater than or equal to 0");
+            if (skip <= 0) {
+                throw new PoijiException("Poiji already skips the header. Skip index must be greater than 1");
             }
-            this.skip = skip;
+            this.skip = skip + 1;
             return this;
         }
 
@@ -490,13 +502,15 @@ public final class PoijiOptions {
          * This is to set the row which the unmarshall will
          * use to start reading header titles, incase the
          * header is not in row 0.
+         * <br/>
+         * Set -1 to indicate that no header in the excel file.
          *
          * @param headerStart an index number of the excel header to start reading header
          * @return this
          */
         public PoijiOptionsBuilder headerStart(int headerStart) {
-            if (headerStart < 0) {
-                throw new PoijiException("Header index must be greater than or equal to 0");
+            if (headerStart < -1) {
+                throw new PoijiException("Header index must be greater than -1");
             }
             this.headerStart = headerStart;
             return this;
@@ -519,13 +533,13 @@ public final class PoijiOptions {
          *
          * @param cellFormat poiji cell format instance
          */
-        public PoijiOptionsBuilder poijiCellFormat(final PoijiLogCellFormat cellFormat) {
+        public PoijiOptionsBuilder poijiLogCellFormat(final PoijiLogCellFormat cellFormat) {
             this.cellFormat = cellFormat;
             return this;
         }
 
         /**
-         * Change the default cell formats of an excel file by overriding
+         * Change the default cell formats of a xlsx excel file by overriding
          *
          * @param numberFormat poiji number format instance
          */
@@ -543,6 +557,15 @@ public final class PoijiOptions {
             this.namedHeaderMandatory = namedHeaderMandatory;
             return this;
         }
-    }
 
+        /**
+         * Disable the cell format of all the number cells of an excel file ending with xlsx
+         *
+         * @return
+         */
+        public PoijiOptionsBuilder disableXLSXNumberCellFormat() {
+            this.disabledXLSXNumberCellFormat = true;
+            return this;
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package com.poiji.bind.mapping;
 
+import com.poiji.annotation.DisableCellFormatXLS;
 import com.poiji.annotation.ExcelCell;
 import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelCellRange;
@@ -11,6 +12,8 @@ import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.AnnotationUtil;
 import com.poiji.util.ReflectUtil;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -59,7 +62,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
 
     @Override
     public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
-        Workbook workbook = workbook();
+        HSSFWorkbook workbook = (HSSFWorkbook) workbook();
         Optional<String> maybeSheetName = this.getSheetName(type, options);
 
         Sheet sheet = this.getSheetToProcess(workbook, options, maybeSheetName.orElse(null));
@@ -115,6 +118,9 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
     private void loadColumnTitles(Sheet sheet, int maxPhysicalNumberOfRows) {
         if (maxPhysicalNumberOfRows > 0) {
             int row = options.getHeaderStart();
+            if (row == -1) {
+                return;
+            }
             Row firstRow = sheet.getRow(row);
             for (Cell cell : firstRow) {
                 final int columnIndex = cell.getColumnIndex();
@@ -170,6 +176,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
 
         Map<String, String> excelUnknownCellsMap = StreamSupport
                 .stream(Spliterators.spliteratorUnknownSize(currentRow.cellIterator(), Spliterator.ORDERED), false)
+                .filter(cell -> caseSensitiveTitlePerColumnIndex.size() != 0)
                 .filter(cell -> !mappedColumnIndices.contains(cell.getColumnIndex()))
                 .filter(cell -> !cell.toString().isEmpty())
                 .collect(Collectors.toMap(
@@ -183,36 +190,46 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
     }
 
     private <T> Integer tailSetFieldValue(Row currentRow, T instance, Field field) {
-        final Integer column = getFieldColumn(field);
-        if (column != null) {
-            constructTypeValue(currentRow, instance, field, column);
+        final FieldAnnotationDetail annotationDetail = getFieldColumn(field);
+        if (annotationDetail.getColumn() != null) {
+            constructTypeValue(currentRow, instance, field, annotationDetail);
         }
-        return column;
+        return annotationDetail.getColumn();
     }
 
-    private Integer getFieldColumn(final Field field) {
+    private FieldAnnotationDetail getFieldColumn(final Field field) {
         ExcelCell index = field.getAnnotation(ExcelCell.class);
-        Integer column = null;
+        DisableCellFormatXLS disableCellFormat = field.getAnnotation(DisableCellFormatXLS.class);
+        final FieldAnnotationDetail annotationDetail = new FieldAnnotationDetail();
+
+        if (disableCellFormat != null) {
+            annotationDetail.setDisabledCellFormat(disableCellFormat.value());
+        }
+
         if (index != null) {
-            column = index.value();
+            annotationDetail.setColumn(index.value());
         } else {
             ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
             if (excelCellName != null) {
                 final String titleName = options.getCaseInsensitive()
                         ? excelCellName.value().toLowerCase()
                         : excelCellName.value();
-                column = columnIndexPerTitle.get(titleName);
+                Integer column = columnIndexPerTitle.get(titleName);
+                annotationDetail.setColumn(column);
             }
         }
-        return column;
+        return annotationDetail;
     }
 
-    private <T> void constructTypeValue(Row currentRow, T instance, Field field, int column) {
-        Cell cell = currentRow.getCell(column);
+    private <T> void constructTypeValue(Row currentRow, T instance, Field field, FieldAnnotationDetail annotationDetail) {
+        HSSFCell cell = (HSSFCell) currentRow.getCell(annotationDetail.getColumn());
 
         if (cell != null) {
+            if (annotationDetail.isDisabledCellFormat()) {
+                cell.setCellStyle(null);
+            }
             String value = dataFormatter.formatCellValue(cell);
-            Object data = casting.castValue(field.getType(), value, currentRow.getRowNum(), column, options);
+            Object data = casting.castValue(field.getType(), value, currentRow.getRowNum(), annotationDetail.getColumn(), options);
             setFieldData(instance, field, data);
         }
     }
@@ -244,6 +261,27 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
             }
         }
         return true;
+    }
+
+    private static class FieldAnnotationDetail {
+        private Integer column;
+        private boolean disabledCellFormat;
+
+        Integer getColumn() {
+            return column;
+        }
+
+        boolean isDisabledCellFormat() {
+            return disabledCellFormat;
+        }
+
+        void setColumn(Integer column) {
+            this.column = column;
+        }
+
+        void setDisabledCellFormat(boolean disabledCellFormat) {
+            this.disabledCellFormat = disabledCellFormat;
+        }
     }
 
 }

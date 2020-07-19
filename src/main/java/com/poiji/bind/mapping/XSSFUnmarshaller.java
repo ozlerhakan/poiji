@@ -45,8 +45,9 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         StylesTable styles = workbookReader.getStylesTable();
 
         PoijiNumberFormat poijiNumberFormat = options.getPoijiNumberFormat();
-        if (poijiNumberFormat != null)
+        if (poijiNumberFormat != null) {
             poijiNumberFormat.overrideExcelNumberFormats(styles);
+        }
 
         XMLReader reader = XMLHelper.newXMLReader();
         InputSource is = new InputSource(workbookReader.getWorkbookData());
