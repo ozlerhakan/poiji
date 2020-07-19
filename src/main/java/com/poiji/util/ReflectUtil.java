@@ -36,8 +36,8 @@ public final class ReflectUtil {
      * <p>
      * Recursively does not refer to super classes.
      */
-    public static <T, A extends Annotation> Collection<A> findRecursivePoijiAnnotations(Class<T> typeToInspect,
-                                                                                        Class<A> annotationType) {
+    static <T, A extends Annotation> Collection<A> findRecursivePoijiAnnotations(Class<T> typeToInspect,
+                                                                                 Class<A> annotationType) {
         List<A> annotations = new ArrayList<>();
 
         for (Field field : typeToInspect.getDeclaredFields()) {
