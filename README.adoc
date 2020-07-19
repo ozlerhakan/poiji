@@ -1,5 +1,5 @@
 = Poiji
-:version: v2.9.0
+:version: v3.0.0
 
 image:https://travis-ci.org/ozlerhakan/poiji.svg?branch=master["Build Status", link="https://travis-ci.org/ozlerhakan/poiji"] image:https://api.codacy.com/project/badge/Grade/6587e90886184da29a1b7c5634695c9d["Codacy code quality", link="https://www.codacy.com/app/ozlerhakan/poiji?utm_source=github.com&utm_medium=referral&utm_content=ozlerhakan/poiji&utm_campaign=Badge_Grade"] image:https://coveralls.io/repos/github/ozlerhakan/poiji/badge.svg?branch=master["Coverage Status", link="https://coveralls.io/github/ozlerhakan/poiji?branch=master"] image:https://img.shields.io/badge/apache.poi-4.1.2-brightgreen.svg[] image:https://img.shields.io/badge/gitter-join%20chat-blue.svg["Gitter", link="https://gitter.im/poiji/Lobby"] image:https://img.shields.io/badge/license-MIT-blue.svg[]
 
@@ -15,7 +15,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 <dependency>
   <groupId>com.github.ozlerhakan</groupId>
   <artifactId>poiji</artifactId>
-  <version>2.9.0</version>
+  <version>3.0.0</version>
 </dependency>
 ----
 
@@ -23,7 +23,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    compile 'com.github.ozlerhakan:poiji:2.9.0'
+    compile 'com.github.ozlerhakan:poiji:3.0.0'
 }
 ----
 
@@ -67,7 +67,8 @@ com.poiji.option.PoijiOptions.PoijiOptionsBuilder#withCasting(Casting)
 com.poiji.option.PoijiOptions.PoijiOptionsBuilder#caseInsensitive(boolean)
 com.poiji.option.PoijiOptions.PoijiOptionsBuilder#namedHeaderMandatory(boolean)
 com.poiji.option.PoijiOptions.PoijiOptionsBuilder#poijiNumberFormat(PoijiNumberFormat)
-com.poiji.option.PoijiOptions.PoijiOptionsBuilder#poijiCellFormat(PoijiLogCellFormat)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#poijiLogCellFormat(PoijiLogCellFormat)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#disableXLSXNumberCellFormat()
 ----
 
 === Feature 1
@@ -710,6 +711,54 @@ The list of built-in (e.g. non-custom) properties in an Excel file, which can be
 
 Poiji can only read Text properties from an Excel file, so you have to use a `String` to read them.
 This does not apply to "modified", "lastPrinted" and "created", which are deserialized into a `Date`.
+
+
+== Feature 13
+
+Consider we have a xls or xlsx excel file like below:
+
+|===
+|Amount
+|25,00
+|(50,00)
+|(65,00)
+|===
+
+Since we use a cell format on line 4 and 5 (i.e. `(50,00)` and `(65,00)`), we don't want to see the formatted value of each cell after processing. In order to do that, we can use `@DisableCellFormatXLS` on a field if the file ends with `xls` or `disableXLSXNumberCellFormat()` for xlsx files using `PoijiOptions`.
+
+.xls files
+----
+public class TestInfo {
+    @ExcelCell(0)
+    @DisableCellFormatXLS <1>
+    public BigDecimal amount;
+}
+----
+1. we only disable cell formats on the specified column.
+
+.xlsx files
+----
+public class TestInfo {
+    @ExcelCell(0)
+    private BigDecimal amount;
+}
+
+PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .disableXLSXNumberCellFormat() <1>
+                .build();
+----
+1. when disabling *number* cell format, we disable it in the entire cells for xlsx files.
+
+and let Poiji ignores the cell formats:
+
+----
+List<TestInfo> result = Poiji.fromExcel(new File(path), TestInfo.class, options); <1>
+
+result.get(1).amount
+// -50
+----
+1. Add `options`, if your excel is xlsx file.
+
 
 == Try with JShell
 
