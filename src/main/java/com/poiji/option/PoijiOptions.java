@@ -561,7 +561,7 @@ public final class PoijiOptions {
         /**
          * Disable the cell format of all the number cells of an excel file ending with xlsx
          *
-         * @return
+         * @return this;
          */
         public PoijiOptionsBuilder disableXLSXNumberCellFormat() {
             this.disabledXLSXNumberCellFormat = true;
