@@ -84,6 +84,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         return ins;
     }
 
+    @SuppressWarnings("unchecked")
     private boolean setValue(String content, Class<? super T> type, int column) {
         Stream.of(type.getDeclaredFields())
                 .filter(field -> field.getAnnotation(ExcelUnknownCells.class) == null)
@@ -122,7 +123,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                                 excelUnknownCellsMap = new HashMap<>();
                                 ReflectUtil.setFieldData(field, excelUnknownCellsMap, instance);
                             } else {
-                                excelUnknownCellsMap = (Map) field.get(instance);
+                                excelUnknownCellsMap = (Map<String, String>) field.get(instance);
                             }
                             excelUnknownCellsMap.put(titlePerColumnIndex.get(column), content);
                         } catch (IllegalAccessException e) {

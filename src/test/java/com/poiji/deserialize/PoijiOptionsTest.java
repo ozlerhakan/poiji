@@ -12,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * Created by hakan on 19.07.2020
  */
+@SuppressWarnings("unused")
 public class PoijiOptionsTest {
 
     @Test(expected = PoijiException.class)

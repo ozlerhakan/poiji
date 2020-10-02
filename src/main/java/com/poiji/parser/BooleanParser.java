@@ -25,7 +25,7 @@ public class BooleanParser implements Parser<Boolean> {
 
         throw new BooleanParseException(value);
     }
-
+    @SuppressWarnings("serial")
     public static class BooleanParseException extends RuntimeException {
         public BooleanParseException(String value) {
             super("Can't parse value to Boolean: " + value);
