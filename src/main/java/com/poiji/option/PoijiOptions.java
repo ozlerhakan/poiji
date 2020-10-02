@@ -36,6 +36,7 @@ public final class PoijiOptions {
     private int headerStart;
     private String sheetName;
     private boolean caseInsensitive;
+    private boolean ignoreWhitespaces;
     private PoijiLogCellFormat poijiLogCellFormat;
     private PoijiNumberFormat numberFormat;
     private boolean namedHeaderMandatory;
@@ -221,6 +222,15 @@ public final class PoijiOptions {
         return this;
     }
 
+    public boolean getIgnoreWhitespaces() {
+        return ignoreWhitespaces;
+    }
+
+    private PoijiOptions setIgnoreWhitespaces(final boolean ignoreWhitespaces) {
+        this.ignoreWhitespaces = ignoreWhitespaces;
+        return this;
+    }
+
     public boolean getNamedHeaderMandatory() {
         return namedHeaderMandatory;
     }
@@ -260,6 +270,7 @@ public final class PoijiOptions {
         private int limit = 0;
         private String sheetName;
         private boolean caseInsensitive;
+        private boolean ignoreWhitespaces;
         private boolean namedHeaderMandatory;
         private boolean disabledXLSXNumberCellFormat;
 
@@ -356,6 +367,7 @@ public final class PoijiOptions {
                     .setPoijiLogCellFormat(cellFormat)
                     .setPoijiNumberFormat(numberFormat)
                     .setCaseInsensitive(caseInsensitive)
+                    .setIgnoreWhitespaces(ignoreWhitespaces)
                     .setNamedHeaderMandatory(namedHeaderMandatory)
                     .disableXLSXNumberCellFormat(disabledXLSXNumberCellFormat);
         }
@@ -524,6 +536,17 @@ public final class PoijiOptions {
          */
         public PoijiOptionsBuilder caseInsensitive(final boolean caseInsensitive) {
             this.caseInsensitive = caseInsensitive;
+            return this;
+        }
+
+        /**
+         * Ignore white space before and after column names for annotation {@link ExcelCellName}.
+         * Default - false.
+         *
+         * @param ignoreWhitespaces true or false
+         */
+        public PoijiOptionsBuilder ignoreWhitespaces(final boolean ignoreWhitespaces) {
+            this.ignoreWhitespaces = ignoreWhitespaces;
             return this;
         }
 

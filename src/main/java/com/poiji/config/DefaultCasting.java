@@ -189,7 +189,7 @@ public final class DefaultCasting implements Casting {
     }
 
 
-    private Object enumValue(String value, String sheetName, int row, int col, Class type) {
+    private Object enumValue(String value, String sheetName, int row, int col, Class<?> type) {
         return Arrays.stream(type.getEnumConstants())
                 .filter(o -> ((Enum<?>) o).name().equals(value))
                 .findFirst()
