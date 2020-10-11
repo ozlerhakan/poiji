@@ -12,14 +12,12 @@ import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.AnnotationUtil;
 import com.poiji.util.ReflectUtil;
-import com.poiji.util.StringUtil;
-
+import com.poiji.util.Strings;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.CellValue;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -27,7 +25,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -132,7 +129,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
             for (Cell cell : firstRow) {
                 final int columnIndex = cell.getColumnIndex();
                 caseSensitiveTitlePerColumnIndex.put(columnIndex, getTitleNameForMap(cell.getStringCellValue(), columnIndex));
-                final String titleName = StringUtil.getTitleName(options, cell.getStringCellValue());
+                final String titleName = Strings.getTitleName(options, cell.getStringCellValue());
                 columnIndexPerTitle.put(titleName, columnIndex);
                 titlePerColumnIndex.put(columnIndex, getTitleNameForMap(titleName, columnIndex));
             }
@@ -219,7 +216,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
         } else {
             ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
             if (excelCellName != null) {
-                final String titleName = StringUtil.getTitleName(options, excelCellName.value());
+                final String titleName = Strings.getTitleName(options, excelCellName.value());
                 Integer column = columnIndexPerTitle.get(titleName);
                 annotationDetail.setColumn(column);
             }

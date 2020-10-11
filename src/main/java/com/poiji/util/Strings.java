@@ -2,9 +2,9 @@ package com.poiji.util;
 
 import com.poiji.option.PoijiOptions;
 
-public final class StringUtil {
+public final class Strings {
 
-    private StringUtil() {
+    private Strings() {
     }
 
     public static String getTitleName(PoijiOptions options, String value) {
