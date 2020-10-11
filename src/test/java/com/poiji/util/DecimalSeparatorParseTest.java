@@ -24,7 +24,6 @@ public class DecimalSeparatorParseTest {
 
     private static class Row {
 
-        @SuppressWarnings("unused")
         @ExcelCellName("decimalNumber")
         private double decimalNumber;
 

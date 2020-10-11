@@ -39,7 +39,9 @@ public final class HSSFPropertyStream implements PropertyUnmarshaller {
         try (OPCPackage open = OPCPackage.open(inputStream)) {
             PropertyHandler propertyHandler = new PropertyHandler();
             XSSFWorkbook xssfWorkbook = new XSSFWorkbook(open);
-            return propertyHandler.unmarshal(type, xssfWorkbook.getProperties());
+            T ret = propertyHandler.unmarshal(type, xssfWorkbook.getProperties());
+            xssfWorkbook.close();
+            return ret;
         } catch (IOException | OpenXML4JException e) {
             throw new PoijiException("Problem occurred while reading data", e);
         }
@@ -52,7 +54,9 @@ public final class HSSFPropertyStream implements PropertyUnmarshaller {
             try (OPCPackage open = OPCPackage.open(stream)) {
                 PropertyHandler propertyHandler = new PropertyHandler();
                 XSSFWorkbook xssfWorkbook = new XSSFWorkbook(open);
-                return propertyHandler.unmarshal(type, xssfWorkbook.getProperties());
+                T ret = propertyHandler.unmarshal(type, xssfWorkbook.getProperties());
+                xssfWorkbook.close();
+                return ret;
             } catch (IOException | OpenXML4JException e) {
                 IOUtils.closeQuietly(fs);
                 throw new PoijiException("Problem occurred while reading data", e);

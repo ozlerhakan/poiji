@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.io.File;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class IllegalAcessTest {
 
     @Test(expected = IllegalCastException.class)
