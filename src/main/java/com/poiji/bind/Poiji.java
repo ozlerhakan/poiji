@@ -363,6 +363,7 @@ public final class Poiji {
                                      final Class<T> type,
                                      final PoijiOptions options,
                                      final Consumer<? super T> consumer) {
+        Objects.requireNonNull(sheet);
         final Unmarshaller unmarshaller = UnmarshallerHelper.SheetInstance(sheet, options);
         unmarshaller.unmarshal(type, consumer);
     }
