@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -66,7 +67,7 @@ public class CustomConfigTest {
     }
 
     @Test
-    public void shouldAddList2() {
+    public void shouldConvertCellsToListObjectsXLSX() {
         PoijiOptions poijiOptions = PoijiOptions.PoijiOptionsBuilder.settings()
                 .addListDelimiter("=")
                 .build();
@@ -75,19 +76,34 @@ public class CustomConfigTest {
         assertThat(actualEmployees, notNullValue());
 
         ListAttributes employeeSecond = actualEmployees.get(1);
-        for (Integer age: employeeSecond.getAge()) {
-            System.out.println(age);
-        }
+        assertThat(employeeSecond.getAge().get(1), is(10));
+        assertThat(employeeSecond.getSurname().get(2), is("mlo"));
+        assertThat(employeeSecond.getName().get(0), is("Sophie"));
+        assertThat(employeeSecond.getBigdecimal().get(2), is(BigDecimal.valueOf(4)));
+        assertThat(employeeSecond.getDoubleAge().get(0), is(20d));
+        assertThat(employeeSecond.getFloatAge().get(0), is(Float.valueOf("323.12")));
+        assertThat(employeeSecond.getLongAge().get(1), is(Long.valueOf("10")));
+        assertThat(employeeSecond.getBooleanSingle().get(0), is(Boolean.valueOf("FALSE")));
     }
 
     @Test
-    public void shouldAddListXLS() {
+    public void shouldConvertCellsToListObjectsXLS() {
         PoijiOptions poijiOptions = PoijiOptions.PoijiOptionsBuilder.settings()
                 .addListDelimiter("=")
                 .build();
 
         List<ListAttributes> actualEmployees = Poiji.fromExcel(new File("src/test/resources/attribute_list.xls"), ListAttributes.class, poijiOptions);
         assertThat(actualEmployees, notNullValue());
+
+        ListAttributes employeeSecond = actualEmployees.get(1);
+        assertThat(employeeSecond.getAge().get(1), is(10));
+        assertThat(employeeSecond.getSurname().get(2), is("mlo"));
+        assertThat(employeeSecond.getName().get(0), is("Sophie"));
+        assertThat(employeeSecond.getBigdecimal().get(2), is(BigDecimal.valueOf(4)));
+        assertThat(employeeSecond.getDoubleAge().get(0), is(20d));
+        assertThat(employeeSecond.getFloatAge().get(0), is(Float.valueOf("323.12")));
+        assertThat(employeeSecond.getLongAge().get(1), is(Long.valueOf("10")));
+        assertThat(employeeSecond.getBooleanSingle().get(0), is(Boolean.valueOf("FALSE")));
     }
 
     static class MyConfigXLSX implements Casting {

@@ -46,5 +46,23 @@ public class ListAttributes {
         return age;
     }
 
+    public List<BigDecimal> getBigdecimal() {
+        return bigdecimal;
+    }
 
+    public List<Double> getDoubleAge() {
+        return doubleAge;
+    }
+
+    public List<Long> getLongAge() {
+        return longAge;
+    }
+
+    public List<Boolean> getBooleanSingle() {
+        return booleanSingle;
+    }
+
+    public List<Float> getFloatAge() {
+        return floatAge;
+    }
 }
