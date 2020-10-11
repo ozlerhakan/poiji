@@ -12,6 +12,8 @@ import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.AnnotationUtil;
 import com.poiji.util.ReflectUtil;
+import com.poiji.util.StringUtil;
+
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -130,9 +132,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
             for (Cell cell : firstRow) {
                 final int columnIndex = cell.getColumnIndex();
                 caseSensitiveTitlePerColumnIndex.put(columnIndex, getTitleNameForMap(cell.getStringCellValue(), columnIndex));
-                final String titleName = options.getCaseInsensitive()
-                        ? cell.getStringCellValue().toLowerCase()
-                        : cell.getStringCellValue();
+                final String titleName = StringUtil.getTitleName(options, cell.getStringCellValue());
                 columnIndexPerTitle.put(titleName, columnIndex);
                 titlePerColumnIndex.put(columnIndex, getTitleNameForMap(titleName, columnIndex));
             }
@@ -141,6 +141,9 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
 
     private String getTitleNameForMap(String cellContent, int columnIndex) {
         String titleName;
+        if (options.getIgnoreWhitespaces()) {
+            cellContent = cellContent.trim();
+        }
         if (titlePerColumnIndex.containsValue(cellContent)
                 || cellContent.isEmpty()) {
             titleName = cellContent + "@" + columnIndex;
@@ -216,9 +219,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
         } else {
             ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
             if (excelCellName != null) {
-                final String titleName = options.getCaseInsensitive()
-                        ? excelCellName.value().toLowerCase()
-                        : excelCellName.value();
+                final String titleName = StringUtil.getTitleName(options, excelCellName.value());
                 Integer column = columnIndexPerTitle.get(titleName);
                 annotationDetail.setColumn(column);
             }

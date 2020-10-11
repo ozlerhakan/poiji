@@ -10,6 +10,8 @@ import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.AnnotationUtil;
 import com.poiji.util.ReflectUtil;
+import com.poiji.util.StringUtil;
+
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.usermodel.XSSFComment;
@@ -162,9 +164,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
             if (excelCellName != null) {
                 excelCellNames.add(excelCellName);
-                final String titleName = options.getCaseInsensitive()
-                        ? excelCellName.value().toLowerCase()
-                        : excelCellName.value();
+                final String titleName = StringUtil.getTitleName(options, excelCellName.value());
                 final Integer titleColumn = columnIndexPerTitle.get(titleName);
                 //Fix both columns mapped to name passing this condition below
                 if (titleColumn != null && titleColumn == column) {
@@ -203,10 +203,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         int header = options.getHeaderStart();
         int column = cellAddress.getColumn();
         if (row == header) {
-            columnIndexPerTitle.put(
-                    options.getCaseInsensitive() ? formattedValue.toLowerCase() : formattedValue,
-                    column
-            );
+            columnIndexPerTitle.put(StringUtil.getTitleName(options, formattedValue), column);
             titlePerColumnIndex.put(column, getTitleNameForMap(formattedValue, column));
         }
         if (row + 1 <= options.skip()) {
@@ -221,6 +218,9 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     private String getTitleNameForMap(String cellContent, int columnIndex) {
         String titleName;
+        if (options.getIgnoreWhitespaces()) {
+            cellContent = cellContent.trim();
+        }
         if (titlePerColumnIndex.containsValue(cellContent)
                 || cellContent.isEmpty()) {
             titleName = cellContent + "@" + columnIndex;

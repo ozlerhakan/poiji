@@ -37,7 +37,10 @@ public final class AnnotationUtil {
 
             Set<String> missingHeaders = excelCellNames.stream()
                     .filter(excelCellName -> headerNames.stream()
-                            .noneMatch(title -> comparator.test(excelCellName.value(), title)))
+                            .noneMatch(title -> comparator.test(
+                                options.getIgnoreWhitespaces() ? excelCellName.value().trim() : excelCellName.value(),
+                                options.getIgnoreWhitespaces() ? title.trim() : title
+                            )))
                     .map(ExcelCellName::value)
                     .collect(Collectors.toSet());
 
