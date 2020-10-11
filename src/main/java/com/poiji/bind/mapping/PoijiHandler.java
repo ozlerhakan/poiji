@@ -1,6 +1,5 @@
 package com.poiji.bind.mapping;
 
-import com.poiji.annotation.DisableCellFormatXLS;
 import com.poiji.annotation.ExcelCell;
 import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelCellRange;
@@ -33,20 +32,20 @@ import static java.lang.String.valueOf;
  */
 final class PoijiHandler<T> implements SheetContentsHandler {
     private T instance;
-    private Consumer<? super T> consumer;
+    private final Consumer<? super T> consumer;
     private int internalRow;
     private int internalCount;
-    private int limit;
-    private Class<T> type;
-    private PoijiOptions options;
+    private final int limit;
+    private final Class<T> type;
+    private final PoijiOptions options;
     private final Casting casting;
-    private Map<String, Integer> columnIndexPerTitle;
-    private Map<Integer, String> titlePerColumnIndex;
+    private final Map<String, Integer> columnIndexPerTitle;
+    private final Map<Integer, String> titlePerColumnIndex;
     // New maps used to speed up computing and handle inner objects
     private Map<String, Object> fieldInstances;
-    private Map<Integer, Field> columnToField;
-    private Map<Integer, Field> columnToSuperClassField;
-    private Set<ExcelCellName> excelCellNames;
+    private final Map<Integer, Field> columnToField;
+    private final Map<Integer, Field> columnToSuperClassField;
+    private final Set<ExcelCellName> excelCellNames;
 
     PoijiHandler(Class<T> type, PoijiOptions options, Consumer<? super T> consumer) {
         this.type = type;
@@ -74,7 +73,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
      * Using this to hold inner objects that will be mapped to the main object
      **/
     private Object getInstance(Field field) {
-        Object ins = null;
+        Object ins;
         if (fieldInstances.containsKey(field.getName())) {
             ins = fieldInstances.get(field.getName());
         } else {
@@ -90,13 +89,13 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                 .forEach(field -> {
                     ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
                     if (excelRow != null) {
-                        Object o = casting.castValue(field.getType(), valueOf(internalRow), internalRow, column, options);
+                        Object o = casting.castValue(field, valueOf(internalRow), internalRow, column, options);
                         ReflectUtil.setFieldData(field, o, instance);
                         columnToField.put(-1, field);
                     }
                     ExcelCellRange range = field.getAnnotation(ExcelCellRange.class);
                     if (range != null) {
-                        Object ins = null;
+                        Object ins;
                         ins = getInstance(field);
                         for (Field f : field.getType().getDeclaredFields()) {
                             if (setValue(f, column, content, ins)) {
@@ -133,7 +132,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         // For ExcelRow annotation
         if (columnToField.containsKey(-1)) {
             Field field = columnToField.get(-1);
-            Object o = casting.castValue(field.getType(), valueOf(internalRow), internalRow, column, options);
+            Object o = casting.castValue(field, valueOf(internalRow), internalRow, column, options);
             ReflectUtil.setFieldData(field, o, instance);
         }
         if (columnToField.containsKey(column) && columnToSuperClassField.containsKey(column)) {
@@ -151,16 +150,10 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     private boolean setValue(Field field, int column, String content, Object ins) {
         ExcelCell index = field.getAnnotation(ExcelCell.class);
-        DisableCellFormatXLS disableCellFormat = field.getAnnotation(DisableCellFormatXLS.class);
-        boolean isCloseCellFormat = false;
-        if (disableCellFormat != null) {
-            isCloseCellFormat = disableCellFormat.value();
-        }
 
         if (index != null) {
-            Class<?> fieldType = field.getType();
             if (column == index.value()) {
-                Object o = casting.castValue(fieldType, content, internalRow, column, options);
+                Object o = casting.castValue(field, content, internalRow, column, options);
                 ReflectUtil.setFieldData(field, o, ins);
                 return true;
             }
@@ -168,14 +161,13 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
             if (excelCellName != null) {
                 excelCellNames.add(excelCellName);
-                Class<?> fieldType = field.getType();
                 final String titleName = options.getCaseInsensitive()
                         ? excelCellName.value().toLowerCase()
                         : excelCellName.value();
                 final Integer titleColumn = columnIndexPerTitle.get(titleName);
                 //Fix both columns mapped to name passing this condition below
                 if (titleColumn != null && titleColumn == column) {
-                    Object o = casting.castValue(fieldType, content, internalRow, column, options);
+                    Object o = casting.castValue(field, content, internalRow, column, options);
                     ReflectUtil.setFieldData(field, o, ins);
                     return true;
                 }

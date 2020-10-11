@@ -3,10 +3,12 @@ package com.poiji.deserialize;
 import com.poiji.bind.Poiji;
 import com.poiji.config.Casting;
 import com.poiji.deserialize.model.byid.ConfigPerson;
+import com.poiji.deserialize.model.byid.ListAttributes;
 import com.poiji.option.PoijiOptions;
 import org.junit.Test;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -63,16 +65,41 @@ public class CustomConfigTest {
 
     }
 
+    @Test
+    public void shouldAddList2() {
+        PoijiOptions poijiOptions = PoijiOptions.PoijiOptionsBuilder.settings()
+                .addListDelimiter("=")
+                .build();
+
+        List<ListAttributes> actualEmployees = Poiji.fromExcel(new File("src/test/resources/attribute_list.xlsx"), ListAttributes.class, poijiOptions);
+        assertThat(actualEmployees, notNullValue());
+
+        ListAttributes employeeSecond = actualEmployees.get(1);
+        for (Integer age: employeeSecond.getAge()) {
+            System.out.println(age);
+        }
+    }
+
+    @Test
+    public void shouldAddListXLS() {
+        PoijiOptions poijiOptions = PoijiOptions.PoijiOptionsBuilder.settings()
+                .addListDelimiter("=")
+                .build();
+
+        List<ListAttributes> actualEmployees = Poiji.fromExcel(new File("src/test/resources/attribute_list.xls"), ListAttributes.class, poijiOptions);
+        assertThat(actualEmployees, notNullValue());
+    }
+
     static class MyConfigXLSX implements Casting {
         @Override
-        public Object castValue(Class<?> fieldType, String value, int row, int column, PoijiOptions options) {
+        public Object castValue(Field fieldType, String value, int row, int column, PoijiOptions options) {
             return value.trim();
         }
     }
 
     static class MyConfigXLS implements Casting {
         @Override
-        public Object castValue(Class<?> fieldType, String value, int row, int column, PoijiOptions options) {
+        public Object castValue(Field fieldType, String value, int row, int column, PoijiOptions options) {
             return "-" + value.trim() + "-";
         }
     }

@@ -13,9 +13,11 @@ import com.poiji.option.PoijiOptions;
 import com.poiji.util.AnnotationUtil;
 import com.poiji.util.ReflectUtil;
 import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.CellValue;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -23,6 +25,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +52,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
     private final Map<Integer, String> caseSensitiveTitlePerColumnIndex;
     private final int limit;
     private int internalCount;
+    private HSSFFormulaEvaluator hssfFormulaEvaluator;
 
     HSSFUnmarshaller(PoijiOptions options) {
         this.options = options;
@@ -65,6 +69,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
         HSSFWorkbook workbook = (HSSFWorkbook) workbook();
         Optional<String> maybeSheetName = this.getSheetName(type, options);
 
+        hssfFormulaEvaluator = HSSFFormulaEvaluator.create(workbook, null, null);
         Sheet sheet = this.getSheetToProcess(workbook, options, maybeSheetName.orElse(null));
 
         int skip = options.skip();
@@ -157,7 +162,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
         for (Field field : type.getDeclaredFields()) {
             if (field.getAnnotation(ExcelRow.class) != null) {
                 final int rowNum = currentRow.getRowNum();
-                final Object data = casting.castValue(field.getType(), valueOf(rowNum), rowNum, -1, options);
+                final Object data = casting.castValue(field, valueOf(rowNum), rowNum, -1, options);
                 setFieldData(instance, field, data);
             } else if (field.getAnnotation(ExcelCellRange.class) != null) {
 
@@ -228,8 +233,8 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
             if (annotationDetail.isDisabledCellFormat()) {
                 cell.setCellStyle(null);
             }
-            String value = dataFormatter.formatCellValue(cell);
-            Object data = casting.castValue(field.getType(), value, currentRow.getRowNum(), annotationDetail.getColumn(), options);
+            String value = dataFormatter.formatCellValue(cell, hssfFormulaEvaluator);
+            Object data = casting.castValue(field, value, currentRow.getRowNum(), annotationDetail.getColumn(), options);
             setFieldData(instance, field, data);
         }
     }

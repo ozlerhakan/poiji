@@ -4,6 +4,9 @@ import com.poiji.option.PoijiOptions;
 import com.poiji.parser.BooleanParser;
 import com.poiji.parser.Parsers;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,6 +19,8 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by hakan on 22/01/2017.
@@ -132,6 +137,14 @@ public final class DefaultCasting implements Casting {
         }
     }
 
+    private String[] parseArrayList(String value, PoijiOptions options, String sheetName, int row, int col) {
+        try {
+            return value.split(options.getListDelimiter());
+        } catch (Exception e) {
+            return onError(value, sheetName, row, col, e, options.preferNullOverDefault() ? null : new String[]{});
+        }
+    }
+
     private Date dateValue(String value, String sheetName, int row, int col, PoijiOptions options) {
 
         //ISSUE #57
@@ -200,18 +213,54 @@ public final class DefaultCasting implements Casting {
     }
 
     public Object castValue(Class<?> fieldType, String value, PoijiOptions options) {
-        return castValue(fieldType, value, -1, -1, options);
+        return getValueObject(null, -1, -1, options, value, fieldType);
+    }
+
+    private Object castListValue(String value, String sheetName, int row, int col, Field field, PoijiOptions options) {
+        final ParameterizedType genericType = (ParameterizedType) field.getGenericType();
+        final Type fieldType = genericType.getActualTypeArguments()[0];
+        String[] valueList = value.split(options.getListDelimiter());
+
+        if (fieldType == Integer.class) {
+            return Stream.of(valueList)
+                    .map(rv -> primitiveIntegerValue(rv, sheetName, row, col))
+                    .collect(Collectors.toList());
+        } else if (fieldType == BigDecimal.class) {
+            return Stream.of(valueList)
+                    .map(rv -> bigDecimalValue(rv, sheetName, row, col, options))
+                    .collect(Collectors.toList());
+        } else if (fieldType == Long.class) {
+            return Stream.of(valueList)
+                    .map(rv -> longValue(rv, sheetName, row, col, options))
+                    .collect(Collectors.toList());
+        } else if (fieldType == Double.class) {
+            return Stream.of(valueList)
+                    .map(rv -> doubleValue(rv, sheetName, row, col, options))
+                    .collect(Collectors.toList());
+        } else if (fieldType == Boolean.class) {
+            return Stream.of(valueList)
+                    .map(rv -> booleanValue(rv, sheetName, row, col, options))
+                    .collect(Collectors.toList());
+        } else if (fieldType == Float.class) {
+            return Stream.of(valueList)
+                    .map(rv -> floatValue(rv, sheetName, row, col, options))
+                    .collect(Collectors.toList());
+        } else {
+            return Arrays.asList(valueList);
+        }
     }
 
     @Override
-    public Object castValue(Class<?> fieldType, String rawValue, int row, int col, PoijiOptions options) {
+    public Object castValue(Field field, String rawValue, int row, int col, PoijiOptions options) {
+        Class<?> fieldType = field.getType();
+        return getValueObject(field, row, col, options, rawValue, fieldType);
+    }
 
+    private Object getValueObject(Field field, int row, int col, PoijiOptions options, String rawValue, Class<?> fieldType) {
         String sheetName = options.getSheetName();
-
         String value = options.trimCellValue() ? rawValue.trim() : rawValue;
 
         Object o;
-
         if (fieldType == int.class) {
             o = primitiveIntegerValue(value, sheetName, row, col);
 
@@ -259,7 +308,8 @@ public final class DefaultCasting implements Casting {
 
         } else if (value.isEmpty()) {
             o = options.preferNullOverDefault() ? null : value;
-
+        } else if (fieldType == List.class) {
+            o = castListValue(value, sheetName, row, col, field, options);
         } else {
             o = value;
 

@@ -40,6 +40,7 @@ public final class PoijiOptions {
     private PoijiNumberFormat numberFormat;
     private boolean namedHeaderMandatory;
     private boolean disableXLSXNumberCellFormat;
+    private String listDelimiter;
 
     public PoijiNumberFormat getPoijiNumberFormat() {
         return numberFormat;
@@ -239,6 +240,15 @@ public final class PoijiOptions {
         return disableXLSXNumberCellFormat;
     }
 
+    public String getListDelimiter() {
+        return listDelimiter;
+    }
+
+    private PoijiOptions setListDelimiter(String listDelimiter) {
+        this.listDelimiter = listDelimiter;
+        return this;
+    }
+
     public static class PoijiOptionsBuilder {
 
         private int sheetIndex;
@@ -262,6 +272,7 @@ public final class PoijiOptions {
         private boolean caseInsensitive;
         private boolean namedHeaderMandatory;
         private boolean disabledXLSXNumberCellFormat;
+        private String listDelimiter = ",";
 
         private PoijiOptionsBuilder() {
         }
@@ -357,7 +368,8 @@ public final class PoijiOptions {
                     .setPoijiNumberFormat(numberFormat)
                     .setCaseInsensitive(caseInsensitive)
                     .setNamedHeaderMandatory(namedHeaderMandatory)
-                    .disableXLSXNumberCellFormat(disabledXLSXNumberCellFormat);
+                    .disableXLSXNumberCellFormat(disabledXLSXNumberCellFormat)
+                    .setListDelimiter(listDelimiter);
         }
 
         /**
@@ -417,7 +429,7 @@ public final class PoijiOptions {
         /**
          * set password for encrypted excel file, Default is null
          *
-         * @param password
+         * @param password excel password
          * @return this
          */
         public PoijiOptionsBuilder password(String password) {
@@ -561,10 +573,21 @@ public final class PoijiOptions {
         /**
          * Disable the cell format of all the number cells of an excel file ending with xlsx
          *
-         * @return this;
+         * @return this
          */
         public PoijiOptionsBuilder disableXLSXNumberCellFormat() {
             this.disabledXLSXNumberCellFormat = true;
+            return this;
+        }
+
+        /**
+         * Use different delimiter to split the list of items of a cell
+         *
+         * @param delimiter by default delimiter is ','
+         * @return this
+         */
+        public PoijiOptionsBuilder addListDelimiter(String delimiter) {
+            this.listDelimiter = delimiter;
             return this;
         }
     }

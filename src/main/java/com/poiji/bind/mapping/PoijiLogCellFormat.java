@@ -74,5 +74,15 @@ public final class PoijiLogCellFormat {
             this.cellType = cellType;
         }
 
+        @Override
+        public String toString() {
+            return "InternalCellFormat{" +
+                    "cellType='" + cellType + '\'' +
+                    ", formatIndex=" + formatIndex +
+                    ", formatString='" + formatString + '\'' +
+                    ", cellStypeStr='" + cellStypeStr + '\'' +
+                    ", cellAddress=" + cellAddress +
+                    '}';
+        }
     }
 }
