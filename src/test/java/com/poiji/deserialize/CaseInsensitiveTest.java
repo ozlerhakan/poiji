@@ -26,7 +26,9 @@ public class CaseInsensitiveTest {
 
     @Parameterized.Parameters
     public static List<String> excel() {
-        return asList("src/test/resources/case_insensitive.xlsx", "src/test/resources/case_insensitive.xls");
+        return asList(
+                "src/test/resources/case_insensitive.xlsx",
+                "src/test/resources/case_insensitive.xls");
     }
 
     @Test
@@ -48,7 +50,7 @@ public class CaseInsensitiveTest {
                 .findFirst()
                 .get();
         assertThat(firstRow.getUnknownCells().size(), is(1));
-        assertThat(firstRow.getUnknownCells().get("Region"), is("EMEA"));
+        assertThat(firstRow.getUnknownCells().get("region"), is("EMEA"));
 
 
         OrgWithUnknownCellsByName secondRow = organisations.stream()
@@ -56,7 +58,7 @@ public class CaseInsensitiveTest {
                 .findFirst()
                 .get();
         assertThat(secondRow.getUnknownCells().size(), is(1));
-        assertThat(secondRow.getUnknownCells().get("Region"), is("NA"));
+        assertThat(secondRow.getUnknownCells().get("region"), is("NA"));
     }
 
 }

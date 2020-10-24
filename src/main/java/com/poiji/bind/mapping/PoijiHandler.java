@@ -6,11 +6,11 @@ import com.poiji.annotation.ExcelCellRange;
 import com.poiji.annotation.ExcelRow;
 import com.poiji.annotation.ExcelUnknownCells;
 import com.poiji.config.Casting;
+import com.poiji.config.Formatting;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.AnnotationUtil;
 import com.poiji.util.ReflectUtil;
-import com.poiji.util.Strings;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.usermodel.XSSFComment;
@@ -40,25 +40,27 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     private final Class<T> type;
     private final PoijiOptions options;
     private final Casting casting;
-    private final Map<String, Integer> columnIndexPerTitle;
-    private final Map<Integer, String> titlePerColumnIndex;
+    private final Formatting formatting;
+    private final Map<String, Integer> titleToIndex;
+    private final Map<Integer, String> indexToTitle;
     // New maps used to speed up computing and handle inner objects
     private Map<String, Object> fieldInstances;
     private final Map<Integer, Field> columnToField;
     private final Map<Integer, Field> columnToSuperClassField;
-    private final Set<ExcelCellName> excelCellNames;
+    private final Set<ExcelCellName> excelCellNameAnnotations;
 
     PoijiHandler(Class<T> type, PoijiOptions options, Consumer<? super T> consumer) {
         this.type = type;
         this.options = options;
         this.consumer = consumer;
         this.limit = options.getLimit();
-        casting = options.getCasting();
-        columnIndexPerTitle = new HashMap<>();
-        titlePerColumnIndex = new HashMap<>();
+        this.casting = options.getCasting();
+        this.formatting = options.getFormatting();
+        titleToIndex = new HashMap<>();
+        indexToTitle = new HashMap<>();
         columnToField = new HashMap<>();
         columnToSuperClassField = new HashMap<>();
-        excelCellNames = new HashSet<>();
+        excelCellNameAnnotations = new HashSet<>();
     }
 
     private void setFieldValue(String content, Class<? super T> subclass, int column) {
@@ -125,7 +127,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                             } else {
                                 excelUnknownCellsMap = (Map<String, String>) field.get(instance);
                             }
-                            excelUnknownCellsMap.put(titlePerColumnIndex.get(column), content);
+                            excelUnknownCellsMap.put(indexToTitle.get(column), content);
                         } catch (IllegalAccessException e) {
                             throw new IllegalCastException("Could not read content of field " + field.getName() + " on Object {" + instance + "}");
                         }
@@ -162,9 +164,9 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         } else {
             ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
             if (excelCellName != null) {
-                excelCellNames.add(excelCellName);
-                final String titleName = Strings.getTitleName(options, excelCellName.value());
-                final Integer titleColumn = columnIndexPerTitle.get(titleName);
+                excelCellNameAnnotations.add(excelCellName);
+                final String titleName = formatting.transform(options, excelCellName.value());
+                final Integer titleColumn = titleToIndex.get(titleName);
                 //Fix both columns mapped to name passing this condition below
                 if (titleColumn != null && titleColumn == column) {
                     Object o = casting.castValue(field, content, internalRow, column, options);
@@ -202,8 +204,9 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         int header = options.getHeaderStart();
         int column = cellAddress.getColumn();
         if (row == header) {
-            columnIndexPerTitle.put(Strings.getTitleName(options, formattedValue), column);
-            titlePerColumnIndex.put(column, getTitleNameForMap(formattedValue, column));
+            String transformedValue = formatting.transform(options, formattedValue);
+            titleToIndex.put(transformedValue, column);
+            indexToTitle.put(column, getTitleNameForMap(transformedValue, column));
         }
         if (row + 1 <= options.skip()) {
             return;
@@ -216,17 +219,12 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     }
 
     private String getTitleNameForMap(String cellContent, int columnIndex) {
-        String titleName;
-        if (options.getIgnoreWhitespaces()) {
-            cellContent = cellContent.trim();
-        }
-        if (titlePerColumnIndex.containsValue(cellContent)
+        if (indexToTitle.containsValue(cellContent)
                 || cellContent.isEmpty()) {
-            titleName = cellContent + "@" + columnIndex;
+            return cellContent + "@" + columnIndex;
         } else {
-            titleName = cellContent;
+            return cellContent;
         }
-        return titleName;
     }
 
     @Override
@@ -236,6 +234,6 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     @Override
     public void endSheet() {
-        AnnotationUtil.validateMandatoryNameColumns(options, type, columnIndexPerTitle.keySet());
+        AnnotationUtil.validateMandatoryNameColumns(options, formatting, type, titleToIndex.keySet());
     }
 }

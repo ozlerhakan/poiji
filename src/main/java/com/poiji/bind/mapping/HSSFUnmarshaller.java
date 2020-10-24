@@ -8,11 +8,11 @@ import com.poiji.annotation.ExcelRow;
 import com.poiji.annotation.ExcelUnknownCells;
 import com.poiji.bind.Unmarshaller;
 import com.poiji.config.Casting;
+import com.poiji.config.Formatting;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.AnnotationUtil;
 import com.poiji.util.ReflectUtil;
-import com.poiji.util.Strings;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.formula.BaseFormulaEvaluator;
@@ -38,7 +38,8 @@ import java.util.stream.StreamSupport;
 import static java.lang.String.valueOf;
 
 /**
- * This is the main class that converts the excel sheet fromExcel Java object
+ * responsible for xls files
+ *
  * Created by hakan on 16/01/2017.
  */
 abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
@@ -46,21 +47,21 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
     private final DataFormatter dataFormatter;
     protected final PoijiOptions options;
     private final Casting casting;
-    final Map<String, Integer> columnIndexPerTitle;
-    private final Map<Integer, String> titlePerColumnIndex;
-    private final Map<Integer, String> caseSensitiveTitlePerColumnIndex;
-    final int limit;
+    private final Formatting formatting;
+    private final Map<String, Integer> titleToIndex;
+    private final Map<Integer, String> indexToTitle;
+    private final int limit;
+    private int internalCount;
     BaseFormulaEvaluator baseFormulaEvaluator;
-    int internalCount;
 
     HSSFUnmarshaller(PoijiOptions options) {
         this.options = options;
         this.limit = options.getLimit();
         dataFormatter = new DataFormatter();
-        columnIndexPerTitle = new HashMap<>();
-        titlePerColumnIndex = new HashMap<>();
-        caseSensitiveTitlePerColumnIndex = new HashMap<>();
-        casting = options.getCasting();
+        titleToIndex = new HashMap<>();
+        indexToTitle = new HashMap<>();
+        this.casting = options.getCasting();
+        this.formatting = options.getFormatting();
     }
 
     @Override
@@ -79,7 +80,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
         int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
 
         loadColumnTitles(sheet, maxPhysicalNumberOfRows);
-        AnnotationUtil.validateMandatoryNameColumns(options, type, columnIndexPerTitle.keySet());
+        AnnotationUtil.validateMandatoryNameColumns(options, formatting, type, titleToIndex.keySet());
 
         for (Row currentRow : sheet) {
             if (!skip(currentRow, skip) && !isRowEmpty(currentRow)) {
@@ -124,7 +125,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
         return sheet;
     }
 
-    void loadColumnTitles(Sheet sheet, int maxPhysicalNumberOfRows) {
+    private void loadColumnTitles(Sheet sheet, int maxPhysicalNumberOfRows) {
         if (maxPhysicalNumberOfRows > 0) {
             int row = options.getHeaderStart();
             if (row == -1) {
@@ -133,26 +134,20 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
             Row firstRow = sheet.getRow(row);
             for (Cell cell : firstRow) {
                 final int columnIndex = cell.getColumnIndex();
-                caseSensitiveTitlePerColumnIndex.put(columnIndex, getTitleNameForMap(cell.getStringCellValue(), columnIndex));
-                final String titleName = Strings.getTitleName(options, cell.getStringCellValue());
-                columnIndexPerTitle.put(titleName, columnIndex);
-                titlePerColumnIndex.put(columnIndex, getTitleNameForMap(titleName, columnIndex));
+                final String titleName = formatting.transform(options, cell.getStringCellValue());
+                indexToTitle.put(columnIndex, getTitleNameForMap(titleName, columnIndex));
+                titleToIndex.put(titleName, columnIndex);
             }
         }
     }
 
     private String getTitleNameForMap(String cellContent, int columnIndex) {
-        String titleName;
-        if (options.getIgnoreWhitespaces()) {
-            cellContent = cellContent.trim();
-        }
-        if (titlePerColumnIndex.containsValue(cellContent)
+        if (indexToTitle.containsValue(cellContent)
                 || cellContent.isEmpty()) {
-            titleName = cellContent + "@" + columnIndex;
+            return cellContent + "@" + columnIndex;
         } else {
-            titleName = cellContent;
+            return cellContent;
         }
-        return titleName;
     }
 
     <T> T deserializeRowToInstance(Row currentRow, Class<T> type) {
@@ -186,11 +181,11 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
 
         Map<String, String> excelUnknownCellsMap = StreamSupport
                 .stream(Spliterators.spliteratorUnknownSize(currentRow.cellIterator(), Spliterator.ORDERED), false)
-                .filter(cell -> caseSensitiveTitlePerColumnIndex.size() != 0)
+                .filter(cell -> indexToTitle.size() != 0)
                 .filter(cell -> !mappedColumnIndices.contains(cell.getColumnIndex()))
                 .filter(cell -> !cell.toString().isEmpty())
                 .collect(Collectors.toMap(
-                        cell -> caseSensitiveTitlePerColumnIndex.get(cell.getColumnIndex()),
+                        cell -> indexToTitle.get(cell.getColumnIndex()),
                         Object::toString
                 ));
 
@@ -221,8 +216,8 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
         } else {
             ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
             if (excelCellName != null) {
-                final String titleName = Strings.getTitleName(options, excelCellName.value());
-                Integer column = columnIndexPerTitle.get(titleName);
+                final String titleName = formatting.transform(options, excelCellName.value());
+                Integer column = titleToIndex.get(titleName);
                 annotationDetail.setColumn(column);
             }
         }

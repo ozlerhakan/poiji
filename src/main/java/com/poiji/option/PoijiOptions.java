@@ -5,6 +5,8 @@ import com.poiji.bind.mapping.PoijiLogCellFormat;
 import com.poiji.bind.mapping.PoijiNumberFormat;
 import com.poiji.config.Casting;
 import com.poiji.config.DefaultCasting;
+import com.poiji.config.DefaultFormatting;
+import com.poiji.config.Formatting;
 import com.poiji.exception.PoijiException;
 
 import java.time.format.DateTimeFormatter;
@@ -42,6 +44,7 @@ public final class PoijiOptions {
     private boolean namedHeaderMandatory;
     private boolean disableXLSXNumberCellFormat;
     private String listDelimiter;
+    private Formatting formatting;
 
     public PoijiNumberFormat getPoijiNumberFormat() {
         return numberFormat;
@@ -259,6 +262,15 @@ public final class PoijiOptions {
         return this;
     }
 
+    public Formatting getFormatting() {
+        return formatting;
+    }
+
+    private PoijiOptions setFormatting(Formatting formatting) {
+        this.formatting = formatting;
+        return this;
+    }
+
     public static class PoijiOptionsBuilder {
 
         private int sheetIndex;
@@ -273,6 +285,7 @@ public final class PoijiOptions {
         private DateTimeFormatter dateFormatter = DEFAULT_DATE_FORMATTER;
         private DateTimeFormatter dateTimeFormatter = DEFAULT_DATE_TIME_FORMATTER;
         private Casting casting = new DefaultCasting();
+        private Formatting formatting = new DefaultFormatting();
         private PoijiLogCellFormat cellFormat;
         private PoijiNumberFormat numberFormat;
         private int headerStart = 0;
@@ -381,7 +394,8 @@ public final class PoijiOptions {
                     .setIgnoreWhitespaces(ignoreWhitespaces)
                     .setNamedHeaderMandatory(namedHeaderMandatory)
                     .disableXLSXNumberCellFormat(disabledXLSXNumberCellFormat)
-                    .setListDelimiter(listDelimiter);
+                    .setListDelimiter(listDelimiter)
+                    .setFormatting(formatting);
         }
 
         /**
@@ -611,6 +625,20 @@ public final class PoijiOptions {
          */
         public PoijiOptionsBuilder addListDelimiter(String delimiter) {
             this.listDelimiter = delimiter;
+            return this;
+        }
+
+
+        /**
+         * Use a custom excel header format implementation
+         *
+         * @param formatting custom header format implementation
+         * @return this
+         */
+        public PoijiOptionsBuilder withFormatting(Formatting formatting) {
+            Objects.requireNonNull(formatting);
+
+            this.formatting = formatting;
             return this;
         }
     }

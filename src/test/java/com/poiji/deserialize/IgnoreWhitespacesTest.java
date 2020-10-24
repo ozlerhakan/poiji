@@ -49,7 +49,7 @@ public class IgnoreWhitespacesTest {
                 .findFirst()
                 .get();
         assertThat(firstRow.getUnknownCells().size(), is(1));
-        assertThat(firstRow.getUnknownCells().get("Region"), is("EMEA"));
+        assertThat(firstRow.getUnknownCells().get("region"), is("EMEA"));
 
 
         OrgWithUnknownCellsByName secondRow = organisations.stream()
@@ -57,7 +57,7 @@ public class IgnoreWhitespacesTest {
                 .findFirst()
                 .get();
         assertThat(secondRow.getUnknownCells().size(), is(1));
-        assertThat(secondRow.getUnknownCells().get("Region"), is("NA"));
+        assertThat(secondRow.getUnknownCells().get("region"), is("NA"));
     }
 
 }

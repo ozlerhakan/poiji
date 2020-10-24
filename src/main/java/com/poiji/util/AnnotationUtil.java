@@ -1,6 +1,7 @@
 package com.poiji.util;
 
 import com.poiji.annotation.ExcelCellName;
+import com.poiji.config.Formatting;
 import com.poiji.exception.HeaderMissingException;
 import com.poiji.option.PoijiOptions;
 
@@ -25,21 +26,19 @@ public final class AnnotationUtil {
      * @throws HeaderMissingException if one or more headers are missing
      */
     public static <T> void validateMandatoryNameColumns(PoijiOptions options,
+                                                        Formatting formatting,
                                                         Class<T> modelType,
                                                         Collection<String> headerNames) {
         if (options.getNamedHeaderMandatory()) {
-            Collection<ExcelCellName> excelCellNames = ReflectUtil.findRecursivePoijiAnnotations(modelType,
-                    ExcelCellName.class);
+            Collection<ExcelCellName> excelCellNames = ReflectUtil.findRecursivePoijiAnnotations(modelType, ExcelCellName.class);
 
-            BiPredicate<String, String> comparator = options.getCaseInsensitive()
-                    ? String::equalsIgnoreCase
-                    : String::equals;
+            BiPredicate<String, String> comparator = String::equals;
 
             Set<String> missingHeaders = excelCellNames.stream()
                     .filter(excelCellName -> headerNames.stream()
                             .noneMatch(title -> comparator.test(
-                                options.getIgnoreWhitespaces() ? excelCellName.value().trim() : excelCellName.value(),
-                                options.getIgnoreWhitespaces() ? title.trim() : title
+                                    formatting.transform(options, excelCellName.value()),
+                                    title
                             )))
                     .map(ExcelCellName::value)
                     .collect(Collectors.toSet());
