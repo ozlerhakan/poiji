@@ -29,7 +29,7 @@ public class DefaultCastingWithErrorLoggingTest {
     @Parameterized.Parameter
     public String sheetName;
 
-    private DefaultCasting casting;
+    private MyConfig casting;
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
@@ -43,8 +43,17 @@ public class DefaultCastingWithErrorLoggingTest {
 
     @Before
     public void setUp() {
+        casting = new MyConfig(true);
+    }
 
-        casting = new DefaultCasting(true);
+    static class MyConfig extends DefaultCasting {
+        MyConfig(boolean errorLoggingEnabled) {
+            super(errorLoggingEnabled);
+        }
+
+        Object castValue(Class<?> fieldType, String value, PoijiOptions options) {
+            return getValueObject(null, -1, -1, options, value, fieldType);
+        }
     }
 
     @Test

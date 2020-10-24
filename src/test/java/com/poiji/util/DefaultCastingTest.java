@@ -1,6 +1,7 @@
 package com.poiji.util;
 
 import com.poiji.config.DefaultCasting;
+import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
 import org.junit.After;
@@ -21,15 +22,19 @@ import static org.junit.Assert.assertNull;
 
 public class DefaultCastingTest {
 
-    private DefaultCasting casting;
+    private MyConfig casting;
     private PoijiOptions options;
 
     @Before
     public void setUp() {
-
-		casting = new DefaultCasting();
+        casting = new MyConfig();
         options = PoijiOptionsBuilder.settings().build();
         Locale.setDefault(Locale.US);
+    }
+
+    @Test(expected = PoijiException.class)
+    public void loggingDisabledException() {
+        casting.getErrors();
     }
 
     @After
@@ -44,9 +49,17 @@ public class DefaultCastingTest {
         assertFalse(casting.isErrorLoggingEnabled());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void loggingDisabledException() {
-        casting.getErrors();
+    @Test
+    public void castLocalDateUnmatchedDateRegex() {
+
+        PoijiOptions options = PoijiOptionsBuilder.settings()
+                .dateRegex("\\d{2}\\/\\d{2}\\/\\d{4}")
+                .preferNullOverDefault(true)
+                .build();
+
+        LocalDate testLocalDate = (LocalDate) casting.castValue(LocalDate.class, "05-01-2016", options);
+
+        assertNull(testLocalDate);
     }
 
     @Test
@@ -180,16 +193,12 @@ public class DefaultCastingTest {
     }
 
     @Test
-    public void castLocalDateUnmatchedDateRegex()  {
+    public void castBigDecimalDE() {
 
-        PoijiOptions options = PoijiOptionsBuilder.settings()
-                .dateRegex("\\d{2}\\/\\d{2}\\/\\d{4}")
-                .preferNullOverDefault(true)
-                .build();
+        Locale.setDefault(Locale.GERMANY);
+        BigDecimal testVal = (BigDecimal) casting.castValue(BigDecimal.class, "81,56", options);
 
-        LocalDate testLocalDate = (LocalDate) casting.castValue(LocalDate.class, "05-01-2016", options);
-
-        assertNull(testLocalDate);
+        assertEquals(BigDecimal.valueOf(81.56), testVal);
     }
 
 
@@ -209,13 +218,10 @@ public class DefaultCastingTest {
         assertEquals(BigDecimal.valueOf(81.56891), testVal);
     }
 
-    @Test
-    public void castBigDecimalDE() {
-
-        Locale.setDefault(Locale.GERMANY);
-        BigDecimal testVal = (BigDecimal) casting.castValue(BigDecimal.class, "81,56", options);
-
-        assertEquals( BigDecimal.valueOf(81.56), testVal);
+    static class MyConfig extends DefaultCasting {
+        Object castValue(Class<?> fieldType, String value, PoijiOptions options) {
+            return getValueObject(null, -1, -1, options, value, fieldType);
+        }
     }
 
     private enum TestEnum {

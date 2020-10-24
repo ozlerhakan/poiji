@@ -1,5 +1,6 @@
 package com.poiji.config;
 
+import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.parser.BooleanParser;
 import com.poiji.parser.Parsers;
@@ -25,7 +26,7 @@ import java.util.stream.Stream;
 /**
  * Created by hakan on 22/01/2017.
  */
-public final class DefaultCasting implements Casting {
+public class DefaultCasting implements Casting {
     private final boolean errorLoggingEnabled;
 
     private final List<DefaultCastingError> errors = new ArrayList<>();
@@ -212,10 +213,6 @@ public final class DefaultCasting implements Casting {
                 });
     }
 
-    public Object castValue(Class<?> fieldType, String value, PoijiOptions options) {
-        return getValueObject(null, -1, -1, options, value, fieldType);
-    }
-
     private Object castListValue(String value, String sheetName, int row, int col, Field field, PoijiOptions options) {
         final ParameterizedType genericType = (ParameterizedType) field.getGenericType();
         final Type fieldType = genericType.getActualTypeArguments()[0];
@@ -256,7 +253,7 @@ public final class DefaultCasting implements Casting {
         return getValueObject(field, row, col, options, rawValue, fieldType);
     }
 
-    private Object getValueObject(Field field, int row, int col, PoijiOptions options, String rawValue, Class<?> fieldType) {
+    protected Object getValueObject(Field field, int row, int col, PoijiOptions options, String rawValue, Class<?> fieldType) {
         String sheetName = options.getSheetName();
         String value = options.trimCellValue() ? rawValue.trim() : rawValue;
 
@@ -325,7 +322,7 @@ public final class DefaultCasting implements Casting {
         if (errorLoggingEnabled) {
             return Collections.unmodifiableList(errors);
         } else {
-            throw new IllegalStateException("logging not enabled");
+            throw new PoijiException("logging not enabled");
         }
     }
 
