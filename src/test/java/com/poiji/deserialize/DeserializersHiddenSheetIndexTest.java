@@ -2,6 +2,7 @@ package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.byid.Person;
+import com.poiji.deserialize.model.byid.PersonSheetName;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import org.junit.Test;
@@ -45,6 +46,26 @@ public class DeserializersHiddenSheetIndexTest {
             PoijiOptions poijiOptions = PoijiOptions.PoijiOptionsBuilder.settings().sheetIndex(2).ignoreHiddenSheets(true).build();
 
             List<Person> people = Poiji.fromExcel(new File(path), Person.class, poijiOptions);
+            assertEquals(expectedPersonList.get(0).getRow(), people.get(0).getRow());
+            assertEquals(expectedPersonList.get(1).getRow(), people.get(1).getRow());
+            assertEquals(expectedPersonList.get(2).getRow(), people.get(2).getRow());
+            assertEquals(expectedPersonList.get(3).getRow(), people.get(3).getRow());
+            assertEquals(expectedPersonList.get(4).getRow(), people.get(4).getRow());
+        } catch (Exception e) {
+            if (expectedException == null) {
+                fail(e.getMessage());
+            } else {
+                assertThat(e, instanceOf(expectedException));
+            }
+        }
+    }
+
+    @Test
+    public void testIgnoreHiddenSheetsReadFromSheetName() {
+        try {
+            PoijiOptions poijiOptions = PoijiOptions.PoijiOptionsBuilder.settings().ignoreHiddenSheets(true).build();
+
+            List<PersonSheetName> people = Poiji.fromExcel(new File(path), PersonSheetName.class, poijiOptions);
             assertEquals(expectedPersonList.get(0).getRow(), people.get(0).getRow());
             assertEquals(expectedPersonList.get(1).getRow(), people.get(1).getRow());
             assertEquals(expectedPersonList.get(2).getRow(), people.get(2).getRow());

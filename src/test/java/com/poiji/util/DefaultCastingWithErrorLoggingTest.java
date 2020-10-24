@@ -883,6 +883,8 @@ public class DefaultCastingWithErrorLoggingTest {
         assertEquals(value, castingError.getValue());
         assertEquals(defaultValue, castingError.getDefaultValue());
         assertEquals(exClass, castingError.getException().getClass());
+        assertEquals(-1, castingError.getColumn());
+        assertEquals(-1, castingError.getRow());
     }
 
     private enum TestEnum {
