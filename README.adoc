@@ -170,7 +170,7 @@ List<Employee> employees = Poiji.fromExcel(stream, PoijiExcelType.XLS, Employee.
 employees.size();
 // 3
 Employee firstEmployee = employees.get(0);
-// Employee{rowIndex=1, employeeId=123923, name='Joe', surname='Doe', age=30, single=TRUE, emails=[joe@doe.com, joedoe@gmail.com], biils=[123,10, 99.99]}
+// Employee{rowIndex=1, employeeId=123923, name='Joe', surname='Doe', age=30, single=true, emails=[joe@doe.com, joedoe@gmail.com], biils=[123,10, 99.99]}
 ----
 <1> By default the delimiter/separator is `,` to split items in a cell. There is an option to change this behavior. Since we use `;` between items, we need to tell Poiji to use `;` as a separator.
 
@@ -814,7 +814,7 @@ Poiji accepts excel records via Poi Sheet object as well:
 
 [source,java]
 ----
-File file = new File("/temp/file.xlsx");
+File file = new File("/tmp/file.xlsx");
 FileInputStream fileInputStream = new FileInputStream(file);
 Workbook workbook = new XSSFWorkbook(fileInputStream);
 Sheet sheet = workbook.getSheetAt(0);
