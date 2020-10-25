@@ -2,7 +2,7 @@
 :toclevels: 1
 
 = Poiji
-:version: v3.0.0
+:version: v3.0.1
 
 
 image:https://travis-ci.org/ozlerhakan/poiji.svg?branch=master["Build Status", link="https://travis-ci.org/ozlerhakan/poiji"] image:https://api.codacy.com/project/badge/Grade/6587e90886184da29a1b7c5634695c9d["Codacy code quality", link="https://www.codacy.com/app/ozlerhakan/poiji?utm_source=github.com&utm_medium=referral&utm_content=ozlerhakan/poiji&utm_campaign=Badge_Grade"] image:https://coveralls.io/repos/github/ozlerhakan/poiji/badge.svg?branch=master["Coverage Status", link="https://coveralls.io/github/ozlerhakan/poiji?branch=master"] image:https://img.shields.io/badge/apache.poi-4.1.2-brightgreen.svg[] image:https://app.fossa.com/api/projects/git%2Bgithub.com%2Fozlerhakan%2Fpoiji.svg?type=shield["FOSSA Status", link="https://app.fossa.com/projects/git%2Bgithub.com%2Fozlerhakan%2Fpoiji?ref=badge_shield"] image:https://img.shields.io/badge/license-MIT-blue.svg[]
@@ -23,7 +23,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 <dependency>
   <groupId>com.github.ozlerhakan</groupId>
   <artifactId>poiji</artifactId>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
 </dependency>
 ----
 
@@ -31,7 +31,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    compile 'com.github.ozlerhakan:poiji:3.0.0'
+    compile 'com.github.ozlerhakan:poiji:3.0.1'
 }
 ----
 
@@ -47,6 +47,9 @@ com.poiji.bind.Poiji#fromExcel(java.io.InputStream, com.poiji.exception.PoijiExc
 com.poiji.bind.Poiji#fromExcel(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>, java.util.function.Consumer<? super T>)
 com.poiji.bind.Poiji#fromExcel(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>, com.poiji.option.PoijiOptions)
 com.poiji.bind.Poiji#fromExcel(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>, com.poiji.option.PoijiOptions, java.util.function.Consumer<? super T>)
+com.poiji.bind.Poiji#fromExcel(org.apache.poi.ss.usermodel.Sheet, java.lang.Class<T>)
+com.poiji.bind.Poiji#fromExcel(org.apache.poi.ss.usermodel.Sheet, java.lang.Class<T>, com.poiji.option.PoijiOptions)
+com.poiji.bind.Poiji#fromExcel(org.apache.poi.ss.usermodel.Sheet, java.lang.Class<T>, com.poiji.option.PoijiOptions, java.util.function.Consumer<? super T>)
 
 com.poiji.bind.Poiji#fromExcelProperties(java.io.File, java.lang.Class<T>)
 com.poiji.bind.Poiji#fromExcelProperties(java.io.File, java.lang.Class<T>, com.poiji.option.PoijiOptions)
@@ -72,11 +75,14 @@ com.poiji.option.PoijiOptions.PoijiOptionsBuilder#limit(int)
 com.poiji.option.PoijiOptions.PoijiOptionsBuilder#trimCellValue(boolean)
 com.poiji.option.PoijiOptions.PoijiOptionsBuilder#headerStart(int)
 com.poiji.option.PoijiOptions.PoijiOptionsBuilder#withCasting(Casting)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#withFormatting(Formatting)
 com.poiji.option.PoijiOptions.PoijiOptionsBuilder#caseInsensitive(boolean)
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#ignoreWhitespaces(boolean)
 com.poiji.option.PoijiOptions.PoijiOptionsBuilder#namedHeaderMandatory(boolean)
 com.poiji.option.PoijiOptions.PoijiOptionsBuilder#poijiNumberFormat(PoijiNumberFormat)
 com.poiji.option.PoijiOptions.PoijiOptionsBuilder#poijiLogCellFormat(PoijiLogCellFormat)
 com.poiji.option.PoijiOptions.PoijiOptionsBuilder#disableXLSXNumberCellFormat()
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder#addListDelimiter(String)
 ----
 
 === Feature 1
@@ -105,61 +111,56 @@ public class Employee {
     @ExcelCell(4)
     private boolean single;
 
+    @ExcelCellName("emails")     <4>
+    List<String> emails;
+
     @ExcelCell(5)
-    private String birthday;
+    List<BigDecimal> bills;
 
     //no need getters/setters to map excel cells to fields
-
-    @Override
-    public String toString() {
-        return "Employee{" +
-                "rowIndex=" + rowIndex +
-                ", employeeId=" + employeeId +
-                ", name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
-                ", age=" + age +
-                ", single=" + single +
-                ", birthday='" + birthday + '\'' +
-                '}';
-    }
 }
 ----
-<1> As of 1.10, optionally we can access the index of each row item by using the `ExcelRow` annotation. Annotated variable should be of type `int`, `double`, `float` or `long`.
+<1> Optionally, we can access the index of each row item by using the `ExcelRow` annotation. Annotated variable should be of type `int`, `double`, `float` or `long`.
 <2> A field must be annotated with `@ExcelCell` along with its property in order to get the value from the right coordinate in the target excel sheet.
 <3> An annotated field can be either protected, private or public modifier. The field may be either of `boolean`, `int`, `long`, `float`, `double`, or their wrapper classes. You can add a field of `java.util.Date`, `java.time.LocalDate`, `java.time.LocalDateTime` and `String` as well.
+<4> If one column contains multiple value, you can get them using a List field. A List field can store items which is of type `BigDecimal`, `Long`, `Double`, `Float`, `Integer`, `Boolean` and `String`.
 
 This is the excel file (`employees.xlsx`) we want to map to a list of `Employee` instance:
 
 |===
-|ID | NAME |SURNAME |AGE |SINGLE |BIRTHDAY
+|ID | NAME |SURNAME |AGE |SINGLE |BILLS | EMAILS
 
 |123923
 |Joe
 |Doe
 |30
 |TRUE
-|4/9/1987
+|123,10;99.99
+|joe@doe.com;joedoe@gmail.com
 
 |123123
 |Sophie
 |Derue
 |20
-|TRUE
-|5/3/1997
+|1022
+|sophie.derue@gmail.com;sophie@derue.com
 
 |135923
 |Paul
 |Raul
 |31
-|FALSE
-|4/9/1986
+|73,25;70
+|paul.raul@gmail.com;paul@raul.com
 |===
 
 The snippet below shows how to obtain the excel data using `Poiji`.
 
 [source,java]
 ----
-List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class);
+PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+        .addListDelimiter(";") <1>
+        .build();
+List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class, options);
 // alternatively
 InputStream stream = new FileInputStream(new File("employees.xls"))
 List<Employee> employees = Poiji.fromExcel(stream, PoijiExcelType.XLS, Employee.class, options);
@@ -167,8 +168,9 @@ List<Employee> employees = Poiji.fromExcel(stream, PoijiExcelType.XLS, Employee.
 employees.size();
 // 3
 Employee firstEmployee = employees.get(0);
-// Employee{rowIndex=1, employeeId=123923, name='Joe', surname='Doe', age=30, single=true, birthday='4/9/1987'}
+// Employee{rowIndex=1, employeeId=123923, name='Joe', surname='Doe', age=30, emails=[joe@doe.com, joedoe@gmail.com], biils=[123,10, 99.99]}
 ----
+<1> By default the delimiter/separator is `,` to split items in a cell. There is an option to change this behavior. Since we use `:` between items, we need to tell Poiji to use `;` as a separator.
 
 By default, Poiji ignores the header row of the excel data. If you want to ignore the first row of data, you need to use `PoijiOptions`.
 
@@ -243,7 +245,7 @@ List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.c
 
 === Feature 4
 
-The version `1.11` introduces a new annotation called `ExcelCellName` so that we can read the values by column names directly.
+Using `ExcelCellName`, we can read the values by column names directly.
 
 [source,java]
 ----
@@ -263,7 +265,7 @@ public class Person {
 
 }
 ----
-1. We need to specify the `name` of the column for which the corresponding value is looked. `@ExcelCellName` is case-sensitive and the excel file should't contain duplicated column names.
+1. We need to specify the `name` of the column for which the corresponding value is looked. By default, `@ExcelCellName` is case-sensitive and the excel file should't contain duplicated column names. However, you can manipulate this feature using `PoijiOptionsBuilder#caseInsensitive(boolean)` and you can ignore white spaces using `PoijiOptionsBuilder#ignoreWhitespaces(boolean)`.
 
 For example, here is the excel (`person.xls`) file we want to use:
 
@@ -402,7 +404,7 @@ Consider you have a table like below:
 
 |===
 
-The new `ExcelCellRange` annotation (as of 1.19) lets us aggregate a range of information in one object model. In this case, we collect the details of the first person in `classA` and for second person in `classB`:
+The `ExcelCellRange` annotation lets us aggregate a range of information in one object model. In this case, we collect the details of the first person in `classA` and for second person in `classB`:
 
 [source,java]
 ----
@@ -460,7 +462,7 @@ GroupB secondRowPerson2 = firstRowGroups.getGroupB();
 
 === Feature 7
 
-As of 1.14, Poiji supports Consumer Interface. As https://github.com/ozlerhakan/poiji/pull/39#issuecomment-409521808[@fmarazita] explained the usage, there are several benefits of having a Consumer:
+Poiji supports Consumer Interface. As https://github.com/ozlerhakan/poiji/pull/39#issuecomment-409521808[@fmarazita] explained the usage, there are several benefits of having a Consumer:
 
 1. Huge excel file ( without you have all in memory)
 2. Run time processing/filtering data
@@ -513,7 +515,7 @@ private void dbInsertion(Calculation siCalculation) {
 
 === Feature 8
 
-Since Poiji 1.19.1, you can create your own casting implementation without relying on the default Poiji casting configuration using the `Casting` interface.
+You can create your own casting implementation without relying on the default Poiji casting configuration using the `Casting` interface.
 
 [source,java]
 ----
@@ -551,7 +553,7 @@ List<Person> people = Poiji.fromExcel(excel, Person.class, options);
 
 === Feature 9
 
-Since Poiji 2.3.0, you can annotate a `Map<String, String>` with `@ExcelUnknownCells` to parse all entries,
+You can annotate a `Map<String, String>` with `@ExcelUnknownCells` to parse all entries,
 which are not mapped in any other way (for example by index or by name).
 
 This is our object model:
@@ -598,7 +600,7 @@ and the one for the second row has `{ENCODING=flac, BITRATE=1500}`.
 
 === Feature 10
 
-Poiji 2.7.0 introduced the Option `namedHeaderMandatory`. If set to true, Poiji will check that all field annotated with `@ExcelCellName` must have a corresponding column in the Excel sheet. If any column is missing a `HeaderMissingException` will be thrown.
+Poiji supports the Option `namedHeaderMandatory`. If set to true, Poiji will check that all field annotated with `@ExcelCellName` must have a corresponding column in the Excel sheet. If any column is missing a `HeaderMissingException` will be thrown.
 
 [source,java]
 ----
@@ -630,7 +632,7 @@ With `namedHeaderMandatory=true`, a `HeaderMissingException` will be thrown.
 
 === Feature 11
 
-As of 2.7.0, we can observe each cell format of a given excel file. Assume that we have an excel file like below:
+We can observe each cell format of a given excel file. Assume that we have an excel file like below:
 
 |===
 |Date
@@ -667,7 +669,7 @@ Now that we know the reason of why we don't see the expected date value, it's be
 
 === Feature 12
 
-Using 2.7.0, we can change the default format of a cell using `PoijiNumberFormat`. Recall `feature 10`, we are unable to see the correct cell format what's more the excel file uses another format which we do not want to.
+We can change the default format of a cell using `PoijiNumberFormat`. Recall `feature 10`, we are unable to see the correct cell format what's more the excel file uses another format which we do not want to.
 
 |===
 |Date
@@ -696,8 +698,7 @@ We know that the index 47 uses the format `mm:ss.0` by default in the given exce
 
 === Feature 13
 
-Since Poiji 2.8.0, it is possible to read excel properties from xlsx files.
-To achieve that, create a class with fields annotated with `@ExcelProperty`.
+It is possible to read excel properties from xlsx files. To achieve that, create a class with fields annotated with `@ExcelProperty`.
 
 Example:
 
@@ -767,24 +768,55 @@ result.get(1).amount
 ----
 1. Add `options`, if your excel is xlsx file.
 
+=== Feature 15
 
-== Try with JShell
+You can create your own formatting implementation without relying on the default Poiji formatting configuration using the `Formatting` interface.
 
-Since we have a new pedagogic tool, Java 9 REPL, you can try Poiji in JShell. Clone the repo and follow the steps below. JShell should open up a new jshell session once loading the startup scripts and the specified jars that must be in the classpath. You must first import and create related packages and classes before using Poiji. We are able to use directly Poiji and Employee classes because they are already imported from `jshell/snippets` with `try-with-jshell.sh`.
+[source,java]
+----
+public class MyFormatting implements Formatting {
+    @Override
+    public String transform(PoijiOptions options, String value) {
+        return value.toUpperCase().trim(); <1>
+    }
+}
+
+public class Person {
+
+    @ExcelCellName("ID")
+    protected String employeeId;
+
+    @ExcelCellName("NAME")
+    protected String name;
+
+    @ExcelCellName("SURNAME")
+    protected String surname;
+
+}
+----
+<1> Suppose that all the header names of an excel file have different formatting. Using custom formatting, we are able to look at headers with a custom format. All the headers will be uppercase and don't have white spaces before and after.
+
+Then you can add your custom implementation with the `withFormatting` method:
+
+[source,java]
+----
+PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .withFormatting(new MyFormatting())
+                .build();
+List<Person> people = Poiji.fromExcel(excel, Person.class, options);
+----
+
+=== Feature 16
+
+Poiji accepts excel records via Poi Sheet object as well:
 
 ----
-$ cd poiji/
+File file = new File("/temp/file.xlsx");
+FileInputStream fileInputStream = new FileInputStream(file);
+Workbook workbook = new XSSFWorkbook(fileInputStream);
+Sheet sheet = workbook.getSheetAt(0);
 
-$ ./try-with-jshell.sh
-|  Welcome to JShell -- Version 9
-|  For an introduction type: /help intro
-
-jshell> List<Employee> employees = Poiji.fromExcel(new File("src/test/resources/employees.xlsx"), Employee.class);
-
-jshell> employees.forEach(System.out::println)
-Employee{employeeId=123923, name='Joe', surname='Doe', age=30, single=true, birthday='4/9/1987'}
-Employee{employeeId=123123, name='Sophie', surname='Derue', age=20, single=false, birthday='5/3/1997'}
-Employee{employeeId=135923, name='Paul', surname='Raul', age=31, single=false, birthday='4/9/1986'}
+List<Model> result = Poiji.fromExcel(sheet, Model.class);
 ----
 
 == Stargazers over time
