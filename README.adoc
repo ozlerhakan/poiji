@@ -172,7 +172,7 @@ employees.size();
 Employee firstEmployee = employees.get(0);
 // Employee{rowIndex=1, employeeId=123923, name='Joe', surname='Doe', age=30, single=TRUE, emails=[joe@doe.com, joedoe@gmail.com], biils=[123,10, 99.99]}
 ----
-<1> By default the delimiter/separator is `,` to split items in a cell. There is an option to change this behavior. Since we use `:` between items, we need to tell Poiji to use `;` as a separator.
+<1> By default the delimiter/separator is `,` to split items in a cell. There is an option to change this behavior. Since we use `;` between items, we need to tell Poiji to use `;` as a separator.
 
 By default, Poiji ignores the header row of the excel data. If you want to ignore the first row of data, you need to use `PoijiOptions`.
 
@@ -181,7 +181,7 @@ By default, Poiji ignores the header row of the excel data. If you want to ignor
 PoijiOptions options = PoijiOptionsBuilder.settings(1).build(); // we eliminate Joe Doe.
 List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class, options);
 Employee firstEmployee = employees.get(0);
-// Employee{rowIndex=2, employeeId=123123, name='Sophie', surname='Derue', age=20, single=true, birthday='5/3/1997'}
+// Employee{rowIndex=2, employeeId=123123, name='Sophie', surname='Derue', age=20, single=true, emails=[sophie.derue@gmail.com, sophie@derue.com], biils=[1022]}
 ----
 
 By default, Poiji selects the first sheet of an excel file. You can override this behaviour like below:
