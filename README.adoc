@@ -598,7 +598,9 @@ This is the excel file we want to parse:
 |===
 
 The object corresponding to the first row of the excel sheet then has a map with `{ENCODING=mp3, BITRATE=256}`
-and the one for the second row has `{ENCODING=flac, BITRATE=1500}`.
+and the one for the second row has `{ENCODING=flac, BITRATE=1500}`. 
+
+Note that If you use the `PoijiOptionsBuilder#caseInsensitive(true)` option, the ExcelUnknownCells map will be parsed with lowercase.
 
 === Feature 10
 
