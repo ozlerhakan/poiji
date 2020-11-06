@@ -36,6 +36,7 @@ public final class PoijiOptions {
     private DateTimeFormatter dateTimeFormatter;
     private Casting casting;
     private int headerStart;
+    private int headerCount;
     private String sheetName;
     private boolean caseInsensitive;
     private boolean ignoreWhitespaces;
@@ -203,8 +204,17 @@ public final class PoijiOptions {
         return headerStart;
     }
 
+    public int getHeaderCount() {
+        return headerCount;
+    }
+
     private PoijiOptions setHeaderStart(int headerStart) {
         this.headerStart = headerStart;
+        return this;
+    }
+
+    private PoijiOptions setHeaderCount(int headerCount) {
+        this.headerCount = headerCount;
         return this;
     }
 
@@ -289,6 +299,7 @@ public final class PoijiOptions {
         private PoijiLogCellFormat cellFormat;
         private PoijiNumberFormat numberFormat;
         private int headerStart = 0;
+        private int headerCount = 1;
         private int skip = 1;
         private int limit = 0;
         private String sheetName;
@@ -372,7 +383,7 @@ public final class PoijiOptions {
 
         public PoijiOptions build() {
             return new PoijiOptions()
-                    .setSkip(skip + headerStart)
+                    .setSkip(skip + headerStart + headerCount - 1)
                     .setPassword(password)
                     .setPreferNullOverDefault(preferNullOverDefault)
                     .setDatePattern(datePattern)
@@ -386,6 +397,7 @@ public final class PoijiOptions {
                     .setDateTimeRegex(dateTimeRegex)
                     .setDateLenient(dateLenient)
                     .setHeaderStart(headerStart)
+                    .setHeaderCount(headerCount)
                     .setCasting(casting)
                     .setLimit(limit)
                     .setPoijiLogCellFormat(cellFormat)
@@ -540,17 +552,32 @@ public final class PoijiOptions {
          * This is to set the row which the unmarshall will
          * use to start reading header titles, incase the
          * header is not in row 0.
-         * <br/>
-         * Set -1 to indicate that no header in the excel file.
          *
          * @param headerStart an index number of the excel header to start reading header
          * @return this
          */
         public PoijiOptionsBuilder headerStart(int headerStart) {
-            if (headerStart < -1) {
-                throw new PoijiException("Header index must be greater than -1");
+            if (headerStart < 0) {
+                throw new PoijiException("Header index must be greater than 0");
             }
             this.headerStart = headerStart;
+            return this;
+        }
+
+        /**
+         * This is to set the number of row contains headers
+         * <br/>
+         * Set 0 to indicate that no header in the excel file.
+         * Default - 1.
+         *
+         * @param headerCount an index number of the excel header to start reading header
+         * @return this
+         */
+        public PoijiOptionsBuilder headerCount(int headerCount) {
+            if (headerCount < 0) {
+                throw new PoijiException("Number of header row must be greater than 0");
+            }
+            this.headerCount = headerCount;
             return this;
         }
 

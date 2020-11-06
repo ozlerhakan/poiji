@@ -38,7 +38,8 @@ public class NoHeaderExcelSheetTest {
     @Test
     public void shouldRetrieveDataWithNoHeaderLimit1Row() {
         PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
-                .headerStart(-1)
+                .headerStart(0)
+                .headerCount(0)
                 .limit(1)
                 .trimCellValue(true)
                 .build();
@@ -56,7 +57,8 @@ public class NoHeaderExcelSheetTest {
     @Test
     public void shouldRetrieveDataWithNoHeaderLimit1RowAndSkip1Row() {
         PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
-                .headerStart(-1)
+                .headerStart(0)
+                .headerCount(0)
                 .skip(1)
                 .limit(1)
                 .trimCellValue(true)

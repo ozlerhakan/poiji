@@ -128,15 +128,19 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
     private void loadColumnTitles(Sheet sheet, int maxPhysicalNumberOfRows) {
         if (maxPhysicalNumberOfRows > 0) {
             int row = options.getHeaderStart();
-            if (row == -1) {
+            int headerCount = options.getHeaderCount();
+            if (headerCount == 0) {
                 return;
             }
-            Row firstRow = sheet.getRow(row);
-            for (Cell cell : firstRow) {
-                final int columnIndex = cell.getColumnIndex();
-                final String titleName = formatting.transform(options, cell.getStringCellValue());
-                indexToTitle.put(columnIndex, getTitleNameForMap(titleName, columnIndex));
-                titleToIndex.put(titleName, columnIndex);
+
+            for (short i = 0; i < headerCount; i++) {
+                Row firstRow = sheet.getRow(row + i);
+                for (Cell cell : firstRow) {
+                    final int columnIndex = cell.getColumnIndex();
+                    final String titleName = formatting.transform(options, cell.getStringCellValue());
+                    indexToTitle.put(columnIndex, getTitleNameForMap(titleName, columnIndex));
+                    titleToIndex.put(titleName, columnIndex);
+                }
             }
         }
     }

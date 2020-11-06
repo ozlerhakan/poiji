@@ -201,9 +201,10 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     public void cell(String cellReference, String formattedValue, XSSFComment comment) {
         final CellAddress cellAddress = new CellAddress(cellReference);
         int row = cellAddress.getRow();
-        int header = options.getHeaderStart();
+        int headerStart = options.getHeaderStart();
+        int headerCount = options.getHeaderCount();
         int column = cellAddress.getColumn();
-        if (row == header) {
+        if (row >= headerStart && row < headerStart + headerCount) {
             String transformedValue = formatting.transform(options, formattedValue);
             titleToIndex.put(transformedValue, column);
             indexToTitle.put(column, getTitleNameForMap(transformedValue, column));
