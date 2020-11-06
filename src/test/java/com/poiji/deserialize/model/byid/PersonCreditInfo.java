@@ -64,7 +64,7 @@ public class PersonCreditInfo {
         private String type;
         @ExcelCellName("Last 4 Digits")
         private String last4Digits;
-        @ExcelCellName("Expriration Date")
+        @ExcelCellName("Expiration Date")
         private String expirationDate;
 
         public String getType() {
