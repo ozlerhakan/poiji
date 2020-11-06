@@ -373,79 +373,77 @@ Car car = cars.get(0);
 Consider you have a table like below:
 
 |===
-3+|Group A 3+| Group B
-|NameA | AgeA | CityA | NameB | AgeB | CityB
+.2+|No. 5+|Personal Information 3+| Credit Card Information
+|Name | Age | City | State | Zip Code | Card Type | Last 4 Digits | Expiration Date
 
+|1
 |John Doe
 |21
 |Vienna
-|Smith Michael
-|32
-|McLean
+|Virginia
+|22349
+|VISA
+|1234
+|Jan-21
 
+|2
 |Jane Doe
 |28
 |Greenbelt
-|Sean Paul
-|25
-|Los Angeles
+|Maryland
+|20993
+|MasterCard
+|2345
+|Jun-22
 
+|3
 |Paul Ryan
 |19
 |Alexandria
-|John Peter
-|25
-|Vienna
-
-|Peter Pan
-|23
-|Alexandria
-|Arnold Regan
-|35
-|Seattle
+|Virginia
+|22312
+|JCB
+|4567
+|Oct-24
 
 |===
 
-The `ExcelCellRange` annotation lets us aggregate a range of information in one object model. In this case, we collect the details of the first person in `classA` and for second person in `classB`:
+The `ExcelCellRange` annotation lets us aggregate a range of information in one object model. In this case, we collect the data in `PersonCreditInfo` plus details of the person in `PersonInfo` and for the credit card in `CardInfo`:
 
 [source,java]
 ----
-public class Groups {
+public class PersonCreditInfo {
 
-  @ExcelCellRange
-  private GroupA groupA;
+    @ExcelCellName("No.")
+    private Integer no;
 
-  @ExcelCellRange
-  private GroupB groupB;
+    @ExcelCellRange
+    private PersonInfo personInfo;
 
-}
-----
+    @ExcelCellRange
+    private CardInfo cardInfo;
 
-[source, java]
-----
-public class GroupA {
+    public static class PersonInfo {
+        @ExcelCellName("Name")
+        private String name;
+        @ExcelCellName("Age")
+        private Integer age;
+        @ExcelCellName("City")
+        private String city;
+        @ExcelCellName("State")
+        private String state;
+        @ExcelCellName("Zip Code")
+        private String zipCode;
+    }
 
-    @ExcelCellName("NameA")
-    private String name;
-
-    @ExcelCellName("AgeA")
-    private Integer age;
-
-    @ExcelCellName("CityA")
-    private String city;
-
-}
-
-public class GroupB {
-
-    @ExcelCellName("NameB")
-    private String name;
-
-    @ExcelCellName("AgeB")
-    private Integer age;
-
-    @ExcelCellName("CityB")
-    private String city;
+    public static class CardInfo {
+        @ExcelCellName("Card Type")
+        private String type;
+        @ExcelCellName("Last 4 Digits")
+        private String last4Digits;
+        @ExcelCellName("Expiration Date")
+        private String expirationDate;
+    }
 }
 ----
 
@@ -453,13 +451,12 @@ Using the conventional way, we can retrieve the data using `Poiji.fromExcel`:
 
 [source,java]
 ----
-PoijiOptions options = PoijiOptionsBuilder.settings().headerStart(1).build(); // header starts at 1 (zero-based).
-List<Groups> groups = Poiji.fromExcel(new File(excel), Groups.class, options);
+PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().headerCount(2).build();
+List<PersonCreditInfo> actualPersonalCredits = Poiji.fromExcel(new File(path), PersonCreditInfo.class, options);
 
-Groups firstRowGroups = actualGroups.get(0);
-
-GroupA firstRowPerson1 = firstRowGroups.getGroupA();
-GroupB secondRowPerson2 = firstRowGroups.getGroupB();
+PersonCreditInfo personCreditInfo1 = actualPersonalCredits.get(0);
+PersonCreditInfo.PersonInfo expectedPerson1 = personCreditInfo1.getPersonInfo();
+PersonCreditInfo.CardInfo expectedCard1 = personCreditInfo1.getCardInfo();
 ----
 
 === Feature 7
@@ -823,96 +820,6 @@ Sheet sheet = workbook.getSheetAt(0);
 
 List<Model> result = Poiji.fromExcel(sheet, Model.class);
 ----
-
-=== Feature 17
-
-Consider you have a table like below:
-
-|===
-.2+|No. 5+|Personal Information 3+| Credit Card Information
-|Name | Age | City | State | Zip Code | Card Type | Last 4 Digits | Expiration Date
-
-|1
-|John Doe
-|21
-|Vienna
-|Virginia
-|22349
-|VISA
-|1234
-|Jan-21
-
-|2
-|Jane Doe
-|28
-|Greenbelt
-|Maryland
-|20993
-|MasterCard
-|2345
-|Jun-22
-
-|3
-|Paul Ryan
-|19
-|Alexandria
-|Virginia
-|22312
-|JCB
-|4567
-|Oct-24
-
-|===
-
-In this case, we collect data in `PersonCreditInfo` class in conventional way
-[source,java]
-----
-public class PersonCreditInfo {
-
-    @ExcelCellName("No.")
-    private Integer no;
-
-    @ExcelCellRange
-    private PersonInfo personInfo;
-
-    @ExcelCellRange
-    private CardInfo cardInfo;
-
-    public static class PersonInfo {
-        @ExcelCellName("Name")
-        private String name;
-        @ExcelCellName("Age")
-        private Integer age;
-        @ExcelCellName("City")
-        private String city;
-        @ExcelCellName("State")
-        private String state;
-        @ExcelCellName("Zip Code")
-        private String zipCode;
-    }
-
-    public static class CardInfo {
-        @ExcelCellName("Card Type")
-        private String type;
-        @ExcelCellName("Last 4 Digits")
-        private String last4Digits;
-        @ExcelCellName("Expiration Date")
-        private String expirationDate;
-    }
-}
-----
-
-[source,java]
-----
-PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().headerCount(2).build();
-List<PersonCreditInfo> actualPersonalCredits = Poiji.fromExcel(new File(path), PersonCreditInfo.class, options);
-
-PersonCreditInfo personCreditInfo1 = actualPersonalCredits.get(0);
-PersonCreditInfo.PersonInfo expectedPerson1 = personCreditInfo1.getPersonInfo();
-PersonCreditInfo.CardInfo expectedCard1 = personCreditInfo1.getCardInfo();
-----
-
-
 
 == Stargazers over time
 
