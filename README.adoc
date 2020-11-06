@@ -824,6 +824,96 @@ Sheet sheet = workbook.getSheetAt(0);
 List<Model> result = Poiji.fromExcel(sheet, Model.class);
 ----
 
+=== Feature 17
+
+Consider you have a table like below:
+
+|===
+.2+|No. 5+|Personal Information 3+| Credit Card Information
+|Name | Age | City | State | Zip Code | Card Type | Last 4 Digits | Expiration Date
+
+|1
+|John Doe
+|21
+|Vienna
+|Virginia
+|22349
+|VISA
+|1234
+|Jan-21
+
+|2
+|Jane Doe
+|28
+|Greenbelt
+|Maryland
+|20993
+|MasterCard
+|2345
+|Jun-22
+
+|3
+|Paul Ryan
+|19
+|Alexandria
+|Virginia
+|22312
+|JCB
+|4567
+|Oct-24
+
+|===
+
+In this case, we collect data in `PersonCreditInfo` class in conventional way
+[source,java]
+----
+public class PersonCreditInfo {
+
+    @ExcelCellName("No.")
+    private Integer no;
+
+    @ExcelCellRange
+    private PersonInfo personInfo;
+
+    @ExcelCellRange
+    private CardInfo cardInfo;
+
+    public static class PersonInfo {
+        @ExcelCellName("Name")
+        private String name;
+        @ExcelCellName("Age")
+        private Integer age;
+        @ExcelCellName("City")
+        private String city;
+        @ExcelCellName("State")
+        private String state;
+        @ExcelCellName("Zip Code")
+        private String zipCode;
+    }
+
+    public static class CardInfo {
+        @ExcelCellName("Card Type")
+        private String type;
+        @ExcelCellName("Last 4 Digits")
+        private String last4Digits;
+        @ExcelCellName("Expiration Date")
+        private String expirationDate;
+    }
+}
+----
+
+[source,java]
+----
+PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().headerCount(2).build();
+List<PersonCreditInfo> actualPersonalCredits = Poiji.fromExcel(new File(path), PersonCreditInfo.class, options);
+
+PersonCreditInfo personCreditInfo1 = actualPersonalCredits.get(0);
+PersonCreditInfo.PersonInfo expectedPerson1 = personCreditInfo1.getPersonInfo();
+PersonCreditInfo.CardInfo expectedCard1 = personCreditInfo1.getCardInfo();
+----
+
+
+
 == Stargazers over time
 
 image:https://starcharts.herokuapp.com/ozlerhakan/poiji.svg["Stargazers over time", link="https://starcharts.herokuapp.com/ozlerhakan/poiji"]
