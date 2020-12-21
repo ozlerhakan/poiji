@@ -1,6 +1,9 @@
 package com.poiji.parser;
 
+import com.poiji.option.PoijiOptions;
+
 import java.text.NumberFormat;
+import java.util.Locale;
 
 /**
  * @see <a href="https://www.ibm.com/developerworks/library/j-numberformat/index.html">Resolving NumberFormat's parsing issues</a>
@@ -25,8 +28,8 @@ public class Parsers {
         return new BigDecimalParser();
     }
 
-    public static NumberParser numbers() {
-        return new NumberParser(NumberFormat.getInstance());
+    public static NumberParser numbers(Locale locale) {
+        return new NumberParser(NumberFormat.getInstance(locale));
     }
 
     public static BooleanParser booleans() {

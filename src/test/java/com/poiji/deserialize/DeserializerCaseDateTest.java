@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -59,6 +60,33 @@ public class DeserializerCaseDateTest {
             assertThat(row.getDate1(), is("12/31/2020 12.00 AM"));
             assertThat(row.getDate2(), is("11/09/2015 12.00 AM"));
             assertThat(row.getDate3(), is("11/09/2015 12.00 AM"));
+
+            assertThat(numberFormat.getNumberFormatAt((short) 47), is("mm/dd/yyyy hh.mm aa"));
+            assertThat(numberFormat.getNumberFormatAt((short) 22), is("mm/dd/yyyy hh.mm aa"));
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldMapExcelToJavaWithNonDefaultLocale() {
+        Locale userLocale = Locale.GERMANY;
+        try (InputStream stream = new FileInputStream(new File(path))) {
+            PoijiNumberFormat numberFormat = new PoijiNumberFormat();
+            numberFormat.putNumberFormat((short) 47, "mm/dd/yyyy hh.mm aa");
+            numberFormat.putNumberFormat((short) 22, "mm/dd/yyyy hh.mm aa");
+
+            PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                    .poijiNumberFormat(numberFormat)
+                    .setLocale(userLocale)
+                    .build();
+
+            List<DateExcelColumn> rows = Poiji.fromExcel(stream, poijiExcelType, DateExcelColumn.class, options);
+
+            DateExcelColumn row = rows.get(0);
+            assertThat(row.getDate1(), is("12/31/2020 12.00 vorm."));
+            assertThat(row.getDate2(), is("11/09/2015 12.00 vorm."));
+            assertThat(row.getDate3(), is("11/09/2015 12.00 vorm."));
 
             assertThat(numberFormat.getNumberFormatAt((short) 47), is("mm/dd/yyyy hh.mm aa"));
             assertThat(numberFormat.getNumberFormatAt((short) 22), is("mm/dd/yyyy hh.mm aa"));

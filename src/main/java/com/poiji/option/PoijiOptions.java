@@ -8,8 +8,10 @@ import com.poiji.config.DefaultCasting;
 import com.poiji.config.DefaultFormatting;
 import com.poiji.config.Formatting;
 import com.poiji.exception.PoijiException;
+import org.apache.poi.util.LocaleUtil;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Objects;
 
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_FORMATTER;
@@ -46,6 +48,7 @@ public final class PoijiOptions {
     private boolean disableXLSXNumberCellFormat;
     private String listDelimiter;
     private Formatting formatting;
+    private Locale locale;
 
     public PoijiNumberFormat getPoijiNumberFormat() {
         return numberFormat;
@@ -281,6 +284,16 @@ public final class PoijiOptions {
         return this;
     }
 
+    public Locale getLocale() {
+        return this.locale;
+    }
+
+    private PoijiOptions setLocale(Locale locale) {
+        this.locale = locale;
+        LocaleUtil.setUserLocale(locale);
+        return this;
+    }
+
     public static class PoijiOptionsBuilder {
 
         private int sheetIndex;
@@ -308,6 +321,7 @@ public final class PoijiOptions {
         private boolean namedHeaderMandatory;
         private boolean disabledXLSXNumberCellFormat;
         private String listDelimiter = ",";
+        private Locale locale = Locale.US;
 
         private PoijiOptionsBuilder() {
         }
@@ -381,6 +395,18 @@ public final class PoijiOptions {
             return this;
         }
 
+        /**
+         * Set the {@link Locale} used by Apache Poi and PoiJ. Default is {@link Locale#ENGLISH}.
+         * This setting is only used by Apache Poi thread and PoiJ. See {@link org.apache.poi.util.LocaleUtil}
+         * for more details.
+         * @param locale Locale
+         * @return this
+         */
+        public PoijiOptionsBuilder setLocale(Locale locale) {
+            this.locale = locale;
+            return this;
+        }
+
         public PoijiOptions build() {
             return new PoijiOptions()
                     .setSkip(skip + headerStart + headerCount - 1)
@@ -407,7 +433,8 @@ public final class PoijiOptions {
                     .setNamedHeaderMandatory(namedHeaderMandatory)
                     .disableXLSXNumberCellFormat(disabledXLSXNumberCellFormat)
                     .setListDelimiter(listDelimiter)
-                    .setFormatting(formatting);
+                    .setFormatting(formatting)
+                    .setLocale(locale);
         }
 
         /**

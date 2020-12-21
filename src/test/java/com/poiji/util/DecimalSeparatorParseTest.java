@@ -55,6 +55,23 @@ public class DecimalSeparatorParseTest {
         parseAndVerify();
     }
 
+    @Test
+    public void testCustomLocaleSet() {
+        InputStream inputStream = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream(FILENAME);
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .preferNullOverDefault(true)
+                .setLocale(Locale.GERMANY)
+                .build();
+
+        List<Row> parsedRows = Poiji.fromExcel(inputStream, PoijiExcelType.XLSX, Row.class, options);
+
+        assertThat(parsedRows.size(), is(3));
+        assertThat(parsedRows.get(0).decimalNumber, is(1.5));
+        assertThat(parsedRows.get(1).decimalNumber, is(1000.0));
+        assertThat(parsedRows.get(2).decimalNumber, is(123456.79));
+    }
+
     private void parseAndVerify() {
         InputStream inputStream = Thread.currentThread().getContextClassLoader()
                 .getResourceAsStream(FILENAME);
