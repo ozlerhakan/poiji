@@ -13,7 +13,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -84,9 +87,18 @@ public class DeserializerCaseDateTest {
             List<DateExcelColumn> rows = Poiji.fromExcel(stream, poijiExcelType, DateExcelColumn.class, options);
 
             DateExcelColumn row = rows.get(0);
-            assertThat(row.getDate1(), is("12/31/2020 12.00 vorm."));
-            assertThat(row.getDate2(), is("11/09/2015 12.00 vorm."));
-            assertThat(row.getDate3(), is("11/09/2015 12.00 vorm."));
+
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh.mm aa", userLocale);
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(2020, 11,31, 0, 00);
+            String expectedValueCol1 = sdf.format(calendar.getTime());
+            calendar.set(2015, 10,9, 0, 00);
+            String expectedValueCol2And3 = sdf.format(calendar.getTime());
+
+
+            assertThat(row.getDate1(), is(expectedValueCol1));
+            assertThat(row.getDate2(), is(expectedValueCol2And3));
+            assertThat(row.getDate3(), is(expectedValueCol2And3));
 
             assertThat(numberFormat.getNumberFormatAt((short) 47), is("mm/dd/yyyy hh.mm aa"));
             assertThat(numberFormat.getNumberFormatAt((short) 22), is("mm/dd/yyyy hh.mm aa"));
