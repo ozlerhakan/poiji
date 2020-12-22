@@ -10,6 +10,7 @@ import com.poiji.config.Formatting;
 import com.poiji.exception.PoijiException;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Objects;
 
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_FORMATTER;
@@ -46,6 +47,16 @@ public final class PoijiOptions {
     private boolean disableXLSXNumberCellFormat;
     private String listDelimiter;
     private Formatting formatting;
+    private List columnsToKeep;
+
+    public List getColumnsToKeep() {
+        return columnsToKeep;
+    }
+
+    private PoijiOptions setColumnsToKeep(List columnsToKeep) {
+        this.columnsToKeep = columnsToKeep;
+        return this;
+    }
 
     public PoijiNumberFormat getPoijiNumberFormat() {
         return numberFormat;
@@ -69,7 +80,7 @@ public final class PoijiOptions {
         super();
     }
 
-    private PoijiOptions setSkip(int skip) {
+    public PoijiOptions setSkip(int skip) {
         this.skip = skip;
         return this;
     }
@@ -208,7 +219,7 @@ public final class PoijiOptions {
         return headerCount;
     }
 
-    private PoijiOptions setHeaderStart(int headerStart) {
+    public PoijiOptions setHeaderStart(int headerStart) {
         this.headerStart = headerStart;
         return this;
     }
@@ -308,6 +319,7 @@ public final class PoijiOptions {
         private boolean namedHeaderMandatory;
         private boolean disabledXLSXNumberCellFormat;
         private String listDelimiter = ",";
+        private List columnsToKeep;
 
         private PoijiOptionsBuilder() {
         }
@@ -407,7 +419,8 @@ public final class PoijiOptions {
                     .setNamedHeaderMandatory(namedHeaderMandatory)
                     .disableXLSXNumberCellFormat(disabledXLSXNumberCellFormat)
                     .setListDelimiter(listDelimiter)
-                    .setFormatting(formatting);
+                    .setFormatting(formatting)
+                    .setColumnsToKeep(columnsToKeep);
         }
 
         /**
@@ -626,8 +639,18 @@ public final class PoijiOptions {
 
         /**
          * Set true if all headers named in {@link ExcelCellName} are mandatory, otherwise false
+         * This feature needs headerstart and skip as mandatory parameters
+         * @param columnsToKeep the headers that should be included
+         */
+        public PoijiOptionsBuilder columnsToKeep(List columnsToKeep) {
+            this.columnsToKeep = columnsToKeep;
+            return this;
+        }
+
+        /**
+         * Provide columns to keep in case of repeated headers
          *
-         * @param namedHeaderMandatory fieldas are mandatory or not
+         * @param namedHeaderMandatory
          */
         public PoijiOptionsBuilder namedHeaderMandatory(boolean namedHeaderMandatory) {
             this.namedHeaderMandatory = namedHeaderMandatory;
