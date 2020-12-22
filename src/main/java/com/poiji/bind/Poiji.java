@@ -1,695 +1,402 @@
-package com.poiji.option;
+package com.poiji.bind;
 
-import com.poiji.annotation.ExcelCellName;
-import com.poiji.bind.mapping.PoijiLogCellFormat;
-import com.poiji.bind.mapping.PoijiNumberFormat;
-import com.poiji.config.Casting;
-import com.poiji.config.DefaultCasting;
-import com.poiji.config.DefaultFormatting;
-import com.poiji.config.Formatting;
+import com.poiji.bind.mapping.HSSFPropertyFile;
+import com.poiji.bind.mapping.HSSFPropertyStream;
+import com.poiji.bind.mapping.PoijiPropertyHelper;
+import com.poiji.bind.mapping.UnmarshallerHelper;
+import com.poiji.bind.mapping.SheetColumns;
+import com.poiji.exception.IllegalCastException;
+import com.poiji.exception.InvalidExcelFileExtension;
+import com.poiji.exception.PoijiExcelType;
 import com.poiji.exception.PoijiException;
+import com.poiji.option.PoijiOptions;
+import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
+import com.poiji.util.Files;
+import org.apache.poi.ss.usermodel.Sheet;
 
-import java.time.format.DateTimeFormatter;
+import java.io.File;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
-import static com.poiji.util.PoijiConstants.DEFAULT_DATE_FORMATTER;
-import static com.poiji.util.PoijiConstants.DEFAULT_DATE_PATTERN;
-import static com.poiji.util.PoijiConstants.DEFAULT_DATE_TIME_FORMATTER;
+import static com.poiji.util.PoijiConstants.XLSX_EXTENSION;
+import static com.poiji.util.PoijiConstants.XLS_EXTENSION;
 
 /**
- * Created by hakan on 17/01/2017.
+ * The entry point of the mapping process.
+ * <p>
+ * Example:
+ * <pre>
+ * List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class);
+ * employees.size();
+ * // 3
+ * Employee firstEmployee = employees.get(0);
+ * // Employee{employeeId=123923, name='Joe', surname='Doe', age=30, single=true, birthday='4/9/1987'}
+ * </pre>
+ * <p>
+ * Created by hakan on 16/01/2017.
  */
-public final class PoijiOptions {
+public final class Poiji {
 
-    private int skip;
-    private int limit;
-    private int sheetIndex;
-    private String password;
-    private String dateRegex;
-    private String dateTimeRegex;
-    private String datePattern;
-    private boolean dateLenient;
-    private boolean trimCellValue;
-    private boolean ignoreHiddenSheets;
-    private boolean preferNullOverDefault;
-    private DateTimeFormatter dateFormatter;
-    private DateTimeFormatter dateTimeFormatter;
-    private Casting casting;
-    private int headerStart;
-    private int headerCount;
-    private String sheetName;
-    private boolean caseInsensitive;
-    private boolean ignoreWhitespaces;
-    private PoijiLogCellFormat poijiLogCellFormat;
-    private PoijiNumberFormat numberFormat;
-    private boolean namedHeaderMandatory;
-    private boolean disableXLSXNumberCellFormat;
-    private String listDelimiter;
-    private Formatting formatting;
-    private List columnsToKeep;
+    private static final Files files = Files.getInstance();
 
-    public List getColumnsToKeep() {
-        return columnsToKeep;
-    }
-
-    private PoijiOptions setColumnsToKeep(List columnsToKeep) {
-        this.columnsToKeep = columnsToKeep;
-        return this;
-    }
-
-    public PoijiNumberFormat getPoijiNumberFormat() {
-        return numberFormat;
-    }
-
-    private PoijiOptions setPoijiNumberFormat(PoijiNumberFormat numberFormat) {
-        this.numberFormat = numberFormat;
-        return this;
-    }
-
-    public PoijiLogCellFormat getPoijiCellFormat() {
-        return poijiLogCellFormat;
-    }
-
-    private PoijiOptions setPoijiLogCellFormat(PoijiLogCellFormat poijiLogCellFormat) {
-        this.poijiLogCellFormat = poijiLogCellFormat;
-        return this;
-    }
-
-    private PoijiOptions() {
-        super();
-    }
-
-    public PoijiOptions setSkip(int skip) {
-        this.skip = skip;
-        return this;
-    }
-
-    public int getLimit() {
-        return limit;
-    }
-
-    public PoijiOptions setLimit(int limit) {
-        this.limit = limit;
-        return this;
-    }
-
-    private PoijiOptions setDatePattern(String datePattern) {
-        this.datePattern = datePattern;
-        return this;
-    }
-
-    private PoijiOptions setDateFormatter(DateTimeFormatter dateFormatter) {
-        this.dateFormatter = dateFormatter;
-        return this;
-    }
-
-    private PoijiOptions setDateTimeFormatter(DateTimeFormatter dateTimeFormatter) {
-        this.dateTimeFormatter = dateTimeFormatter;
-        return this;
-    }
-
-    private PoijiOptions setPreferNullOverDefault(boolean preferNullOverDefault) {
-        this.preferNullOverDefault = preferNullOverDefault;
-        return this;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    private PoijiOptions setPassword(String password) {
-        this.password = password;
-        return this;
-    }
-
-    public String datePattern() {
-        return datePattern;
-    }
-
-    public DateTimeFormatter dateFormatter() {
-        return dateFormatter;
-    }
-
-    public DateTimeFormatter dateTimeFormatter() {
-        return dateTimeFormatter;
-    }
-
-    public boolean preferNullOverDefault() {
-        return preferNullOverDefault;
+    private Poiji() {
     }
 
     /**
-     * the number of skipped rows
+     * converts excel properties into an object
      *
-     * @return n rows skipped
+     * @param file excel file ending with .xlsx.
+     * @param type type of the root object.
+     * @param <T>  type of the root object.
+     * @return the newly created objects
+     * @throws PoijiException            if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     * @see Poiji#fromExcelProperties(File, Class, PoijiOptions)
      */
-    public int skip() {
-        return skip;
+    public static <T> T fromExcelProperties(final File file, final Class<T> type) {
+        return fromExcelProperties(file, type, PoijiOptionsBuilder.settings().build());
     }
 
-    public boolean ignoreHiddenSheets() {
-        return ignoreHiddenSheets;
+    /**
+     * converts excel properties into an object
+     *
+     * @param inputStream excel file stream
+     * @param excelType   type of the excel file, xlsx only!
+     * @param type        type of the root object.
+     * @param <T>         type of the root object.
+     * @return the newly created object
+     * @throws PoijiException            if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     * @see Poiji#fromExcelProperties(InputStream, PoijiExcelType, Class, PoijiOptions)
+     */
+    public static <T> T fromExcelProperties(final InputStream inputStream,
+                                            PoijiExcelType excelType,
+                                            final Class<T> type) {
+        return fromExcelProperties(inputStream, excelType, type, PoijiOptionsBuilder.settings().build());
     }
 
-    private PoijiOptions setIgnoreHiddenSheets(boolean ignoreHiddenSheets) {
-        this.ignoreHiddenSheets = ignoreHiddenSheets;
-        return this;
+    /**
+     * converts excel properties into an object
+     *
+     * @param file    excel file ending with .xlsx.
+     * @param type    type of the root object.
+     * @param <T>     type of the root object.
+     * @param options specifies to change the default behaviour of the poiji. In this case, only the password has an effect
+     * @return the newly created object
+     * @throws PoijiException            if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     * @see Poiji#fromExcelProperties(File, Class)
+     */
+    public static <T> T fromExcelProperties(final File file, final Class<T> type, final PoijiOptions options) {
+        HSSFPropertyFile hssfPropertyFile = deserializerPropertyFile(file, options);
+        return hssfPropertyFile.unmarshal(type);
     }
 
-    public boolean trimCellValue() {
-        return trimCellValue;
-    }
-
-    public PoijiOptions setTrimCellValue(boolean trimCellValue) {
-        this.trimCellValue = trimCellValue;
-        return this;
-    }
-
-    public Casting getCasting() {
-        return casting;
-    }
-
-    public PoijiOptions setCasting(Casting casting) {
-        this.casting = casting;
-        return this;
-    }
-
-    private PoijiOptions setSheetIndex(int sheetIndex) {
-        this.sheetIndex = sheetIndex;
-        return this;
-    }
-
-    public int sheetIndex() {
-        return sheetIndex;
-    }
-
-    public String getDateRegex() {
-        return dateRegex;
-    }
-
-    private PoijiOptions setDateRegex(String dateRegex) {
-        this.dateRegex = dateRegex;
-        return this;
-    }
-
-    public String getDateTimeRegex() {
-        return dateTimeRegex;
-    }
-
-    private PoijiOptions setDateTimeRegex(String dateTimeRegex) {
-        this.dateTimeRegex = dateTimeRegex;
-        return this;
-    }
-
-    public boolean getDateLenient() {
-        return dateLenient;
-    }
-
-    private PoijiOptions setDateLenient(boolean dateLenient) {
-        this.dateLenient = dateLenient;
-        return this;
-    }
-
-    public int getHeaderStart() {
-        return headerStart;
-    }
-
-    public int getHeaderCount() {
-        return headerCount;
-    }
-
-    public PoijiOptions setHeaderStart(int headerStart) {
-        this.headerStart = headerStart;
-        return this;
-    }
-
-    private PoijiOptions setHeaderCount(int headerCount) {
-        this.headerCount = headerCount;
-        return this;
-    }
-
-    private PoijiOptions setSheetName(String sheetName) {
-        this.sheetName = sheetName;
-        return this;
-    }
-
-    public String getSheetName() {
-        return sheetName;
-    }
-
-    public boolean getCaseInsensitive() {
-        return caseInsensitive;
-    }
-
-    private PoijiOptions setCaseInsensitive(final boolean caseInsensitive) {
-        this.caseInsensitive = caseInsensitive;
-        return this;
-    }
-
-    public boolean getIgnoreWhitespaces() {
-        return ignoreWhitespaces;
-    }
-
-    private PoijiOptions setIgnoreWhitespaces(final boolean ignoreWhitespaces) {
-        this.ignoreWhitespaces = ignoreWhitespaces;
-        return this;
-    }
-
-    public boolean getNamedHeaderMandatory() {
-        return namedHeaderMandatory;
-    }
-
-    private PoijiOptions setNamedHeaderMandatory(boolean namedHeaderMandatory) {
-        this.namedHeaderMandatory = namedHeaderMandatory;
-        return this;
-    }
-
-    private PoijiOptions disableXLSXNumberCellFormat(boolean disableXLSXNumberCellFormat) {
-        this.disableXLSXNumberCellFormat = disableXLSXNumberCellFormat;
-        return this;
-    }
-
-    public boolean isDisableXLSXNumberCellFormat() {
-        return disableXLSXNumberCellFormat;
-    }
-
-    public String getListDelimiter() {
-        return listDelimiter;
-    }
-
-    private PoijiOptions setListDelimiter(String listDelimiter) {
-        this.listDelimiter = listDelimiter;
-        return this;
-    }
-
-    public Formatting getFormatting() {
-        return formatting;
-    }
-
-    private PoijiOptions setFormatting(Formatting formatting) {
-        this.formatting = formatting;
-        return this;
-    }
-
-    public static class PoijiOptionsBuilder {
-
-        private int sheetIndex;
-        private String password;
-        private String dateRegex;
-        private String dateTimeRegex;
-        private boolean dateLenient;
-        private boolean trimCellValue;
-        private boolean ignoreHiddenSheets;
-        private boolean preferNullOverDefault;
-        private String datePattern = DEFAULT_DATE_PATTERN;
-        private DateTimeFormatter dateFormatter = DEFAULT_DATE_FORMATTER;
-        private DateTimeFormatter dateTimeFormatter = DEFAULT_DATE_TIME_FORMATTER;
-        private Casting casting = new DefaultCasting();
-        private Formatting formatting = new DefaultFormatting();
-        private PoijiLogCellFormat cellFormat;
-        private PoijiNumberFormat numberFormat;
-        private int headerStart = 0;
-        private int headerCount = 1;
-        private int skip = 1;
-        private int limit = 0;
-        private String sheetName;
-        private boolean caseInsensitive;
-        private boolean ignoreWhitespaces;
-        private boolean namedHeaderMandatory;
-        private boolean disabledXLSXNumberCellFormat;
-        private String listDelimiter = ",";
-        private List columnsToKeep;
-
-        private PoijiOptionsBuilder() {
-        }
-
-        private PoijiOptionsBuilder(int skip) {
-            this.skip = skip;
-        }
-
-        /**
-         * Skip a number of rows after the header row. The header row is not counted.
-         *
-         * @param skip ignored row number after the header row
-         * @return builder itself
-         */
-        public static PoijiOptionsBuilder settings(int skip) {
-            if (skip <= 0) {
-                throw new PoijiException("Poiji already skips the header. Skip index must be greater than 1");
-            }
-            return new PoijiOptionsBuilder(skip + 1);
-        }
-
-        public static PoijiOptionsBuilder settings() {
-            return new PoijiOptionsBuilder();
-        }
-
-        /**
-         * set a date formatter, default date time formatter is "dd/M/yyyy"
-         * for java.time.LocalDate
-         *
-         * @param dateFormatter date time formatter
-         * @return this
-         */
-        public PoijiOptionsBuilder dateFormatter(DateTimeFormatter dateFormatter) {
-            this.dateFormatter = dateFormatter;
-            return this;
-        }
-
-        /**
-         * set a date time formatter, default date time formatter is "dd/M/yyyy HH:mm:ss"
-         * for java.time.LocalDateTime
-         *
-         * @param dateTimeFormatter date time formatter
-         * @return this
-         */
-        public PoijiOptionsBuilder dateTimeFormatter(DateTimeFormatter dateTimeFormatter) {
-            this.dateTimeFormatter = dateTimeFormatter;
-            return this;
-        }
-
-        /**
-         * set date pattern, default date format is "dd/M/yyyy" for
-         * java.util.Date
-         *
-         * @param datePattern date time formatter
-         * @return this
-         */
-        public PoijiOptionsBuilder datePattern(String datePattern) {
-            this.datePattern = datePattern;
-            return this;
-        }
-
-        /**
-         * set whether or not to use null instead of default values for Integer,
-         * Double, Float, Long, String and java.util.Date types.
-         *
-         * @param preferNullOverDefault boolean
-         * @return this
-         */
-        public PoijiOptionsBuilder preferNullOverDefault(boolean preferNullOverDefault) {
-            this.preferNullOverDefault = preferNullOverDefault;
-            return this;
-        }
-
-        public PoijiOptions build() {
-            return new PoijiOptions()
-                    .setSkip(skip + headerStart + headerCount - 1)
-                    .setPassword(password)
-                    .setPreferNullOverDefault(preferNullOverDefault)
-                    .setDatePattern(datePattern)
-                    .setDateFormatter(dateFormatter)
-                    .setDateTimeFormatter(dateTimeFormatter)
-                    .setSheetIndex(sheetIndex)
-                    .setSheetName(sheetName)
-                    .setIgnoreHiddenSheets(ignoreHiddenSheets)
-                    .setTrimCellValue(trimCellValue)
-                    .setDateRegex(dateRegex)
-                    .setDateTimeRegex(dateTimeRegex)
-                    .setDateLenient(dateLenient)
-                    .setHeaderStart(headerStart)
-                    .setHeaderCount(headerCount)
-                    .setCasting(casting)
-                    .setLimit(limit)
-                    .setPoijiLogCellFormat(cellFormat)
-                    .setPoijiNumberFormat(numberFormat)
-                    .setCaseInsensitive(caseInsensitive)
-                    .setIgnoreWhitespaces(ignoreWhitespaces)
-                    .setNamedHeaderMandatory(namedHeaderMandatory)
-                    .disableXLSXNumberCellFormat(disabledXLSXNumberCellFormat)
-                    .setListDelimiter(listDelimiter)
-                    .setFormatting(formatting)
-                    .setColumnsToKeep(columnsToKeep);
-        }
-
-        /**
-         * set sheet index, default is 0
-         *
-         * @param sheetIndex number
-         * @return this
-         */
-        public PoijiOptionsBuilder sheetIndex(int sheetIndex) {
-            if (sheetIndex < 0) {
-                throw new PoijiException("Sheet index must be greater than or equal to 0");
-            }
-            this.sheetIndex = sheetIndex;
-            return this;
-        }
-
-        /**
-         * Set the sheet Name
-         *
-         * @param sheetName excel sheet name
-         * @return this
-         */
-        public PoijiOptionsBuilder sheetName(String sheetName) {
-            this.sheetName = sheetName;
-            return this;
-        }
-
-        /**
-         * skip a number of rows after the header row. The header row is not counted.
-         *
-         * @param skip number
-         * @return this
-         */
-        public PoijiOptionsBuilder skip(int skip) {
-            if (skip <= 0) {
-                throw new PoijiException("Poiji already skips the header. Skip index must be greater than 1");
-            }
-            this.skip = skip + 1;
-            return this;
-        }
-
-        /**
-         * limit a number of rows after the header & skipped rows row. The header & skipped rows are not counted.
-         *
-         * @param limit number
-         * @return this
-         */
-
-        public PoijiOptionsBuilder limit(int limit) {
-            if (limit < 1) {
-                throw new PoijiException("limit must be greater than 0");
-            }
-            this.limit = limit;
-            return this;
-        }
-
-        /**
-         * set password for encrypted excel file, Default is null
-         *
-         * @param password excel password
-         * @return this
-         */
-        public PoijiOptionsBuilder password(String password) {
-            this.password = password;
-            return this;
-        }
-
-        /**
-         * Ignore hidden sheets
-         *
-         * @param ignoreHiddenSheets whether or not to ignore any hidden sheets
-         *                           in the work book.
-         * @return this
-         */
-        public PoijiOptionsBuilder ignoreHiddenSheets(boolean ignoreHiddenSheets) {
-            this.ignoreHiddenSheets = ignoreHiddenSheets;
-            return this;
-        }
-
-        /**
-         * Trim cell value
-         *
-         * @param trimCellValue trim the cell value before processing work book.
-         * @return this
-         */
-        public PoijiOptionsBuilder trimCellValue(boolean trimCellValue) {
-            this.trimCellValue = trimCellValue;
-            return this;
-        }
-
-        /**
-         * Date regex, if would like to specify a regex patter the date must be
-         * in, e.g.\\d{2}/\\d{1}/\\d{4}.
-         *
-         * @param dateRegex date regex pattern
-         * @return this
-         */
-        public PoijiOptionsBuilder dateRegex(String dateRegex) {
-            this.dateRegex = dateRegex;
-            return this;
-        }
-
-        /**
-         * DateTime regex, if would like to specify a regex patter the date time must be
-         * in, e.g.\\d{2}/\\d{1}/\\d{4} \\d{2}:\\d{2}:\\d{2}.
-         *
-         * @param dateTimeRegex date regex pattern
-         * @return this
-         */
-        public PoijiOptionsBuilder dateTimeRegex(String dateTimeRegex) {
-            this.dateTimeRegex = dateTimeRegex;
-            return this;
-        }
-
-        /**
-         * If the simple date format is lenient, use to
-         * set how strict the date formatting must be, defaults to lenient false.
-         * It works only for java.util.Date.
-         *
-         * @param dateLenient true or false
-         * @return this
-         */
-        public PoijiOptionsBuilder dateLenient(boolean dateLenient) {
-            this.dateLenient = dateLenient;
-            return this;
-        }
-
-        /**
-         * Use a custom casting implementation
-         *
-         * @param casting custom casting implementation
-         * @return this
-         */
-        public PoijiOptionsBuilder withCasting(Casting casting) {
-            Objects.requireNonNull(casting);
-
-            this.casting = casting;
-            return this;
-        }
-
-        /**
-         * This is to set the row which the unmarshall will
-         * use to start reading header titles, incase the
-         * header is not in row 0.
-         *
-         * @param headerStart an index number of the excel header to start reading header
-         * @return this
-         */
-        public PoijiOptionsBuilder headerStart(int headerStart) {
-            if (headerStart < 0) {
-                throw new PoijiException("Header index must be greater than 0");
-            }
-            this.headerStart = headerStart;
-            return this;
-        }
-
-        /**
-         * This is to set the number of row contains headers
-         * <br/>
-         * Set 0 to indicate that no header in the excel file.
-         * Default - 1.
-         *
-         * @param headerCount an index number of the excel header to start reading header
-         * @return this
-         */
-        public PoijiOptionsBuilder headerCount(int headerCount) {
-            if (headerCount < 0) {
-                throw new PoijiException("Number of header row must be greater than 0");
-            }
-            this.headerCount = headerCount;
-            return this;
-        }
-
-        /**
-         * Permits case insensitive column names mapping for annotation {@link ExcelCellName}.
-         * Default - false.
-         *
-         * @param caseInsensitive true or false
-         */
-        public PoijiOptionsBuilder caseInsensitive(final boolean caseInsensitive) {
-            this.caseInsensitive = caseInsensitive;
-            return this;
-        }
-
-        /**
-         * Ignore white space before and after column names for annotation {@link ExcelCellName}.
-         * Default - false.
-         *
-         * @param ignoreWhitespaces true or false
-         */
-        public PoijiOptionsBuilder ignoreWhitespaces(final boolean ignoreWhitespaces) {
-            this.ignoreWhitespaces = ignoreWhitespaces;
-            return this;
-        }
-
-        /**
-         * Add cell format option to see each internal cell's excel format for files ending with xlsx format.
-         * This option should be enabled for debugging purpose.
-         *
-         * @param cellFormat poiji cell format instance
-         */
-        public PoijiOptionsBuilder poijiLogCellFormat(final PoijiLogCellFormat cellFormat) {
-            this.cellFormat = cellFormat;
-            return this;
-        }
-
-        /**
-         * Change the default cell formats of a xlsx excel file by overriding
-         *
-         * @param numberFormat poiji number format instance
-         */
-        public PoijiOptionsBuilder poijiNumberFormat(final PoijiNumberFormat numberFormat) {
-            this.numberFormat = numberFormat;
-            return this;
-        }
-
-        /**
-         * Set true if all headers named in {@link ExcelCellName} are mandatory, otherwise false
-         * This feature needs headerstart and skip as mandatory parameters
-         * @param columnsToKeep the headers that should be included
-         */
-        public PoijiOptionsBuilder columnsToKeep(List columnsToKeep) {
-            this.columnsToKeep = columnsToKeep;
-            return this;
-        }
-
-        /**
-         * Provide columns to keep in case of repeated headers
-         *
-         * @param namedHeaderMandatory
-         */
-        public PoijiOptionsBuilder namedHeaderMandatory(boolean namedHeaderMandatory) {
-            this.namedHeaderMandatory = namedHeaderMandatory;
-            return this;
-        }
-
-        /**
-         * Disable the cell format of all the number cells of an excel file ending with xlsx
-         *
-         * @return this
-         */
-        public PoijiOptionsBuilder disableXLSXNumberCellFormat() {
-            this.disabledXLSXNumberCellFormat = true;
-            return this;
-        }
-
-        /**
-         * Use different delimiter to split the list of items of a cell
-         *
-         * @param delimiter by default delimiter is ','
-         * @return this
-         */
-        public PoijiOptionsBuilder addListDelimiter(String delimiter) {
-            this.listDelimiter = delimiter;
-            return this;
-        }
-
-
-        /**
-         * Use a custom excel header format implementation
-         *
-         * @param formatting custom header format implementation
-         * @return this
-         */
-        public PoijiOptionsBuilder withFormatting(Formatting formatting) {
-            Objects.requireNonNull(formatting);
-
-            this.formatting = formatting;
-            return this;
+    private static HSSFPropertyFile deserializerPropertyFile(final File file, PoijiOptions options) {
+        String extension = files.getExtension(file.getName());
+        if (XLSX_EXTENSION.equals(extension)) {
+            return PoijiPropertyHelper.createPoijiPropertyFile(file, options);
+        } else if (XLS_EXTENSION.equals(extension)) {
+            throw new InvalidExcelFileExtension("Reading metadata from (" + extension + "), is not supported");
+        } else {
+            throw new InvalidExcelFileExtension("Invalid file extension (" + extension + "), expected .xlsx");
         }
     }
+
+    private static HSSFPropertyStream deserializerPropertyStream(PoijiExcelType excelType, InputStream inputStream, PoijiOptions options) {
+        if (excelType == PoijiExcelType.XLSX) {
+            return PoijiPropertyHelper.createPoijiPropertyStream(inputStream, options);
+        } else {
+            throw new InvalidExcelFileExtension("Reading metadata from (" + excelType + "), is not supported");
+        }
+    }
+
+    /**
+     * converts excel properties into an object
+     *
+     * @param inputStream excel file stream
+     * @param excelType   type of the excel file, xlsx only!
+     * @param type        type of the root object.
+     * @param <T>         type of the root object.
+     * @param options     specifies to change the default behaviour of the poiji. In this case, only the password has an effect
+     * @return the newly created object
+     * @throws PoijiException            if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     * @see Poiji#fromExcelProperties(InputStream, PoijiExcelType, Class)
+     */
+    public static <T> T fromExcelProperties(final InputStream inputStream,
+                                            PoijiExcelType excelType,
+                                            final Class<T> type,
+                                            PoijiOptions options) {
+        Objects.requireNonNull(excelType);
+        HSSFPropertyStream hssfPropertyStream = deserializerPropertyStream(excelType, inputStream, options);
+        return hssfPropertyStream.unmarshal(type);
+    }
+
+    /**
+     * converts excel rows into a list of objects
+     *
+     * @param file excel file ending with .xls or .xlsx.
+     * @param type type of the root object.
+     * @param <T>  type of the root object.
+     * @return the newly created list of objects
+     * @throws PoijiException            if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     * @see Poiji#fromExcel(File, Class, PoijiOptions)
+     */
+    public static <T> List<T> fromExcel(final File file, final Class<T> type) {
+        final ArrayList<T> list = new ArrayList<>();
+        fromExcel(file, type, list::add);
+        return list;
+    }
+
+    /**
+     * converts excel rows into a list of objects
+     *
+     * @param file     excel file ending with .xls or .xlsx.
+     * @param type     type of the root object.
+     * @param <T>      type of the root object.
+     * @param consumer output retrieves records
+     * @throws PoijiException            if an internal exception occurs during the mapping
+     *                                   process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension
+     *                                   is invalid.
+     * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     * @see Poiji#fromExcel(File, Class, PoijiOptions)
+     */
+    public static <T> void fromExcel(final File file, final Class<T> type, final Consumer<? super T> consumer) {
+        final Unmarshaller unmarshaller = deserializer(file, PoijiOptionsBuilder.settings().build());
+        unmarshaller.unmarshal(type, consumer);
+    }
+
+    /**
+     * converts excel rows into a list of objects
+     *
+     * @param inputStream excel file stream
+     * @param excelType   type of the excel file, xls or xlsx
+     * @param type        type of the root object.
+     * @param <T>         type of the root object.
+     * @return the newly created list of objects
+     * @throws PoijiException            if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     * @see Poiji#fromExcel(InputStream, PoijiExcelType, Class, PoijiOptions)
+     */
+    public static <T> List<T> fromExcel(final InputStream inputStream,
+                                        PoijiExcelType excelType,
+                                        final Class<T> type) {
+        final ArrayList<T> list = new ArrayList<>();
+        fromExcel(inputStream, excelType, type, list::add);
+        return list;
+    }
+
+    /**
+     * converts excel rows into a list of objects
+     *
+     * @param inputStream excel file stream
+     * @param excelType   type of the excel file, xls or xlsx
+     * @param type        type of the root object.
+     * @param <T>         type of the root object.
+     * @param consumer    represents an operation that accepts the type argument
+     * @throws PoijiException            if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     * @see Poiji#fromExcel(File, Class, PoijiOptions)
+     */
+    public static <T> void fromExcel(final InputStream inputStream,
+                                     PoijiExcelType excelType,
+                                     final Class<T> type,
+                                     final Consumer<? super T> consumer) {
+        Objects.requireNonNull(excelType);
+
+        final Unmarshaller unmarshaller = deserializer(inputStream, excelType, PoijiOptionsBuilder.settings().build());
+        unmarshaller.unmarshal(type, consumer);
+    }
+
+    /**
+     * converts excel rows into a list of objects
+     *
+     * @param file    excel file ending with .xls or .xlsx.
+     * @param type    type of the root object.
+     * @param <T>     type of the root object.
+     * @param options specifies to change the default behaviour of the poiji.
+     * @return the newly created list of objects
+     * @throws PoijiException            if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     * @see Poiji#fromExcel(File, Class)
+     */
+    public static <T> List<T> fromExcel(final File file, final Class<T> type, final PoijiOptions options) {
+        final ArrayList<T> list = new ArrayList<>();
+        fromExcel(file, type, options, list::add);
+        return list;
+    }
+
+    /**
+     * converts excel rows into a list of objects
+     *
+     * @param file     excel file ending with .xls or .xlsx.
+     * @param type     type of the root object.
+     * @param <T>      type of the root object.
+     * @param options  specifies to change the default behaviour of the poiji.
+     * @param consumer represents an operation that accepts the type argument
+     * @throws PoijiException            if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     * @see Poiji#fromExcel(File, Class)
+     */
+    public static <T> void fromExcel(final File file, final Class<T> type, final PoijiOptions options, final Consumer<? super T> consumer) {
+        final Unmarshaller unmarshaller = deserializer(file, options);
+        unmarshaller.unmarshal(type, consumer);
+    }
+
+    /**
+     * converts excel rows into a list of objects
+     *
+     * @param inputStream excel file stream
+     * @param excelType   type of the excel file, xls or xlsx
+     * @param type        type of the root object.
+     * @param <T>         type of the root object.
+     * @param options     specifies to change the default behaviour of the poiji.
+     * @return the newly created list of objects
+     * @throws PoijiException            if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     * @see Poiji#fromExcel(InputStream, PoijiExcelType, Class)
+     */
+    public static <T> List<T> fromExcel(final InputStream inputStream,
+                                        final PoijiExcelType excelType,
+                                        final Class<T> type,
+                                        final PoijiOptions options) {
+        Objects.requireNonNull(excelType);
+        final ArrayList<T> list = new ArrayList<>();
+        fromExcel(inputStream, excelType, type, options, list::add);
+        return list;
+    }
+
+    /**
+     * converts excel rows into a list of objects
+     *
+     * @param inputStream excel file stream
+     * @param excelType   type of the excel file, xls or xlsx
+     * @param type        type of the root object.
+     * @param <T>         type of the root object.
+     * @param options     specifies to change the default behaviour of the poiji.
+     * @param consumer    represents an operation that accepts the type argument
+     * @throws PoijiException            if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException      if this Field object is enforcing Java
+     *                                   language access control and the underlying field is either inaccessible or final.
+     * @see Poiji#fromExcel(File, Class)
+     */
+    public static <T> void fromExcel(final InputStream inputStream,
+                                     final PoijiExcelType excelType,
+                                     final Class<T> type,
+                                     final PoijiOptions options,
+                                     final Consumer<? super T> consumer) {
+        Objects.requireNonNull(excelType);
+
+        final Unmarshaller unmarshaller = deserializer(inputStream, excelType, options);
+        unmarshaller.unmarshal(type, consumer);
+    }
+
+    /**
+     * converts excel rows into a list of objects
+     *
+     * @param sheet   excel sheet its workbook must be either  an instance of {@code HSSFWorkbook} or {@code XSSFWorkbook}.
+     * @param type    type of the root object.
+     * @param <T>     type of the root object.
+     * @param options specifies to change the default behaviour of the poiji.
+     * @throws PoijiException if an internal exception occurs during the mapping process.
+     * @see Poiji#fromExcel(Sheet, Class, PoijiOptions, Consumer)
+     * @see Poiji#fromExcel(Sheet, Class)
+     */
+    public static <T> List<T> fromExcel(final Sheet sheet,
+                                        final Class<T> type,
+                                        final PoijiOptions options) {
+        Objects.requireNonNull(sheet);
+        final ArrayList<T> list = new ArrayList<>();
+        fromExcel(sheet, type, options, list::add);
+        return list;
+    }
+
+
+    /**
+     * converts excel rows into a list of objects
+     *
+     * @param sheet excel sheet its workbook must be either an instance of {@code HSSFWorkbook} or {@code XSSFWorkbook}.
+     * @param type  type of the root object.
+     * @param <T>   type of the root object.
+     * @throws PoijiException if an internal exception occurs during the mapping process.
+     * @see Poiji#fromExcel(Sheet, Class, PoijiOptions)
+     * @see Poiji#fromExcel(Sheet, Class, PoijiOptions, Consumer)
+     */
+    public static <T> List<T> fromExcel(final Sheet sheet,
+                                        final Class<T> type) {
+        Objects.requireNonNull(sheet);
+        final ArrayList<T> list = new ArrayList<>();
+        fromExcel(sheet, type, PoijiOptionsBuilder.settings().build(), list::add);
+        return list;
+    }
+
+
+    /**
+     * converts excel rows into a list of objects
+     *
+     * @param sheet    excel sheet its workbook must be either an instance of {@code HSSFWorkbook} or {@code XSSFWorkbook}.
+     * @param type     type of the root object.
+     * @param <T>      type of the root object.
+     * @param options  specifies to change the default behaviour of the poiji.
+     * @param consumer represents an operation that accepts the type argument.
+     * @throws PoijiException if an internal exception occurs during the mapping process.
+     * @see Poiji#fromExcel(Sheet, Class, PoijiOptions)
+     * @see Poiji#fromExcel(Sheet, Class)
+     */
+    public static <T> void fromExcel(Sheet sheet,
+                                     final Class<T> type,
+                                     final PoijiOptions options,
+                                     final Consumer<? super T> consumer) {
+        Objects.requireNonNull(sheet);
+        if(options.getColumnsToKeep()!=null)
+            sheet = SheetColumns.sheetAdaptor(sheet,options);
+        options.setSkip(options.skip()-options.getHeaderStart());
+        options.setHeaderStart(0);
+        final Unmarshaller unmarshaller = UnmarshallerHelper.SheetInstance(sheet, options);
+        unmarshaller.unmarshal(type, consumer);
+    }
+
+    private static Unmarshaller deserializer(final File file, final PoijiOptions options) {
+        final PoijiFile<?> poijiFile = new PoijiFile<>(file);
+
+        String extension = files.getExtension(file.getName());
+
+        if (XLS_EXTENSION.equals(extension)) {
+            return UnmarshallerHelper.HSSFInstance(poijiFile, options);
+        } else if (XLSX_EXTENSION.equals(extension)) {
+            return UnmarshallerHelper.XSSFInstance(poijiFile, options);
+        } else {
+            throw new InvalidExcelFileExtension("Invalid file extension (" + extension + "), expected .xls or .xlsx");
+        }
+    }
+
+    private static Unmarshaller deserializer(final InputStream inputStream, PoijiExcelType excelType, final PoijiOptions options) {
+        final PoijiInputStream<?> poijiInputStream = new PoijiInputStream<>(inputStream);
+
+        if (excelType == PoijiExcelType.XLS) {
+            return UnmarshallerHelper.HSSFInstance(poijiInputStream, options);
+        } else if (excelType == PoijiExcelType.XLSX) {
+            return UnmarshallerHelper.XSSFInstance(poijiInputStream, options);
+        } else {
+            throw new InvalidExcelFileExtension("Invalid file extension (" + excelType + "), expected .xls or .xlsx");
+        }
+    }
+
 }
