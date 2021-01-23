@@ -1,0 +1,22 @@
+Hi, First of all thank you for making such helpful utility,
+I have come across situation where I have to generate List from sheet, like below
+
+@ExcelSheet("ModifyCustomerRequest")
+public class ModifyCustomerRequest implements Request {
+
+@ExcelCellName("accNum")
+public String accNum;
+
+public List<DocumentDetail> documentDetails;
+//@ExcelSheet("DocumentDetail")
+public static class DocumentDetail {
+
+    @ExcelCellName("documentType")
+    public int documentType;
+
+    @ExcelCellName("documentStatus")
+    public int documentStatus;
+}
+}
+
+How would I achieve this, I have made separate sheet for DocumentDetail but still it doesn't work, Please help.
