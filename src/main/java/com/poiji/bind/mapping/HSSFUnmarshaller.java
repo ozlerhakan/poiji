@@ -10,6 +10,7 @@ import com.poiji.bind.Unmarshaller;
 import com.poiji.config.Casting;
 import com.poiji.config.Formatting;
 import com.poiji.exception.IllegalCastException;
+import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.AnnotationUtil;
 import com.poiji.util.ReflectUtil;
@@ -67,6 +68,9 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
     @Override
     public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
         HSSFWorkbook workbook = (HSSFWorkbook) workbook();
+        if (workbook == null) {
+            throw new PoijiException("The workbook is null.");
+        }
         Optional<String> maybeSheetName = this.getSheetName(type, options);
 
         baseFormulaEvaluator = HSSFFormulaEvaluator.create(workbook, null, null);
