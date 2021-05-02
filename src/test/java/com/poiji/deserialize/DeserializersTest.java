@@ -46,6 +46,7 @@ public class DeserializersTest {
         return Arrays.asList(new Object[][]{
                 {"src/test/resources/employees.xlsx", unmarshallingDeserialize(), null, -1},
                 {"src/test/resources/employees_sheet2.xlsx", unmarshallingDeserialize(), null, 1},
+                {"src/test/resources/cloud-not-found.xls", unmarshallingDeserialize(), PoijiException.class, -1},
                 {"src/test/resources/cloud.xls", unmarshallingDeserialize(), PoijiException.class, -1},
                 {"src/test/resources/cloud", unmarshallingDeserialize(), PoijiException.class, -1},
         });
