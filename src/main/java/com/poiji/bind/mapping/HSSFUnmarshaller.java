@@ -23,6 +23,7 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.NumberToTextConverter;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -239,7 +240,12 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
             if (annotationDetail.isDisabledCellFormat()) {
                 cell.setCellStyle(null);
             }
-            String value = dataFormatter.formatCellValue(cell, baseFormulaEvaluator);
+            String value;
+            if (options.isReturnRawValues() && cell.getCellType() == CellType.NUMERIC) {
+                value = NumberToTextConverter.toText(cell.getNumericCellValue());
+            } else {
+                value = dataFormatter.formatCellValue(cell, baseFormulaEvaluator);
+            }
             Object data = casting.castValue(field, value, currentRow.getRowNum(), annotationDetail.getColumn(), options);
             setFieldData(instance, field, data);
         }

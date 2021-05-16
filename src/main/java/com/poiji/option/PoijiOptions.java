@@ -49,6 +49,7 @@ public final class PoijiOptions {
     private String listDelimiter;
     private Formatting formatting;
     private Locale locale;
+    private boolean returnRawValues;
 
     public PoijiNumberFormat getPoijiNumberFormat() {
         return numberFormat;
@@ -294,6 +295,15 @@ public final class PoijiOptions {
         return this;
     }
 
+    public boolean isReturnRawValues() {
+        return returnRawValues;
+    }
+
+    private PoijiOptions setReturnRawValues(boolean returnRawValues) {
+        this.returnRawValues = returnRawValues;
+        return this;
+    }
+
     public static class PoijiOptionsBuilder {
 
         private int sheetIndex;
@@ -322,6 +332,7 @@ public final class PoijiOptions {
         private boolean disabledXLSXNumberCellFormat;
         private String listDelimiter = ",";
         private Locale locale = Locale.US;
+        private boolean returnRawValues;
 
         private PoijiOptionsBuilder() {
         }
@@ -434,7 +445,9 @@ public final class PoijiOptions {
                     .disableXLSXNumberCellFormat(disabledXLSXNumberCellFormat)
                     .setListDelimiter(listDelimiter)
                     .setFormatting(formatting)
-                    .setLocale(locale);
+                    .setLocale(locale)
+                    .setReturnRawValues(returnRawValues);
+
         }
 
         /**
@@ -695,5 +708,16 @@ public final class PoijiOptions {
             this.formatting = formatting;
             return this;
         }
+
+        /**
+         * Use this option to get the underlying/original/non-visible cell value. The cell must be a numeric type.
+         *
+         * @return this
+         */
+        public PoijiOptionsBuilder returnNumericRawValues() {
+            this.returnRawValues = true;
+            return this;
+        }
     }
+
 }

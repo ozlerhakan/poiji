@@ -7,7 +7,6 @@ import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.XMLHelper;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
@@ -102,7 +101,7 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
                                   InputStream sheetInputStream,
                                   Consumer<? super T> consumer) {
 
-        DataFormatter formatter = new DataFormatter();
+        PoijiDataFormatter formatter = new PoijiDataFormatter(options);
         InputSource sheetSource = new InputSource(sheetInputStream);
         try {
             PoijiHandler<T> poijiHandler = new PoijiHandler<>(type, options, consumer);
