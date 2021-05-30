@@ -241,7 +241,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
                 cell.setCellStyle(null);
             }
             String value;
-            if (options.isReturnRawValues() && cell.getCellType() == CellType.NUMERIC) {
+            if (options.isRawData() && cell.getCellType() == CellType.NUMERIC) {
                 value = NumberToTextConverter.toText(cell.getNumericCellValue());
             } else {
                 value = dataFormatter.formatCellValue(cell, baseFormulaEvaluator);

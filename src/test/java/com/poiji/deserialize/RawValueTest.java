@@ -37,7 +37,7 @@ public class RawValueTest {
     @Test
     public void shouldMapCalculations() {
 
-        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().headerCount(0).returnNumericRawValues().build();
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().headerCount(0).rawData(true).build();
         List<RowModel> models = Poiji.fromExcel(new File(path), RowModel.class, options);
 
         for (RowModel model : models) {

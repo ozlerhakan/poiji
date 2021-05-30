@@ -49,7 +49,7 @@ public final class PoijiOptions {
     private String listDelimiter;
     private Formatting formatting;
     private Locale locale;
-    private boolean returnRawValues;
+    private boolean rawData;
 
     public PoijiNumberFormat getPoijiNumberFormat() {
         return numberFormat;
@@ -295,12 +295,12 @@ public final class PoijiOptions {
         return this;
     }
 
-    public boolean isReturnRawValues() {
-        return returnRawValues;
+    public boolean isRawData() {
+        return rawData;
     }
 
-    private PoijiOptions setReturnRawValues(boolean returnRawValues) {
-        this.returnRawValues = returnRawValues;
+    private PoijiOptions setRawData(boolean rawData) {
+        this.rawData = rawData;
         return this;
     }
 
@@ -332,7 +332,7 @@ public final class PoijiOptions {
         private boolean disabledXLSXNumberCellFormat;
         private String listDelimiter = ",";
         private Locale locale = Locale.US;
-        private boolean returnRawValues;
+        private boolean rawData;
 
         private PoijiOptionsBuilder() {
         }
@@ -446,7 +446,7 @@ public final class PoijiOptions {
                     .setListDelimiter(listDelimiter)
                     .setFormatting(formatting)
                     .setLocale(locale)
-                    .setReturnRawValues(returnRawValues);
+                    .setRawData(rawData);
 
         }
 
@@ -710,12 +710,13 @@ public final class PoijiOptions {
         }
 
         /**
-         * Use this option to get the underlying/original/non-visible cell value. The cell must be a numeric type.
+         * Use this option to get the underlying/original/non-visible/raw cell value. The cell must be a numeric type.
          *
+         * @param status set true to retrieve the underlying data in the excel file.
          * @return this
          */
-        public PoijiOptionsBuilder returnNumericRawValues() {
-            this.returnRawValues = true;
+        public PoijiOptionsBuilder rawData(boolean status) {
+            this.rawData = status;
             return this;
         }
     }
