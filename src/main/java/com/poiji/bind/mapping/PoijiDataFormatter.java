@@ -2,6 +2,7 @@ package com.poiji.bind.mapping;
 
 import com.poiji.option.PoijiOptions;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.util.NumberToTextConverter;
 
 /**
@@ -18,12 +19,10 @@ public class PoijiDataFormatter extends DataFormatter {
 
     @Override
     public String formatRawCellContents(double value, int formatIndex, String formatString, boolean use1904Windowing) {
-        String cellContents = super.formatRawCellContents(value, formatIndex, formatString, use1904Windowing);
-
-        if (options.isReturnRawValues()) {
+        if (!DateUtil.isADateFormat(formatIndex, formatString) && options.isReturnRawValues()) {
             return NumberToTextConverter.toText(value);
         } else {
-            return cellContents;
+            return super.formatRawCellContents(value, formatIndex, formatString, use1904Windowing);
         }
     }
 }
