@@ -842,8 +842,7 @@ PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
 ----
 == Stargazers over time
 
-image:https://starcharts.herokuapp.com/ozlerhakan/poiji.svg["Stargazers over time", link="https://starcharts.herokuapp.com/ozlerhakan/poiji"]
-
+image:https://starchart.cc/ozlerhakan/poiji.svg["Stargazers over time", link="https://starchart.cc/ozlerhakan/poiji"]
 
 == License
 
