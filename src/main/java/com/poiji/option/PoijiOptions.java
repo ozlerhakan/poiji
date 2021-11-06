@@ -330,7 +330,7 @@ public final class PoijiOptions {
         private boolean ignoreWhitespaces;
         private boolean namedHeaderMandatory;
         private boolean disabledXLSXNumberCellFormat;
-        private String listDelimiter = ",";
+        private String listDelimiter = "\\s*,\\s*";
         private Locale locale = Locale.US;
         private boolean rawData;
 
@@ -691,7 +691,7 @@ public final class PoijiOptions {
          * @return this
          */
         public PoijiOptionsBuilder addListDelimiter(String delimiter) {
-            this.listDelimiter = delimiter;
+            this.listDelimiter = String.format("\\s*%s\\s*", delimiter);
             return this;
         }
 
