@@ -560,7 +560,7 @@ Then you can add your custom implementation with the `withCasting` method:
 List<Person> people = Poiji.fromExcel(excel, Person.class, options);
 ----
 
-=== Parse UnkownCells
+=== Parse UnknownCells
 
 You can annotate a `Map<String, String>` with `@ExcelUnknownCells` to parse all entries,
 which are not mapped in any other way (for example by index or by name).
