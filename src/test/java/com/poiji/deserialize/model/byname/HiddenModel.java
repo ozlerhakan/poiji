@@ -9,4 +9,12 @@ public class HiddenModel {
 
     @ExcelCellName("HIDDEN 1")
     private String hiddenColumn;
+
+    public String getHiddenColumn() {
+        return hiddenColumn;
+    }
+
+    public void setHiddenColumn(String hiddenColumn) {
+        this.hiddenColumn = hiddenColumn;
+    }
 }

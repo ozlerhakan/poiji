@@ -12,4 +12,20 @@ public class DataRowModel {
 
     @ExcelCellName("Replace by")
     private String replace;
+
+    public String getTerm() {
+        return term;
+    }
+
+    public void setTerm(String term) {
+        this.term = term;
+    }
+
+    public String getReplace() {
+        return replace;
+    }
+
+    public void setReplace(String replace) {
+        this.replace = replace;
+    }
 }

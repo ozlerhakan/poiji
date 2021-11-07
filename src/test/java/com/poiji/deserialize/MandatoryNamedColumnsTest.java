@@ -9,6 +9,10 @@ import org.junit.runners.Parameterized;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 @RunWith(Parameterized.class)
 public class MandatoryNamedColumnsTest {
@@ -29,9 +33,10 @@ public class MandatoryNamedColumnsTest {
 
     @Test
     public void testExcelSuccessOptionalColumn() {
-        Poiji.fromExcel(new File(path), PersonByNameOptionalColumn.class, PoijiOptions.PoijiOptionsBuilder
+        List<PersonByNameOptionalColumn> response = Poiji.fromExcel(new File(path), PersonByNameOptionalColumn.class, PoijiOptions.PoijiOptionsBuilder
                 .settings()
                 .build());
+        assertThat(response, notNullValue());
     }
 
 }
