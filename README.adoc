@@ -779,7 +779,7 @@ result.get(1).amount
 ----
 1. Add `options`, if your excel is xlsx file.
 
-=== Feature 15
+=== Custom Formatting
 
 You can create your own formatting implementation without relying on the default Poiji formatting configuration using the `Formatting` interface.
 
