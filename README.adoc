@@ -1,13 +1,13 @@
 :toc: macro
-:toclevels: 1
+:toclevels: 2
 
 = Poiji
-:version: v3.1.1
+:version: v3.1.2
 
 
 image:https://travis-ci.org/ozlerhakan/poiji.svg?branch=master["Build Status", link="https://travis-ci.org/ozlerhakan/poiji"] image:https://api.codacy.com/project/badge/Grade/6587e90886184da29a1b7c5634695c9d["Codacy code quality", link="https://www.codacy.com/app/ozlerhakan/poiji?utm_source=github.com&utm_medium=referral&utm_content=ozlerhakan/poiji&utm_campaign=Badge_Grade"] image:https://coveralls.io/repos/github/ozlerhakan/poiji/badge.svg?branch=master["Coverage Status", link="https://coveralls.io/github/ozlerhakan/poiji?branch=master"] image:https://img.shields.io/badge/apache.poi-5.0.0-brightgreen.svg[] image:https://app.fossa.com/api/projects/git%2Bgithub.com%2Fozlerhakan%2Fpoiji.svg?type=shield["FOSSA Status", link="https://app.fossa.com/projects/git%2Bgithub.com%2Fozlerhakan%2Fpoiji?ref=badge_shield"] image:https://img.shields.io/badge/license-MIT-blue.svg[]
 
-Poiji is a teeny Java library that provides one way mapping from Excel sheets to Java classes. In a way it lets us convert each row of the specified excel data into Java objects. Poiji uses https://poi.apache.org/[Apache Poi] (the Java API for Microsoft Documents) under the hood to fulfill the mapping process.
+Poiji is a tiny thread-safe Java library that provides one way mapping from Excel sheets to Java classes. In a way it lets us convert each row of the specified excel data into Java objects. Poiji uses https://poi.apache.org/[Apache Poi] (the Java API for Microsoft Documents) under the hood to fulfill the mapping process.
 
 [%collapsible]
 toc::[]
@@ -23,7 +23,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 <dependency>
   <groupId>com.github.ozlerhakan</groupId>
   <artifactId>poiji</artifactId>
-  <version>3.1.1</version>
+  <version>3.1.2</version>
 </dependency>
 ----
 
@@ -31,7 +31,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    compile 'com.github.ozlerhakan:poiji:3.1.1'
+    compile 'com.github.ozlerhakan:poiji:3.1.2'
 }
 ----
 
@@ -88,7 +88,11 @@ com.poiji.option.PoijiOptions.PoijiOptionsBuilder
 #rawData(boolean)
 ----
 
-=== Feature 1
+== Features
+
+Here are the list of features with examples that the latest version of Poiji supports.
+
+=== Annotations
 
 Create your object model:
 
@@ -197,6 +201,8 @@ PoijiOptions options = PoijiOptionsBuilder.settings()
 ----
 1. Poiji should look at the second (zero-based index) sheet of your excel file.
 
+=== Prefer Default Value
+
 If you want a date field to return `null` rather than a default date, use `PoijiOptionsBuilder` with the `preferNullOverDefault` method as follows:
 
 [source,java]
@@ -207,7 +213,8 @@ PoijiOptions options = PoijiOptionsBuilder.settings()
 ----
 1. a field that is of type either `java.util.Date`, `Float`, `Double`, `Integer`, `Long` or `String` will have a `null` value.
 
-=== Feature 2
+=== Sheet Name Option
+
 Poiji allows specifying the sheet name using annotation
 
 [source,java]
@@ -237,7 +244,7 @@ public class Student {
 ----
 <1> With the `ExcelSheet` annotation we are configuring the name of the sheet to read data from. The other sheets will be ignored.
 
-=== Feature 3
+=== Protected Excels
 
 Consider that your excel file is protected with a password, you can define the password via `PoijiOptionsBuilder` to read rows:
 
@@ -248,7 +255,7 @@ PoijiOptions options = PoijiOptionsBuilder.settings()
 List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class, options);
 ----
 
-=== Feature 4
+=== Annotation ExcelCellName
 
 Using `ExcelCellName`, we can read the values by column names directly.
 
@@ -322,7 +329,7 @@ public class Person {
 }
 ----
 
-=== Feature 5
+=== Super Class Inheritance
 
 Your object model may be derived from a super class:
 
@@ -371,7 +378,7 @@ Car car = cars.get(0);
 // 4
 ----
 
-=== Feature 6
+=== ExcelCellRange Annotation
 
 Consider you have a table like below:
 
@@ -462,7 +469,7 @@ PersonCreditInfo.PersonInfo expectedPerson1 = personCreditInfo1.getPersonInfo();
 PersonCreditInfo.CardInfo expectedCard1 = personCreditInfo1.getCardInfo();
 ----
 
-=== Feature 7
+=== Support Consumer Interface
 
 Poiji supports Consumer Interface. As https://github.com/ozlerhakan/poiji/pull/39#issuecomment-409521808[@fmarazita] explained the usage, there are several benefits of having a Consumer:
 
@@ -515,7 +522,7 @@ private void dbInsertion(Calculation siCalculation) {
 }
 ----
 
-=== Feature 8
+=== Custom Casting Implementation
 
 You can create your own casting implementation without relying on the default Poiji casting configuration using the `Casting` interface.
 
@@ -553,7 +560,7 @@ Then you can add your custom implementation with the `withCasting` method:
 List<Person> people = Poiji.fromExcel(excel, Person.class, options);
 ----
 
-=== Feature 9
+=== Parse UnkownCells
 
 You can annotate a `Map<String, String>` with `@ExcelUnknownCells` to parse all entries,
 which are not mapped in any other way (for example by index or by name).
@@ -602,7 +609,7 @@ and the one for the second row has `{ENCODING=flac, BITRATE=1500}`.
 
 Note that If you use the `PoijiOptionsBuilder#caseInsensitive(true)` option, the ExcelUnknownCells map will be parsed with lowercase.
 
-=== Feature 10
+=== Mandatory Headers
 
 Poiji supports the Option `namedHeaderMandatory`. If set to true, Poiji will check that all field annotated with `@ExcelCellName` must have a corresponding column in the Excel sheet. If any column is missing a `HeaderMissingException` will be thrown.
 
@@ -634,7 +641,7 @@ This is the excel file we want to parse:
 In the default setting of Poiji (`namedHeaderMandatory=false`), the author field will be null for both objects.
 With `namedHeaderMandatory=true`, a `HeaderMissingException` will be thrown.
 
-=== Feature 11
+=== Debug Cells Formats
 
 We can observe each cell format of a given excel file. Assume that we have an excel file like below:
 
@@ -671,7 +678,7 @@ cell10.getFormatIndex()
 
 Now that we know the reason of why we don't see the expected date value, it's because the default format of the date cell is the `mm:ss.0` format with a given index 47, we need to change the default format of index (i.e. `47`). This format was automatically assigned to the cell having a number, but almost certainly with a special style or format. Note that this option should be used for debugging purpose only.
 
-=== Feature 12
+=== Modify Cells Formats
 
 We can change the default format of a cell using `PoijiNumberFormat`. Recall `feature 10`, we are unable to see the correct cell format what's more the excel file uses another format which we do not want to.
 
@@ -700,7 +707,7 @@ model.getDate();
 
 We know that the index 47 uses the format `mm:ss.0` by default in the given excel file, thus we're able to override its format with `mm/dd/yyyy hh.mm aa` using the `putNumberFormat` method.
 
-=== Feature 13
+=== Read Excel Properties
 
 It is possible to read excel properties from xlsx files. To achieve that, create a class with fields annotated with `@ExcelProperty`.
 
@@ -726,7 +733,7 @@ Poiji can only read Text properties from an Excel file, so you have to use a `St
 This does not apply to "modified", "lastPrinted" and "created", which are deserialized into a `Date`.
 
 
-=== Feature 14
+=== Disable Cells Formats
 
 Consider we have a xls or xlsx excel file like below:
 
@@ -810,7 +817,7 @@ PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
 List<Person> people = Poiji.fromExcel(excel, Person.class, options);
 ----
 
-=== Feature 16
+=== Use Poi Sheet
 
 Poiji accepts excel records via Poi Sheet object as well:
 
@@ -824,7 +831,7 @@ Sheet sheet = workbook.getSheetAt(0);
 List<Model> result = Poiji.fromExcel(sheet, Model.class);
 ----
 
-=== Feature 17
+=== Update Default Locale
 
 For parsing numbers and dates java.lang.Locale is used. Also Apache Poi uses the Locale for parsing.
 As default, Poij uses Locale.US irrespective of Locale used on the running system. If you want to change that
@@ -840,6 +847,7 @@ PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
                 .setLocale(Locale.getDefault())
                 .build();
 ----
+
 == Stargazers over time
 
 image:https://starcharts.herokuapp.com/ozlerhakan/poiji.svg["Stargazers over time", link="https://starcharts.herokuapp.com/ozlerhakan/poiji"]
