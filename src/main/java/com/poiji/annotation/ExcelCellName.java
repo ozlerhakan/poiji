@@ -20,4 +20,11 @@ public @interface ExcelCellName {
      * @return column name
      */
     String value();
+
+    /**
+     * Specifies whether the column is required or not.
+     *
+     * @return mandatory signal default is true
+     */
+    boolean mandatory() default true;
 }

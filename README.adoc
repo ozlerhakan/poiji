@@ -79,7 +79,6 @@ com.poiji.option.PoijiOptions.PoijiOptionsBuilder
 #withFormatting(Formatting)
 #caseInsensitive(boolean)
 #ignoreWhitespaces(boolean)
-#namedHeaderMandatory(boolean)
 #poijiNumberFormat(PoijiNumberFormat)
 #poijiLogCellFormat(PoijiLogCellFormat)
 #disableXLSXNumberCellFormat()
@@ -609,37 +608,19 @@ and the one for the second row has `{ENCODING=flac, BITRATE=1500}`.
 
 Note that If you use the `PoijiOptionsBuilder#caseInsensitive(true)` option, the ExcelUnknownCells map will be parsed with lowercase.
 
-=== Mandatory Headers
+=== Optional Mandatory Columns
 
-Poiji supports the Option `namedHeaderMandatory`. If set to true, Poiji will check that all field annotated with `@ExcelCellName` must have a corresponding column in the Excel sheet. If any column is missing a `HeaderMissingException` will be thrown.
+By default `@ExcelCellName` and `@ExcelCell` expect their related excel columns exist in a given excel file, otherwise a `HeaderMissingException` will be thrown.
 
-[source,java]
+You can change this behavior by using the `mandatory` parameter on each annotation:
+
 ----
-public class MusicTrack {
+@ExcelCellName(value = "COLUMN NAME", mandatory = false)
+String missingColumn;
 
-    @ExcelCellName("ID")
-    private String employeeId;
-
-    @ExcelCellName("AUTHOR")
-    private String author;
-
-}
+@ExcelCell(value = COLUMN_INDEX, mandatory = false)
+String missingColumn;
 ----
-
-This is the excel file we want to parse:
-
-|===
-|ID | Artist
-
-|123923
-|Joe Doe
-
-|56437
-|Jane Doe
-|===
-
-In the default setting of Poiji (`namedHeaderMandatory=false`), the author field will be null for both objects.
-With `namedHeaderMandatory=true`, a `HeaderMissingException` will be thrown.
 
 === Debug Cells Formats
 

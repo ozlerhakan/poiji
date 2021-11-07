@@ -23,6 +23,9 @@ public class Person {
     @ExcelCell(3)
     protected String email;
 
+    @ExcelCell(4)
+    protected float insurance;
+
     public int getRow() {
         return row;
     }
@@ -51,9 +54,20 @@ public class Person {
         this.email = email;
     }
 
+    public void setInsurance(float insurance) {
+        this.insurance = insurance;
+    }
+
     @Override
     public String toString() {
-        return "Person{" + "row=" + row + ", name=" + name + ", address=" + address + ", mobile=" + mobile + ", email=" + email + '}';
+        return "Person{" +
+                "name='" + name + '\'' +
+                ", address='" + address + '\'' +
+                ", mobile='" + mobile + '\'' +
+                ", email='" + email + '\'' +
+                ", insurance=" + insurance +
+                ", row=" + row +
+                '}';
     }
 
 }

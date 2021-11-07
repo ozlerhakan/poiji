@@ -1,11 +1,13 @@
 package com.poiji.util;
 
+import com.poiji.annotation.ExcelCell;
 import com.poiji.annotation.ExcelCellName;
 import com.poiji.config.Formatting;
 import com.poiji.exception.HeaderMissingException;
 import com.poiji.option.PoijiOptions;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
@@ -28,24 +30,44 @@ public final class AnnotationUtil {
     public static <T> void validateMandatoryNameColumns(PoijiOptions options,
                                                         Formatting formatting,
                                                         Class<T> modelType,
-                                                        Collection<String> headerNames) {
-        if (options.getNamedHeaderMandatory()) {
-            Collection<ExcelCellName> excelCellNames = ReflectUtil.findRecursivePoijiAnnotations(modelType, ExcelCellName.class);
+                                                        Map<String, Integer> titleToIndex,
+                                                        Map<Integer, String> indexToTitle) {
+        Collection<ExcelCellName> excelCellNames = ReflectUtil.findRecursivePoijiAnnotations(modelType, ExcelCellName.class);
+        Collection<ExcelCell> excelCells = ReflectUtil.findRecursivePoijiAnnotations(modelType, ExcelCell.class);
 
-            BiPredicate<String, String> comparator = String::equals;
+        BiPredicate<String, String> comparator = String::equals;
 
-            Set<String> missingHeaders = excelCellNames.stream()
-                    .filter(excelCellName -> headerNames.stream()
-                            .noneMatch(title -> comparator.test(
-                                    formatting.transform(options, excelCellName.value()),
-                                    title
-                            )))
-                    .map(ExcelCellName::value)
-                    .collect(Collectors.toSet());
+        Set<Integer> missingExcelCells = excelCells.stream()
+                .filter(excelCell -> indexToTitle.get(excelCell.value()) == null)
+                .filter(excelCell -> options.getHeaderCount() != 0)
+                .filter(ExcelCell::mandatory)
+                .map(ExcelCell::value)
+                .collect(Collectors.toSet());
 
+        Set<String> missingHeaders = excelCellNames.stream()
+                .filter(excelCellName -> titleToIndex.keySet().stream()
+                        .noneMatch(title -> comparator.test(
+                                formatting.transform(options, excelCellName.value()),
+                                title
+                        )))
+                .filter(ExcelCellName::mandatory)
+                .map(ExcelCellName::value)
+                .collect(Collectors.toSet());
+
+        long totalMissingColumns = missingHeaders.size() + missingExcelCells.size();
+        if (totalMissingColumns != 0) {
+            String message = "Some headers are missing in the sheet: ";
             if (!missingHeaders.isEmpty()) {
-                throw new HeaderMissingException("Some headers are missing in the sheet: " + missingHeaders);
+                message += missingHeaders;
             }
+            if (!missingExcelCells.isEmpty()) {
+                StringBuilder missingMessage = new StringBuilder();
+                missingExcelCells.stream()
+                        .map(i -> String.join(" ", " index column on ", String.valueOf(i)))
+                        .forEach(missingMessage::append);
+                message += missingMessage;
+            }
+            throw new HeaderMissingException(message);
         }
     }
 }

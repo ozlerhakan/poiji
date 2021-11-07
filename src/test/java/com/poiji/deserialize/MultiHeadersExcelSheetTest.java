@@ -1,8 +1,6 @@
 package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
-import com.poiji.deserialize.model.byid.PersonATest;
-import com.poiji.deserialize.model.byid.PersonBTest;
 import com.poiji.deserialize.model.byid.PersonCreditInfo;
 import com.poiji.option.PoijiOptions;
 import org.junit.Test;
@@ -13,7 +11,9 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 

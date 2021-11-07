@@ -34,6 +34,7 @@ public class ListAttributes {
     @ExcelCell(8)
     protected List<Float> floatAge;
 
+
     public List<String> getName() {
         return name;
     }
@@ -64,5 +65,9 @@ public class ListAttributes {
 
     public List<Float> getFloatAge() {
         return floatAge;
+    }
+
+    public void setFloatAge(List<Float> floatAge) {
+        this.floatAge = floatAge;
     }
 }

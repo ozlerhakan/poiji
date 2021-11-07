@@ -44,7 +44,6 @@ public final class PoijiOptions {
     private boolean ignoreWhitespaces;
     private PoijiLogCellFormat poijiLogCellFormat;
     private PoijiNumberFormat numberFormat;
-    private boolean namedHeaderMandatory;
     private boolean disableXLSXNumberCellFormat;
     private String listDelimiter;
     private Formatting formatting;
@@ -249,15 +248,6 @@ public final class PoijiOptions {
         return this;
     }
 
-    public boolean getNamedHeaderMandatory() {
-        return namedHeaderMandatory;
-    }
-
-    private PoijiOptions setNamedHeaderMandatory(boolean namedHeaderMandatory) {
-        this.namedHeaderMandatory = namedHeaderMandatory;
-        return this;
-    }
-
     private PoijiOptions disableXLSXNumberCellFormat(boolean disableXLSXNumberCellFormat) {
         this.disableXLSXNumberCellFormat = disableXLSXNumberCellFormat;
         return this;
@@ -328,7 +318,6 @@ public final class PoijiOptions {
         private String sheetName;
         private boolean caseInsensitive;
         private boolean ignoreWhitespaces;
-        private boolean namedHeaderMandatory;
         private boolean disabledXLSXNumberCellFormat;
         private String listDelimiter = "\\s*,\\s*";
         private Locale locale = Locale.US;
@@ -441,7 +430,6 @@ public final class PoijiOptions {
                     .setPoijiNumberFormat(numberFormat)
                     .setCaseInsensitive(caseInsensitive)
                     .setIgnoreWhitespaces(ignoreWhitespaces)
-                    .setNamedHeaderMandatory(namedHeaderMandatory)
                     .disableXLSXNumberCellFormat(disabledXLSXNumberCellFormat)
                     .setListDelimiter(listDelimiter)
                     .setFormatting(formatting)
@@ -661,16 +649,6 @@ public final class PoijiOptions {
          */
         public PoijiOptionsBuilder poijiNumberFormat(final PoijiNumberFormat numberFormat) {
             this.numberFormat = numberFormat;
-            return this;
-        }
-
-        /**
-         * Set true if all headers named in {@link ExcelCellName} are mandatory, otherwise false
-         *
-         * @param namedHeaderMandatory fieldas are mandatory or not
-         */
-        public PoijiOptionsBuilder namedHeaderMandatory(boolean namedHeaderMandatory) {
-            this.namedHeaderMandatory = namedHeaderMandatory;
             return this;
         }
 

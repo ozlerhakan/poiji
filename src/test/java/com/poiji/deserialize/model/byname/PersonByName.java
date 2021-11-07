@@ -20,6 +20,9 @@ public class PersonByName {
     @ExcelCellName("Email")
     protected String email;
 
+    @ExcelCellName("Insurance")
+    protected float insurance;
+
     @ExcelRow
     protected int row;
 
@@ -39,4 +42,19 @@ public class PersonByName {
         this.address = address;
     }
 
+    public float getInsurance() {
+        return insurance;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "name='" + name + '\'' +
+                ", address='" + address + '\'' +
+                ", mobile='" + mobile + '\'' +
+                ", email='" + email + '\'' +
+                ", insurance=" + insurance +
+                ", row=" + row +
+                '}';
+    }
 }

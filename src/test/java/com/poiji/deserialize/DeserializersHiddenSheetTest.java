@@ -2,6 +2,7 @@ package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.byid.Person;
+import com.poiji.deserialize.model.byname.HiddenModel;
 import com.poiji.option.PoijiOptions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,7 +52,7 @@ public class DeserializersHiddenSheetTest {
     public void testProcessHiddenSheets() {
 
         PoijiOptions poijiOptions = PoijiOptions.PoijiOptionsBuilder.settings().ignoreHiddenSheets(false).build();
-        List<Person> people = Poiji.fromExcel(new File(path), Person.class, poijiOptions);
+        List<HiddenModel> people = Poiji.fromExcel(new File(path), HiddenModel.class, poijiOptions);
         assertEquals(people.size(), 0);
 
     }

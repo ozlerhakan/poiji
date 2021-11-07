@@ -235,6 +235,6 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     @Override
     public void endSheet() {
-        AnnotationUtil.validateMandatoryNameColumns(options, formatting, type, titleToIndex.keySet());
+        AnnotationUtil.validateMandatoryNameColumns(options, formatting, type, titleToIndex, indexToTitle);
     }
 }

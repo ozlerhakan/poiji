@@ -46,18 +46,18 @@ public class ExcelByIdAndByNameTest {
         try {
             if (clazz == Person.class) {
                 List<Person> actualCars = Poiji.fromExcel(new File(path), Person.class);
-                assertEquals(expectedPersonList.get(0).getRow(), actualCars.get(0).getRow());
-                assertEquals(expectedPersonList.get(1).getRow(), actualCars.get(1).getRow());
-                assertEquals(expectedPersonList.get(2).getRow(), actualCars.get(2).getRow());
-                assertEquals(expectedPersonList.get(3).getRow(), actualCars.get(3).getRow());
-                assertEquals(expectedPersonList.get(4).getRow(), actualCars.get(4).getRow());
+                assertEquals(expectedPersonList.get(0).toString(), actualCars.get(0).toString());
+                assertEquals(expectedPersonList.get(1).toString(), actualCars.get(1).toString());
+                assertEquals(expectedPersonList.get(2).toString(), actualCars.get(2).toString());
+                assertEquals(expectedPersonList.get(3).toString(), actualCars.get(3).toString());
+                assertEquals(expectedPersonList.get(4).toString(), actualCars.get(4).toString());
             } else if (clazz == PersonByName.class) {
                 List<PersonByName> actualCars = Poiji.fromExcel(new File(path), PersonByName.class);
-                assertEquals(expectedPersonList.get(0).getRow(), actualCars.get(0).getRow());
-                assertEquals(expectedPersonList.get(1).getRow(), actualCars.get(1).getRow());
-                assertEquals(expectedPersonList.get(2).getRow(), actualCars.get(2).getRow());
-                assertEquals(expectedPersonList.get(3).getRow(), actualCars.get(3).getRow());
-                assertEquals(expectedPersonList.get(4).getRow(), actualCars.get(4).getRow());
+                assertEquals(expectedPersonList.get(0).toString(), actualCars.get(0).toString());
+                assertEquals(expectedPersonList.get(1).toString(), actualCars.get(1).toString());
+                assertEquals(expectedPersonList.get(2).toString(), actualCars.get(2).toString());
+                assertEquals(expectedPersonList.get(3).toString(), actualCars.get(3).toString());
+                assertEquals(expectedPersonList.get(4).toString(), actualCars.get(4).toString());
             }
         } catch (Exception e) {
             fail(e.getMessage());

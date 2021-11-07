@@ -22,4 +22,11 @@ public @interface ExcelCell {
      * @return column index
      */
     int value();
+
+    /**
+     * Specifies whether the column is required or not.
+     *
+     * @return mandatory signal default is true
+     */
+    boolean mandatory() default true;
 }

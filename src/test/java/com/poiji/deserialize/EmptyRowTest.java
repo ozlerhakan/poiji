@@ -1,7 +1,7 @@
 package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
-import com.poiji.deserialize.model.byid.Employee;
+import com.poiji.deserialize.model.byname.DataRowModel;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -32,8 +32,8 @@ public class EmptyRowTest {
     @Test
     public void shouldRetrieveDataRow() {
 
-        List<Employee> actualEmployees = Poiji.fromExcel(new File(path), Employee.class);
-        assertThat(actualEmployees, notNullValue());
-        assertThat(actualEmployees.size(), is(101));
+        List<DataRowModel> rows = Poiji.fromExcel(new File(path), DataRowModel.class);
+        assertThat(rows, notNullValue());
+        assertThat(rows.size(), is(101));
     }
 }
