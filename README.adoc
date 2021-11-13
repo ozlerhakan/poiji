@@ -645,7 +645,7 @@ model.getDate();
 // 12.00
 ----
 
-Hmm, It looks like we did not achieve the correct date format when we get the date value (`12.00`). Let's see how internally the excel file parses the value of the cell via `PoijiLogCellFormat`:
+Hmm, It looks like we did not achieve the correct date format since we get the date value as (`12.00`). Let's see how internally the excel file is being parsed via `PoijiLogCellFormat`:
 
 ----
 List<InternalCellFormat> formats = log.formats();
@@ -661,7 +661,7 @@ Now that we know the reason of why we don't see the expected date value, it's be
 
 === Modify Cells Formats
 
-We can change the default format of a cell using `PoijiNumberFormat`. Recall `feature 10`, we are unable to see the correct cell format what's more the excel file uses another format which we do not want to.
+We can change the default format of a cell using `PoijiNumberFormat`. Recall `Debug Cells Formats`, we are unable to see the correct cell format, what's more the excel file uses another format which we do not want to.
 
 |===
 |Date
