@@ -45,6 +45,7 @@ public final class AnnotationUtil {
                 .collect(Collectors.toSet());
 
         Set<String> missingHeaders = excelCellNames.stream()
+                .filter(excelCell -> options.getHeaderCount() != 0)
                 .filter(excelCellName -> titleToIndex.keySet().stream()
                         .noneMatch(title -> comparator.test(
                                 formatting.transform(options, excelCellName.value()),
@@ -63,7 +64,7 @@ public final class AnnotationUtil {
             if (!missingExcelCells.isEmpty()) {
                 StringBuilder missingMessage = new StringBuilder();
                 missingExcelCells.stream()
-                        .map(i -> String.join(" ", " index column on ", String.valueOf(i)))
+                        .map(i -> String.join(" ", " missing index column on ", String.valueOf(i)))
                         .forEach(missingMessage::append);
                 message += missingMessage;
             }

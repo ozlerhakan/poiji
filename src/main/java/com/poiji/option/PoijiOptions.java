@@ -310,7 +310,7 @@ public final class PoijiOptions {
         private Casting casting = new DefaultCasting();
         private Formatting formatting = new DefaultFormatting();
         private PoijiLogCellFormat cellFormat;
-        private PoijiNumberFormat numberFormat;
+        private PoijiNumberFormat numberFormat = StylesFormat.loadDefaultStyles();
         private int headerStart = 0;
         private int headerCount = 1;
         private int skip = 1;
