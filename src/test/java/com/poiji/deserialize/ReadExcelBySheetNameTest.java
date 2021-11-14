@@ -8,10 +8,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.io.File;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,11 +33,7 @@ public class ReadExcelBySheetNameTest {
 	    @Test
 	    public void shouldReadExcelBySheetName() {
 
-	        final DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-	                .appendPattern("M/d/")
-	                .appendValueReduced(ChronoField.YEAR_OF_ERA, 2, 2, LocalDate.now().minusYears(80)).toFormatter();
-
-	        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().sheetName("SI calculations").dateFormatter(formatter).build();
+          PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().sheetName("SI calculations").build();
 
 	        List<Calculation> calculations = Poiji.fromExcel(new File(path), Calculation.class, options);
 

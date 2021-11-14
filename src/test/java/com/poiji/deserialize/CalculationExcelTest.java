@@ -8,15 +8,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.io.File;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * Created by hakan on 02/08/2018
@@ -40,11 +36,7 @@ public class CalculationExcelTest {
     @Test
     public void shouldMapCalculations() {
 
-        final DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                .appendPattern("M/d/")
-                .appendValueReduced(ChronoField.YEAR_OF_ERA, 2, 2, LocalDate.now().minusYears(80)).toFormatter();
-
-        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().sheetIndex(1).dateFormatter(formatter).build();
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().sheetIndex(1).build();
 
         List<Calculation> calculations = Poiji.fromExcel(new File(path), Calculation.class, options);
 

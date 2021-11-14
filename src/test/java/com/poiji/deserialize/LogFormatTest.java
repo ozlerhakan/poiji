@@ -49,6 +49,7 @@ public class LogFormatTest {
             PoijiLogCellFormat log = new PoijiLogCellFormat();
             PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
                     .poijiLogCellFormat(log)
+                    .poijiNumberFormat(null)
                     .build();
             List<DateExcelColumn> dates = Poiji.fromExcel(stream, poijiExcelType, DateExcelColumn.class, options);
 
