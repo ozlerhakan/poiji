@@ -127,7 +127,7 @@ public class DefaultCasting implements Casting {
 
     private BigDecimal bigDecimalValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
-            return Parsers.bigDecimals(options.isRawData() ? Locale.US : options.getLocale()).parse(value);
+            return Parsers.bigDecimals(options.getLocale()).parse(value);
         } catch (NumberFormatException | IllegalStateException e) {
             return onError(value, sheetName, row, col, e, options.preferNullOverDefault() ? null : BigDecimal.ZERO);
         }
