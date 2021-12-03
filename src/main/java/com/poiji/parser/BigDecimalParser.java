@@ -8,12 +8,11 @@ public class BigDecimalParser implements Parser<BigDecimal> {
 
     private final NumberParser delegate;
 
-    BigDecimalParser() {
-        this.delegate = new NumberParser(getDecimalFormatInstance());
+    BigDecimalParser(NumberFormat numberFormat) {
+        this.delegate = new NumberParser(getDecimalFormatInstance(numberFormat));
     }
 
-    private DecimalFormat getDecimalFormatInstance() {
-        NumberFormat numberFormat = NumberFormat.getInstance();
+    private DecimalFormat getDecimalFormatInstance(NumberFormat numberFormat) {
         DecimalFormat decimalFormat = (DecimalFormat) numberFormat;
         decimalFormat.setParseBigDecimal(true);
         return decimalFormat;
