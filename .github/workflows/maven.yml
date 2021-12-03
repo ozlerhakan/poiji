@@ -1,4 +1,4 @@
-name: Poiji build workflow with Maven
+name: Poiji Build
 
 on: [push]
 
@@ -15,7 +15,7 @@ jobs:
           cache: maven
       - name: Build and Test with Maven
         run: mvn clean -B package --file pom.xml -P coverage
-      - name: Coveralls GitHub Action
+      - name: Codecov GitHub Action
         uses: codecov/codecov-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
