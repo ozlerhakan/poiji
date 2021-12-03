@@ -52,8 +52,8 @@
 
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-enforcer-plugin.version>1.2</maven-enforcer-plugin.version>
-        <jdk.source>1.8</jdk.source>
-        <jdk.target>1.8</jdk.target>
+        <jdk.source>11</jdk.source>
+        <jdk.target>11</jdk.target>
 
         <maven.version>3.0.4</maven.version>
     </properties>
@@ -158,27 +158,6 @@
             </plugin>
 
             <plugin>
-                <groupId>org.eluder.coveralls</groupId>
-                <artifactId>coveralls-maven-plugin</artifactId>
-                <version>4.3.0</version>
-                <configuration>
-                    <repoToken>${env.COVERALLS_TOKEN}</repoToken>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.7</version>
-                <configuration>
-                    <format>xml</format>
-                    <maxmem>256m</maxmem>
-                    <aggregate>true</aggregate>
-                    <check/>
-                </configuration>
-            </plugin>
-
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <version>${maven-enforcer-plugin.version}</version>
@@ -205,18 +184,8 @@
         </plugins>
     </build>
 
+
     <profiles>
-        <profile>
-            <id>java9</id>
-            <activation>
-                <jdk>[9,)</jdk>
-            </activation>
-            <properties>
-                <!-- we need to open a specific package of a platform module to the unnamed module that uses deep reflection at runtime,
-                     currently this is allowed but deep reflection in the unnamed module will not be validated in a future release of JDK at runtime -->
-                <add.opens>--add-opens java.base/java.io=ALL-UNNAMED --add-opens java.xml/com.sun.org.apache.xerces.internal.util=ALL-UNNAMED</add.opens>
-            </properties>
-        </profile>
         <profile>
             <id>javadoclint</id>
             <activation>
@@ -225,33 +194,6 @@
             <properties>
                 <javadoc.none>-Xdoclint:none</javadoc.none>
             </properties>
-        </profile>
-        <profile>
-            <id>release-sign-artifacts</id>
-            <activation>
-                <property>
-                    <name>doRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 
