@@ -17,5 +17,3 @@ jobs:
         run: mvn clean -B package --file pom.xml -P coverage
       - name: Codecov GitHub Action
         uses: codecov/codecov-action@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
