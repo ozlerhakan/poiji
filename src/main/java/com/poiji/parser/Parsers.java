@@ -22,8 +22,8 @@ public class Parsers {
         return new NumberParser(format);
     }
 
-    public static BigDecimalParser bigDecimals() {
-        return new BigDecimalParser();
+    public static BigDecimalParser bigDecimals(Locale locale) {
+        return new BigDecimalParser(NumberFormat.getInstance(locale));
     }
 
     public static NumberParser numbers(Locale locale) {

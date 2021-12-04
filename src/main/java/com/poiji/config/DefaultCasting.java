@@ -14,12 +14,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -132,7 +127,7 @@ public class DefaultCasting implements Casting {
 
     private BigDecimal bigDecimalValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
-            return Parsers.bigDecimals().parse(value);
+            return Parsers.bigDecimals(options.getLocale()).parse(value);
         } catch (NumberFormatException | IllegalStateException e) {
             return onError(value, sheetName, row, col, e, options.preferNullOverDefault() ? null : BigDecimal.ZERO);
         }

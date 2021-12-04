@@ -1,0 +1,16 @@
+name: Greetings
+
+on: [pull_request, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: 'Thank you for contributing to Poiji! Feel free to create a PR If you want to contribute directly :)'
+          pr-message: 'Thank you for contributing to Poiji!. We will check your PR. Feel free to add more comments If you have'

@@ -194,8 +194,7 @@ public class DefaultCastingTest {
 
     @Test
     public void castBigDecimalDE() {
-
-        Locale.setDefault(Locale.GERMANY);
+        PoijiOptions options = PoijiOptionsBuilder.settings().setLocale(Locale.GERMANY).build();
         BigDecimal testVal = (BigDecimal) casting.castValue(BigDecimal.class, "81,56", options);
 
         assertEquals(BigDecimal.valueOf(81.56), testVal);
