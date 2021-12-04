@@ -141,6 +141,8 @@
                             <goal>jar</goal>
                         </goals>
                         <configuration>
+                            <source>11</source>
+                            <detectJavaApiLink>false</detectJavaApiLink>
                             <additionalparam>${javadoc.none}</additionalparam>
                         </configuration>
                     </execution>
