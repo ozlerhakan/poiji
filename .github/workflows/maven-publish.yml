@@ -1,7 +1,7 @@
 # This workflow will build a package using Maven and then publish it to GitHub packages when a release is created
 # For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#apache-maven-with-a-settings-path
 
-name: Maven Package
+name: Poiji Artifact Phase
 
 on:
   release:
@@ -25,8 +25,10 @@ jobs:
           server-id: ossrh
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
       - name: Publish package
         run: mvn --batch-mode deploy
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
