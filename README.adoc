@@ -2,11 +2,11 @@
 :toclevels: 2
 
 = Poiji
-:version: v3.1.4
-:branch: 3.1.4
+:version: v3.1.5
+:branch: 3.1.5
 
-image:https://github.com/ozlerhakan/poiji/actions/workflows/maven.yml/badge.svg["Build Status"] image:https://app.codacy.com/project/badge/Grade/64f7e2cb9e604807b62334a4cfc3952d["Codacy code quality", link="https://www.codacy.com/gh/ozlerhakan/poiji/dashboard?utm_source=github.com&utm_medium=referral&utm_content=ozlerhakan/poiji&utm_campaign=Badge_Grade"]
-image:https://codecov.io/gh/ozlerhakan/poiji/branch/{branch}/graph/badge.svg?token=MN6V6xOWBq["Codecov", link="https://codecov.io/gh/ozlerhakan/poiji"] image:https://img.shields.io/badge/apache.poi-5.0.0-brightgreen.svg[] image:https://app.fossa.com/api/projects/git%2Bgithub.com%2Fozlerhakan%2Fpoiji.svg?type=shield["FOSSA Status", link="https://app.fossa.com/projects/git%2Bgithub.com%2Fozlerhakan%2Fpoiji?ref=badge_shield"]
+image:https://github.com/ozlerhakan/poiji/actions/workflows/maven.yml/badge.svg["Build Status"] image:https://github.com/ozlerhakan/poiji/actions/workflows/maven-publish.yml/badge.svg?branch=v3.1.4[Poiji Artifact Phase] image:https://app.codacy.com/project/badge/Grade/64f7e2cb9e604807b62334a4cfc3952d["Codacy code quality", link="https://www.codacy.com/gh/ozlerhakan/poiji/dashboard?utm_source=github.com&utm_medium=referral&utm_content=ozlerhakan/poiji&utm_campaign=Badge_Grade"]
+image:https://codecov.io/gh/ozlerhakan/poiji/branch/{branch}/graph/badge.svg?token=MN6V6xOWBq["Codecov", link="https://codecov.io/gh/ozlerhakan/poiji"] image:https://img.shields.io/badge/apache.poi-5.1.0-brightgreen.svg[] image:https://app.fossa.com/api/projects/git%2Bgithub.com%2Fozlerhakan%2Fpoiji.svg?type=shield["FOSSA Status", link="https://app.fossa.com/projects/git%2Bgithub.com%2Fozlerhakan%2Fpoiji?ref=badge_shield"]
 
 Poiji is a tiny thread-safe Java library that provides one way mapping from Excel sheets to Java classes. In a way it lets us convert each row of the specified excel data into Java objects. Poiji uses https://poi.apache.org/[Apache Poi] (the Java API for Microsoft Documents) under the hood to fulfill the mapping process.
 
@@ -24,7 +24,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 <dependency>
   <groupId>com.github.ozlerhakan</groupId>
   <artifactId>poiji</artifactId>
-  <version>3.1.4</version>
+  <version>3.1.5</version>
 </dependency>
 ----
 
@@ -32,7 +32,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    compile 'com.github.ozlerhakan:poiji:3.1.4'
+    compile 'com.github.ozlerhakan:poiji:3.1.5'
 }
 ----
 

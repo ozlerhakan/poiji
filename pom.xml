@@ -6,7 +6,7 @@
 
     <groupId>com.github.ozlerhakan</groupId>
     <artifactId>poiji</artifactId>
-    <version>3.1.4</version>
+    <version>3.1.5</version>
     <packaging>jar</packaging>
 
     <name>poiji</name>
