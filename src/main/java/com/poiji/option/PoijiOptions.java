@@ -280,8 +280,10 @@ public final class PoijiOptions {
     }
 
     private PoijiOptions setLocale(Locale locale) {
-        this.locale = locale;
-        LocaleUtil.setUserLocale(locale);
+        if (!this.rawData) {
+            this.locale = locale;
+            LocaleUtil.setUserLocale(locale);
+        }
         return this;
     }
 
@@ -290,6 +292,9 @@ public final class PoijiOptions {
     }
 
     private PoijiOptions setRawData(boolean rawData) {
+        if (rawData) {
+            setLocale(Locale.US);
+        }
         this.rawData = rawData;
         return this;
     }
@@ -399,6 +404,7 @@ public final class PoijiOptions {
          * Set the {@link Locale} used by Apache Poi and PoiJ. Default is {@link Locale#ENGLISH}.
          * This setting is only used by Apache Poi thread and PoiJ. See {@link org.apache.poi.util.LocaleUtil}
          * for more details.
+         *
          * @param locale Locale
          * @return this
          */
