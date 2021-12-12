@@ -1,7 +1,6 @@
 package com.poiji.bind.mapping;
 
 import com.poiji.option.PoijiOptions;
-import org.apache.poi.ss.usermodel.BuiltinFormats;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
@@ -12,8 +11,6 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.Attributes2Impl;
-
-import static org.apache.poi.xssf.usermodel.XSSFRelation.NS_SPREADSHEETML;
 
 /**
  * Created by hakan on 26.04.2020
@@ -72,9 +69,6 @@ class XSSFSheetXMLPoijiHandler extends XSSFSheetXMLHandler {
         if (this.cellFormat == null) {
             return;
         }
-        if (uri != null && !uri.equals(NS_SPREADSHEETML)) {
-            return;
-        }
 
         if ("c".equals(localName)) {
             // Set up defaults.
@@ -82,10 +76,6 @@ class XSSFSheetXMLPoijiHandler extends XSSFSheetXMLHandler {
             String cellType = attributes.getValue("t");
             String cellStyleStr = attributes.getValue("s");
             CellAddress cellAddress = new CellAddress(cellRef);
-            if ("b".equals(cellType) || "e".equals(cellType) || "inlineStr".equals(cellType)) {
-                this.cellFormat.addFormat(cellAddress, (short) 0, null, cellType, cellStyleStr);
-                return;
-            }
             if ("s".equals(cellType) || "str".equals(cellType)) {
                 this.cellFormat.addFormat(cellAddress, (short) 0, null, cellType, cellStyleStr);
                 return;
@@ -96,15 +86,11 @@ class XSSFSheetXMLPoijiHandler extends XSSFSheetXMLHandler {
                 if (cellStyleStr != null) {
                     int styleIndex = Integer.parseInt(cellStyleStr);
                     style = stylesTable.getStyleAt(styleIndex);
-                } else if (stylesTable.getNumCellStyles() > 0) {
-                    style = stylesTable.getStyleAt(0);
                 }
             }
             if (style != null) {
                 short formatIndex = style.getDataFormat();
                 String formatString = style.getDataFormatString();
-                if (formatString == null)
-                    formatString = BuiltinFormats.getBuiltinFormat(formatIndex);
 
                 this.cellFormat.addFormat(cellAddress, formatIndex, formatString, cellType, cellStyleStr);
             }
