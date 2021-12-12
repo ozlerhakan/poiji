@@ -22,16 +22,20 @@ import static org.junit.Assert.assertEquals;
 public class RawValueLocaleTest {
 
     private final String path;
+    private final boolean isRawData;
 
-    public RawValueLocaleTest(String path) {
+    public RawValueLocaleTest(String path, boolean isRawData) {
         this.path = path;
+        this.isRawData = isRawData;
     }
 
     @Parameterized.Parameters(name = "{index}: ({0})={1}")
     public static Iterable<Object[]> queries() {
         return Arrays.asList(new Object[][]{
-                {"src/test/resources/raw_value_locale.xls"},
-                {"src/test/resources/raw_value_locale.xlsx"},
+                {"src/test/resources/raw_value_locale.xls", true},
+                {"src/test/resources/raw_value_locale.xlsx", true},
+                {"src/test/resources/raw_value_locale.xls", false},
+                {"src/test/resources/raw_value_locale.xlsx", false},
         });
     }
 
@@ -42,11 +46,15 @@ public class RawValueLocaleTest {
 
     @Test
     public void shouldMapRawValueWithDifferentLocale() {
-        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().headerCount(0).setLocale(Locale.GERMANY).rawData(true).build();
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().headerCount(0).setLocale(Locale.GERMANY).rawData(isRawData).build();
         List<RowModelDouble> models = Poiji.fromExcel(new File(path), RowModelDouble.class, options);
 
         for (RowModelDouble model : models) {
-            assertEquals(0.351D, model.getRowValue(), 0);
+            if (isRawData) {
+                assertEquals(0.351D, model.getRowValue(), 0);
+            } else {
+                assertEquals(0.4D, model.getRowValue(), 0);
+            }
         }
     }
 }

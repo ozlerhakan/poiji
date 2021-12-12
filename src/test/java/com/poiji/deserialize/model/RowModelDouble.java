@@ -14,7 +14,4 @@ public class RowModelDouble {
         return rowValue;
     }
 
-    public void setRowValue(double rowValue) {
-        this.rowValue = rowValue;
-    }
 }
