@@ -34,7 +34,7 @@ You can find the latest and earlier development versions including javadoc and s
 
 == Documentation
 
-Poiji has a new documentation site. Documentation is available online at https://ozlerhakan.github.io/poiji/[ozlerhakan.github.io/poiji] and in the docs directory.
+Poiji has a new documentation site. Documentation is available online at https://ozlerhakan.github.io/poiji/[ozlerhakan.github.io/poiji] and in the https://github.com/ozlerhakan/poiji-documentation[poiji-docs] repository.
 
 == License
 
