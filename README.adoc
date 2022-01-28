@@ -1,3 +1,5 @@
+:toc: macro
+:toclevels: 2
 
 = Poiji
 :version: v3.1.5
@@ -7,6 +9,9 @@ image:https://github.com/ozlerhakan/poiji/actions/workflows/maven.yml/badge.svg[
 image:https://codecov.io/gh/ozlerhakan/poiji/branch/{branch}/graph/badge.svg?token=MN6V6xOWBq["Codecov", link="https://codecov.io/gh/ozlerhakan/poiji"] image:https://img.shields.io/badge/apache.poi-5.1.0-brightgreen.svg[] image:https://app.fossa.com/api/projects/git%2Bgithub.com%2Fozlerhakan%2Fpoiji.svg?type=shield["FOSSA Status", link="https://app.fossa.com/projects/git%2Bgithub.com%2Fozlerhakan%2Fpoiji?ref=badge_shield"]
 
 Poiji is a tiny thread-safe Java library that provides one way mapping from Excel sheets to Java classes. In a way it lets us convert each row of the specified excel data into Java objects. Poiji uses https://poi.apache.org/[Apache Poi] (the Java API for Microsoft Documents) under the hood to fulfill the mapping process.
+
+[%collapsible]
+toc::[]
 
 == Getting Started
 
@@ -32,9 +37,801 @@ dependencies {
 
 You can find the latest and earlier development versions including javadoc and source files on https://oss.sonatype.org/content/groups/public/com/github/ozlerhakan/poiji/[Sonatypes OSS repository].
 
+
+You can find the latest and earlier development versions including javadoc and source files on https://oss.sonatype.org/content/groups/public/com/github/ozlerhakan/poiji/[Sonatypes OSS repository].
+
+.`Poiji.fromExcel` Structure
+----
+com.poiji.bind.Poiji#fromExcel(java.io.File, java.lang.Class<T>)
+com.poiji.bind.Poiji#fromExcel(java.io.File, java.lang.Class<T>, java.util.function.Consumer<? super T>)
+com.poiji.bind.Poiji#fromExcel(java.io.File, java.lang.Class<T>, com.poiji.option.PoijiOptions)
+com.poiji.bind.Poiji#fromExcel(java.io.File, java.lang.Class<T>, com.poiji.option.PoijiOptions, java.util.function.Consumer<? super T>)
+com.poiji.bind.Poiji#fromExcel(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>)
+com.poiji.bind.Poiji#fromExcel(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>, java.util.function.Consumer<? super T>)
+com.poiji.bind.Poiji#fromExcel(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>, com.poiji.option.PoijiOptions)
+com.poiji.bind.Poiji#fromExcel(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>, com.poiji.option.PoijiOptions, java.util.function.Consumer<? super T>)
+com.poiji.bind.Poiji#fromExcel(org.apache.poi.ss.usermodel.Sheet, java.lang.Class<T>)
+com.poiji.bind.Poiji#fromExcel(org.apache.poi.ss.usermodel.Sheet, java.lang.Class<T>, com.poiji.option.PoijiOptions)
+com.poiji.bind.Poiji#fromExcel(org.apache.poi.ss.usermodel.Sheet, java.lang.Class<T>, com.poiji.option.PoijiOptions, java.util.function.Consumer<? super T>)
+
+com.poiji.bind.Poiji#fromExcelProperties(java.io.File, java.lang.Class<T>)
+com.poiji.bind.Poiji#fromExcelProperties(java.io.File, java.lang.Class<T>, com.poiji.option.PoijiOptions)
+com.poiji.bind.Poiji#fromExcelProperties(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>)
+com.poiji.bind.Poiji#fromExcelProperties(java.io.InputStream, com.poiji.exception.PoijiExcelType, java.lang.Class<T>, com.poiji.option.PoijiOptions)
+----
+
+.`PoijiOptions.PoijiOptionsBuilder` Structure
+----
+com.poiji.option.PoijiOptions.PoijiOptionsBuilder
+    #settings()
+    #build()
+    #dateLenient(boolean)
+    #dateRegex(String)
+    #datePattern(String)
+    #dateTimeFormatter(java.time.format.DateTimeFormatter)
+    #ignoreHiddenSheets(boolean)
+    #password(String)
+    #preferNullOverDefault(boolean)
+    #settings(int)
+    #sheetIndex(int)
+    #skip(int)
+    #limit(int)
+    #trimCellValue(boolean)
+    #headerStart(int)
+    #withCasting(Casting)
+    #withFormatting(Formatting)
+    #caseInsensitive(boolean)
+    #ignoreWhitespaces(boolean)
+    #poijiNumberFormat(PoijiNumberFormat)
+    #poijiLogCellFormat(PoijiLogCellFormat)
+    #disableXLSXNumberCellFormat()
+    #addListDelimiter(String)
+    #setLocale(java.util.Locale)
+    #rawData(boolean)
+----
+
 == Documentation
 
-Poiji has a new documentation site. Documentation is available online at https://ozlerhakan.github.io/poiji/[ozlerhakan.github.io/poiji] and in the https://github.com/ozlerhakan/poiji-documentation[poiji-docs] repository.
+Here are the list of features with examples that the latest version of Poiji supports.
+
+=== Annotations
+
+Create your object model:
+
+[source,java]
+----
+public class Employee {
+
+    @ExcelRow                    <1>
+    private int rowIndex;
+
+    @ExcelCell(0)                <2>
+    private long employeeId;     <3>
+
+    @ExcelCell(1)
+    private String name;
+
+    @ExcelCell(2)
+    private String surname;
+
+    @ExcelCell(3)
+    private int age;
+
+    @ExcelCell(4)
+    private boolean single;
+
+    @ExcelCellName("emails")     <4>
+    List<String> emails;
+
+    @ExcelCell(5)
+    List<BigDecimal> bills;
+
+    //no need getters/setters to map excel cells to fields
+}
+----
+<1> Optionally, we can access the index of each row item by using the `ExcelRow` annotation. Annotated variable should be of type `int`, `double`, `float` or `long`.
+<2> A field must be annotated with `@ExcelCell` along with its property in order to get the value from the right coordinate in the target excel sheet.
+<3> An annotated field can be either protected, private or public modifier. The field may be either of `boolean`, `int`, `long`, `float`, `double`, or their wrapper classes. You can add a field of `java.util.Date`, `java.time.LocalDate`, `java.time.LocalDateTime` and `String` as well.
+<4> If one column contains multiple value, you can get them using a List field. A List field can store items which is of type `BigDecimal`, `Long`, `Double`, `Float`, `Integer`, `Boolean` and `String`.
+
+This is the excel file (`employees.xlsx`) we want to map to a list of `Employee` instance:
+
+|===
+|ID | NAME |SURNAME |AGE |SINGLE |BILLS | EMAILS
+
+|123923
+|Joe
+|Doe
+|30
+|TRUE
+|123,10;99.99
+|joe@doe.com;joedoe@gmail.com
+
+|123123
+|Sophie
+|Derue
+|20
+|TRUE
+|1022
+|sophie.derue@gmail.com;sophie@derue.com
+
+|135923
+|Paul
+|Raul
+|31
+|FALSE
+|73,25;70
+|paul.raul@gmail.com;paul@raul.com
+|===
+
+The snippet below shows how to obtain the excel data using `Poiji`.
+
+[source,java]
+----
+PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+        .addListDelimiter(";") <1>
+        .build();
+List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class, options);
+// alternatively
+InputStream stream = new FileInputStream(new File("employees.xls"))
+List<Employee> employees = Poiji.fromExcel(stream, PoijiExcelType.XLS, Employee.class, options);
+
+employees.size();
+// 3
+Employee firstEmployee = employees.get(0);
+// Employee{rowIndex=1, employeeId=123923, name='Joe', surname='Doe', age=30, single=true, emails=[joe@doe.com, joedoe@gmail.com], biils=[123,10, 99.99]}
+----
+<1> By default the delimiter/separator is `,` to split items in a cell. There is an option to change this behavior. Since we use `;` between items, we need to tell Poiji to use `;` as a separator.
+
+By default, Poiji ignores the header row of the excel data. If you want to ignore the first row of data, you need to use `PoijiOptions`.
+
+[source,java]
+----
+PoijiOptions options = PoijiOptionsBuilder.settings(1).build(); // we eliminate Joe Doe.
+List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class, options);
+Employee firstEmployee = employees.get(0);
+// Employee{rowIndex=2, employeeId=123123, name='Sophie', surname='Derue', age=20, single=true, emails=[sophie.derue@gmail.com, sophie@derue.com], biils=[1022]}
+----
+
+By default, Poiji selects the first sheet of an excel file. You can override this behaviour like below:
+
+[source,java]
+----
+PoijiOptions options = PoijiOptionsBuilder.settings()
+                       .sheetIndex(1) <1>
+                       .build();
+----
+1. Poiji should look at the second (zero-based index) sheet of your excel file.
+== Documentation
+
+=== Prefer Default Value
+
+If you want a date field to return `null` rather than a default date, use `PoijiOptionsBuilder` with the `preferNullOverDefault` method as follows:
+
+[source,java]
+----
+PoijiOptions options = PoijiOptionsBuilder.settings()
+                       .preferNullOverDefault(true) <1>
+                       .build();
+----
+1. a field that is of type either `java.util.Date`, `Float`, `Double`, `Integer`, `Long` or `String` will have a `null` value.
+
+=== Sheet Name Option
+
+Poiji allows specifying the sheet name using annotation
+
+[source,java]
+----
+@ExcelSheet("Sheet2")  (1)
+public class Student {
+
+    @ExcelCell(0)
+    private String name;
+
+    @ExcelCell(1)
+    private String id;
+
+    @ExcelCell(2)
+    private String phone;
+
+
+    @Override
+    public String toString() {
+        return "Student {" +
+                " name=" + name +
+                ", id=" + id + "'" +
+                ", phone='" + phone + "'" +
+                '}';
+    }
+}
+----
+<1> With the `ExcelSheet` annotation we are configuring the name of the sheet to read data from. The other sheets will be ignored.
+
+=== Protected Excels
+
+Consider that your excel file is protected with a password, you can define the password via `PoijiOptionsBuilder` to read rows:
+
+----
+PoijiOptions options = PoijiOptionsBuilder.settings()
+                    .password("1234")
+                    .build();
+List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class, options);
+----
+
+=== Annotation ExcelCellName
+
+Using `ExcelCellName`, we can read the values by column names directly.
+
+[source,java]
+----
+public class Person {
+
+    @ExcelCellName("Name")  <1>
+    protected String name;
+
+    @ExcelCellName("Address")
+    protected String address;
+
+    @ExcelCellName("Age")
+    protected int age;
+
+    @ExcelCellName("Email")
+    protected String email;
+
+}
+----
+1. We need to specify the `name` of the column for which the corresponding value is looked. By default, `@ExcelCellName` is case-sensitive and the excel file should't contain duplicated column names. However, you can manipulate this feature using `PoijiOptionsBuilder#caseInsensitive(boolean)` and you can ignore white spaces using `PoijiOptionsBuilder#ignoreWhitespaces(boolean)`.
+
+For example, here is the excel (`person.xls`) file we want to use:
+
+|===
+| Name |Address |Age |Email
+
+|Joe
+|San Francisco, CA
+|30
+|joe@doe.com
+
+|Sophie
+|Costa Mesa, CA
+|20
+|sophie@doe.com
+
+|===
+
+[source,java]
+----
+List<Person> people = Poiji.fromExcel(new File("person.xls"), Person.class);
+people.size();
+// 2
+Person person = people.get(0);
+// Joe
+// San Francisco, CA
+// 30
+// joe@doe.com
+----
+
+Given that the first column always stands for the names of people, you're able to combine the `ExcelCell` annotation with `ExcelCellName` in your object model:
+
+[source,java]
+----
+public class Person {
+
+    @ExcelCell(0)
+    protected String name;
+
+    @ExcelCellName("Address")
+    protected String address;
+
+    @ExcelCellName("Age")
+    protected int age;
+
+    @ExcelCellName("Email")
+    protected String email;
+
+}
+----
+
+=== Super Class Inheritance
+
+Your object model may be derived from a super class:
+
+[source,java]
+----
+public abstract class Vehicle {
+
+    @ExcelCell(0)
+    protected String name;
+
+    @ExcelCell(1)
+    protected int year;
+}
+
+public class Car extends Vehicle {
+
+    @ExcelCell(2)
+    private int nOfSeats;
+}
+----
+
+and you want to map the table (`car.xlsx`) below to Car objects:
+
+|===
+|NAME |YEAR |SEATS
+
+|Honda Civic
+|2017
+|4
+
+|Chevrolet Corvette
+|2017
+|2
+|===
+
+Using Poiji, you can map the annotated field(s) of super class(es) of the target class like so:
+
+[source,java]
+----
+List<Car> cars = Poiji.fromExcel(new File("cars.xls"), Car.class);
+cars.size();
+// 2
+Car car = cars.get(0);
+// Honda Civic
+// 2017
+// 4
+----
+
+=== ExcelCellRange Annotation
+
+Consider you have a table like below:
+
+|===
+.2+|No. 5+|Personal Information 3+| Credit Card Information
+|Name | Age | City | State | Zip Code | Card Type | Last 4 Digits | Expiration Date
+
+|1
+|John Doe
+|21
+|Vienna
+|Virginia
+|22349
+|VISA
+|1234
+|Jan-21
+
+|2
+|Jane Doe
+|28
+|Greenbelt
+|Maryland
+|20993
+|MasterCard
+|2345
+|Jun-22
+
+|3
+|Paul Ryan
+|19
+|Alexandria
+|Virginia
+|22312
+|JCB
+|4567
+|Oct-24
+
+|===
+
+The `ExcelCellRange` annotation lets us aggregate a range of information in one object model. In this case, we collect the data in `PersonCreditInfo` plus details of the person in `PersonInfo` and for the credit card in `CardInfo`:
+
+[source,java]
+----
+public class PersonCreditInfo {
+
+    @ExcelCellName("No.")
+    private Integer no;
+
+    @ExcelCellRange
+    private PersonInfo personInfo;
+
+    @ExcelCellRange
+    private CardInfo cardInfo;
+
+    public static class PersonInfo {
+        @ExcelCellName("Name")
+        private String name;
+        @ExcelCellName("Age")
+        private Integer age;
+        @ExcelCellName("City")
+        private String city;
+        @ExcelCellName("State")
+        private String state;
+        @ExcelCellName("Zip Code")
+        private String zipCode;
+    }
+
+    public static class CardInfo {
+        @ExcelCellName("Card Type")
+        private String type;
+        @ExcelCellName("Last 4 Digits")
+        private String last4Digits;
+        @ExcelCellName("Expiration Date")
+        private String expirationDate;
+    }
+}
+----
+
+Using the conventional way, we can retrieve the data using `Poiji.fromExcel`:
+
+[source,java]
+----
+PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().headerCount(2).build();
+List<PersonCreditInfo> actualPersonalCredits = Poiji.fromExcel(new File(path), PersonCreditInfo.class, options);
+
+PersonCreditInfo personCreditInfo1 = actualPersonalCredits.get(0);
+PersonCreditInfo.PersonInfo expectedPerson1 = personCreditInfo1.getPersonInfo();
+PersonCreditInfo.CardInfo expectedCard1 = personCreditInfo1.getCardInfo();
+----
+
+=== Support Consumer Interface
+
+Poiji supports Consumer Interface. As https://github.com/ozlerhakan/poiji/pull/39#issuecomment-409521808[@fmarazita] explained the usage, there are several benefits of having a Consumer:
+
+1. Huge excel file ( without you have all in memory)
+2. Run time processing/filtering data
+3. DB batch insertion
+
+For example, we have a Calculation entity class and want to insert each row into a database while retrieving:
+
+[source, java]
+----
+class Calculation {
+
+  @ExcelCell(0)
+  String name
+
+  @ExcelCell(1)
+  int a
+
+  @ExcelCell(2)
+  int b
+
+  public int getA(){
+    return a;
+  }
+
+  public int getB(){
+    return b;
+  }
+
+  public int getName(){
+    return name;
+  }
+
+}
+----
+
+[source, java]
+----
+File fileCalculation = new File(example.xlsx);
+
+PoijiOptions options = PoijiOptionsBuilder.settings().sheetIndex(1).build();
+
+Poiji.fromExcel(fileCalculation, Calculation.class, options, this::dbInsertion);
+
+private void dbInsertion(Calculation siCalculation) {
+  int value= siCalculation.getA() + siCalculation.getB();
+  String name = siCalculation.getName();
+  insertDB(name , value);
+}
+----
+
+=== Custom Casting Implementation
+
+You can create your own casting implementation without relying on the default Poiji casting configuration using the `Casting` interface.
+
+[source,java]
+----
+public class MyCasting implements Casting {
+    @Override
+    public Object castValue(Class<?> fieldType, String value, PoijiOptions options) {
+       return value.trim();
+    }
+}
+
+public class Person {
+
+    @ExcelCell(0)
+    protected String employeeId;
+
+    @ExcelCell(1)
+    protected String name;
+
+    @ExcelCell(2)
+    protected String surname;
+
+}
+----
+
+Then you can add your custom implementation with the `withCasting` method:
+
+[source,java]
+----
+ PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .withCasting(new MyCasting())
+                .build();
+
+List<Person> people = Poiji.fromExcel(excel, Person.class, options);
+----
+
+=== Parse UnknownCells
+
+You can annotate a `Map<String, String>` with `@ExcelUnknownCells` to parse all entries,
+which are not mapped in any other way (for example by index or by name).
+
+This is our object model:
+
+[source,java]
+----
+public class MusicTrack {
+
+    @ExcelCellName("ID")
+    private String employeeId;
+
+    @ExcelCellName("AUTHOR")
+    private String author;
+
+    @ExcelCellName("NAME")
+    private String name;
+
+    @ExcelUnknownCells
+    private Map<String, String> unknownCells;
+
+}
+----
+
+This is the excel file we want to parse:
+
+|===
+|ID | AUTHOR |NAME |ENCODING |BITRATE
+
+|123923
+|Joe Doe
+|The example song
+|mp3
+|256
+
+|56437
+|Jane Doe
+|The random song
+|flac
+|1500
+|===
+
+The object corresponding to the first row of the excel sheet then has a map with `{ENCODING=mp3, BITRATE=256}`
+and the one for the second row has `{ENCODING=flac, BITRATE=1500}`.
+
+Note that If you use the `PoijiOptionsBuilder#caseInsensitive(true)` option, the ExcelUnknownCells map will be parsed with lowercase.
+
+=== Optional Mandatory Columns
+
+By default `@ExcelCellName` and `@ExcelCell` expect their related excel columns exist in a given excel file, otherwise a `HeaderMissingException` will be thrown.
+
+You can change this behavior by using the `mandatory` parameter on each annotation:
+
+----
+@ExcelCellName(value = "COLUMN NAME", mandatory = false)
+String missingColumn;
+
+@ExcelCell(value = COLUMN_INDEX, mandatory = false)
+String missingColumn;
+----
+
+=== Debug Cells Formats
+
+We can observe each cell format of a given excel file. Assume that we have an excel file like below:
+
+|===
+|Date
+|12/31/2020 12.00 AM
+|===
+
+We can get all the list of cell formats using `PoijiLogCellFormat` with `PoijiOptions`:
+
+----
+PoijiLogCellFormat log = new PoijiLogCellFormat();
+PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+        .poijiCellFormat(log)
+        .build();
+List<Model> dates = Poiji.fromExcel(stream, poijiExcelType, Model.class, options);
+
+Model model = rows.get(0)
+model.getDate();
+// 12.00
+----
+
+Hmm, It looks like we did not achieve the correct date format since we get the date value as (`12.00`). Let's see how internally the excel file is being parsed via `PoijiLogCellFormat`:
+
+----
+List<InternalCellFormat> formats = log.formats();
+InternalCellFormat cell10 = formats.get(1);
+
+cell10.getFormatString()
+// mm:ss.0
+cell10.getFormatIndex()
+// 47
+----
+
+Now that we know the reason of why we don't see the expected date value, it's because the default format of the date cell is the `mm:ss.0` format with a given index 47, we need to change the default format of index (i.e. `47`). This format was automatically assigned to the cell having a number, but almost certainly with a special style or format. Note that this option should be used for debugging purpose only.
+
+=== Modify Cells Formats
+
+We can change the default format of a cell using `PoijiNumberFormat`. Recall `Debug Cells Formats`, we are unable to see the correct cell format, what's more the excel file uses another format which we do not want to.
+
+|===
+|Date
+|12/31/2020 12.00 AM
+|===
+
+Using `PoijiNumberFormat` option, we are able to change the behavior of the format of a specific index:
+
+----
+PoijiNumberFormat numberFormat = new PoijiNumberFormat();
+numberFormat.putNumberFormat((short) 47, "mm/dd/yyyy hh.mm aa");
+
+PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+        .poijiNumberFormat(numberFormat)
+        .build();
+
+List<Model> rows = Poiji.fromExcel(stream, poijiExcelType, Model.class, options);
+
+Model model = rows.get(0)
+model.getDate();
+// 12/31/2020 12.00 AM  <1>
+----
+1. Voila!
+
+We know that the index 47 uses the format `mm:ss.0` by default in the given excel file, thus we're able to override its format with `mm/dd/yyyy hh.mm aa` using the `putNumberFormat` method.
+
+=== Read Excel Properties
+
+It is possible to read excel properties from xlsx files. To achieve that, create a class with fields annotated with `@ExcelProperty`.
+
+Example:
+
+[source,java]
+----
+public class ExcelProperties {
+    @ExcelProperty
+    private String title;
+
+    @ExcelProperty
+    private String customProperty;
+}
+----
+
+The field name corresponds to the name of the property inside the Excel file.
+To use a different one than the field name, you can specify a `propertyName` (e.g. `@ExcelProperty(propertyName = "customPropertyName")`)
+
+The list of built-in (e.g. non-custom) properties in an Excel file, which can be read by Poiji can be found in the class `DefaultExcelProperties`.
+
+Poiji can only read Text properties from an Excel file, so you have to use a `String` to read them.
+This does not apply to "modified", "lastPrinted" and "created", which are deserialized into a `Date`.
+
+
+=== Disable Cells Formats
+
+Consider we have a xls or xlsx excel file like below:
+
+|===
+|Amount
+|25,00
+|(50,00)
+|(65,00)
+|===
+
+Since we use a cell format on line 4 and 5 (i.e. `(50,00)` and `(65,00)`), we don't want to see the formatted value of each cell after processing. In order to do that, we can use `@DisableCellFormatXLS` on a field if the file ends with `xls` or `disableXLSXNumberCellFormat()` for xlsx files using `PoijiOptions`.
+
+.xls files
+----
+public class TestInfo {
+    @ExcelCell(0)
+    @DisableCellFormatXLS <1>
+    public BigDecimal amount;
+}
+----
+1. we only disable cell formats on the specified column.
+
+.xlsx files
+----
+public class TestInfo {
+    @ExcelCell(0)
+    private BigDecimal amount;
+}
+
+PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .disableXLSXNumberCellFormat() <1>
+                .build();
+----
+1. when disabling *number* cell format, we disable it in the entire cells for xlsx files.
+
+and let Poiji ignores the cell formats:
+
+----
+List<TestInfo> result = Poiji.fromExcel(new File(path), TestInfo.class, options); <1>
+
+result.get(1).amount
+// -50
+----
+1. Add `options`, if your excel is xlsx file.
+
+=== Create Custom Formatting
+
+You can create your own formatting implementation without relying on the default Poiji formatting configuration using the `Formatting` interface.
+
+[source,java]
+----
+public class MyFormatting implements Formatting {
+    @Override
+    public String transform(PoijiOptions options, String value) {
+        return value.toUpperCase().trim(); <1>
+    }
+}
+
+public class Person {
+
+    @ExcelCellName("ID")
+    protected String employeeId;
+
+    @ExcelCellName("NAME")
+    protected String name;
+
+    @ExcelCellName("SURNAME")
+    protected String surname;
+
+}
+----
+<1> Suppose that all the header names of an excel file have different formatting. Using custom formatting, we are able to look at headers with a custom format. All the headers will be uppercase and don't have white spaces before and after.
+
+Then you can add your custom implementation with the `withFormatting` method:
+
+[source,java]
+----
+PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .withFormatting(new MyFormatting())
+                .build();
+List<Person> people = Poiji.fromExcel(excel, Person.class, options);
+----
+
+=== Poi Sheet Support
+
+Poiji accepts excel records via Poi Sheet object as well:
+
+[source,java]
+----
+File file = new File("/tmp/file.xlsx");
+FileInputStream fileInputStream = new FileInputStream(file);
+Workbook workbook = new XSSFWorkbook(fileInputStream);
+Sheet sheet = workbook.getSheetAt(0);
+
+List<Model> result = Poiji.fromExcel(sheet, Model.class);
+----
+
+=== Update Default Locale
+
+For parsing numbers and dates java.lang.Locale is used. Also Apache Poi uses the Locale for parsing.
+As default, Poij uses Locale.US irrespective of Locale used on the running system. If you want to change that
+you can use a option to pass the Locale to be used like shown below.
+
+In this example the Jvm default locale is used. Beware that if your code run's on a other Jvm with another Locale set as default parsing could give different results. Better is to use a fixed locale.
+Also be aware of differences how Locales behave between Java 8 and 9+. For example AM/PM in Locale.GERMANY is displayed as AM/PM in Java 8 but Vorn./Nam. in Java 9 or higher.
+This is due to the changes in Java 9. See https://openjdk.java.net/jeps/252[JEP-252] for more details.
+
+[source,java]
+----
+PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .setLocale(Locale.getDefault())
+                .build();
+----
 
 == License
 
