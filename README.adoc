@@ -37,8 +37,7 @@ dependencies {
 
 You can find the latest and earlier development versions including javadoc and source files on https://oss.sonatype.org/content/groups/public/com/github/ozlerhakan/poiji/[Sonatypes OSS repository].
 
-
-You can find the latest and earlier development versions including javadoc and source files on https://oss.sonatype.org/content/groups/public/com/github/ozlerhakan/poiji/[Sonatypes OSS repository].
+== Usage
 
 .`Poiji.fromExcel` Structure
 ----
