@@ -45,8 +45,8 @@
     </issueManagement>
 
     <properties>
-      <apache.poi.version>5.1.0</apache.poi.version>
-        <junit.version>4.12</junit.version>
+        <apache.poi.version>5.2.1</apache.poi.version>
+        <junit.version>4.13.2</junit.version>
         <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -126,7 +126,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.4</version>
+                <version>3.3.2</version>
                 <dependencies>
                     <dependency>
                         <groupId>commons-lang</groupId>
@@ -143,7 +143,6 @@
                         <configuration>
                             <source>11</source>
                             <detectJavaApiLink>false</detectJavaApiLink>
-                            <additionalparam>${javadoc.none}</additionalparam>
                         </configuration>
                     </execution>
                 </executions>
@@ -202,7 +201,7 @@
         <profile>
             <id>javadoclint</id>
             <activation>
-                <jdk>[1.8,)</jdk>
+                <jdk>[1.8)</jdk>
             </activation>
             <properties>
                 <javadoc.none>-Xdoclint:none</javadoc.none>
