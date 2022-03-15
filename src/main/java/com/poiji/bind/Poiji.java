@@ -28,7 +28,7 @@ import static com.poiji.util.PoijiConstants.XLS_EXTENSION;
  * <p>
  * Example:
  * <pre>
- * List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class);
+ * List employees = Poiji.fromExcel(new File("employees.xls"), Employee.class);
  * employees.size();
  * // 3
  * Employee firstEmployee = employees.get(0);
@@ -164,6 +164,7 @@ public final class Poiji {
      * @param type     type of the root object.
      * @param <T>      type of the root object.
      * @param consumer output retrieves records
+     * @return the newly created objects
      * @throws PoijiException            if an internal exception occurs during the mapping
      *                                   process.
      * @throws InvalidExcelFileExtension if the specified excel file extension
@@ -204,6 +205,7 @@ public final class Poiji {
      * @param excelType   type of the excel file, xls or xlsx
      * @param type        type of the root object.
      * @param <T>         type of the root object.
+     * @return the newly created objects
      * @param consumer    represents an operation that accepts the type argument
      * @throws PoijiException            if an internal exception occurs during the mapping process.
      * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
@@ -245,6 +247,7 @@ public final class Poiji {
      * @param file     excel file ending with .xls or .xlsx.
      * @param type     type of the root object.
      * @param <T>      type of the root object.
+     * @return the newly created objects
      * @param options  specifies to change the default behaviour of the poiji.
      * @param consumer represents an operation that accepts the type argument
      * @throws PoijiException            if an internal exception occurs during the mapping process.
@@ -290,6 +293,7 @@ public final class Poiji {
      * @param <T>         type of the root object.
      * @param options     specifies to change the default behaviour of the poiji.
      * @param consumer    represents an operation that accepts the type argument
+     * @return the newly created objects
      * @throws PoijiException            if an internal exception occurs during the mapping process.
      * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
      * @throws IllegalCastException      if this Field object is enforcing Java
@@ -314,6 +318,7 @@ public final class Poiji {
      * @param type    type of the root object.
      * @param <T>     type of the root object.
      * @param options specifies to change the default behaviour of the poiji.
+     * @return the newly created objects
      * @throws PoijiException if an internal exception occurs during the mapping process.
      * @see Poiji#fromExcel(Sheet, Class, PoijiOptions, Consumer)
      * @see Poiji#fromExcel(Sheet, Class)
@@ -334,6 +339,7 @@ public final class Poiji {
      * @param sheet excel sheet its workbook must be either an instance of {@code HSSFWorkbook} or {@code XSSFWorkbook}.
      * @param type  type of the root object.
      * @param <T>   type of the root object.
+     * @return the newly created objects
      * @throws PoijiException if an internal exception occurs during the mapping process.
      * @see Poiji#fromExcel(Sheet, Class, PoijiOptions)
      * @see Poiji#fromExcel(Sheet, Class, PoijiOptions, Consumer)
@@ -355,6 +361,7 @@ public final class Poiji {
      * @param <T>      type of the root object.
      * @param options  specifies to change the default behaviour of the poiji.
      * @param consumer represents an operation that accepts the type argument.
+     * @return the newly created objects
      * @throws PoijiException if an internal exception occurs during the mapping process.
      * @see Poiji#fromExcel(Sheet, Class, PoijiOptions)
      * @see Poiji#fromExcel(Sheet, Class)
