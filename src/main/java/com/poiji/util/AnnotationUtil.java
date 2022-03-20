@@ -24,7 +24,12 @@ public final class AnnotationUtil {
      * Validate that all headers specified via @ExcelCellName annotations are present in the list of header names.
      * <p>
      * Validation is only performed if it is set in the PoijiOptions
-     *
+     * @param options poijoption
+     * @param formatting formatting
+     * @param modelType class model
+     * @param titleToIndex tiletoindex
+     * @param indexToTitle indextoTitle
+     * @param <T> model Type
      * @throws HeaderMissingException if one or more headers are missing
      */
     public static <T> void validateMandatoryNameColumns(PoijiOptions options,

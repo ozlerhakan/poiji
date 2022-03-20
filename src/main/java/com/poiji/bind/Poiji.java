@@ -28,7 +28,7 @@ import static com.poiji.util.PoijiConstants.XLS_EXTENSION;
  * <p>
  * Example:
  * <pre>
- * List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class);
+ * List employees = Poiji.fromExcel(new File("employees.xls"), Employee.class);
  * employees.size();
  * // 3
  * Employee firstEmployee = employees.get(0);
@@ -314,6 +314,7 @@ public final class Poiji {
      * @param type    type of the root object.
      * @param <T>     type of the root object.
      * @param options specifies to change the default behaviour of the poiji.
+     * @return the newly created objects
      * @throws PoijiException if an internal exception occurs during the mapping process.
      * @see Poiji#fromExcel(Sheet, Class, PoijiOptions, Consumer)
      * @see Poiji#fromExcel(Sheet, Class)
@@ -334,6 +335,7 @@ public final class Poiji {
      * @param sheet excel sheet its workbook must be either an instance of {@code HSSFWorkbook} or {@code XSSFWorkbook}.
      * @param type  type of the root object.
      * @param <T>   type of the root object.
+     * @return the newly created objects
      * @throws PoijiException if an internal exception occurs during the mapping process.
      * @see Poiji#fromExcel(Sheet, Class, PoijiOptions)
      * @see Poiji#fromExcel(Sheet, Class, PoijiOptions, Consumer)
