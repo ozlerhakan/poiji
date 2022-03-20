@@ -46,7 +46,6 @@ class XSSFSheetXMLPoijiHandler extends XSSFSheetXMLHandler {
                 !"oddFooter".equals(localName) &&
                 !"evenFooter".equals(localName)) {
             if ("c".equals(localName)) {
-                String cellFormat = attributes.getValue("r");
                 String cellType = attributes.getValue("t");
                 String cellStyleStr = attributes.getValue("s");
                 if (!"b".equals(cellType) &&
