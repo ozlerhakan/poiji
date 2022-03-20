@@ -5,8 +5,6 @@ package com.poiji.util;
     Each of these properties has corresponds to a certain type.
  */
 public final class DefaultExcelProperties {
-    private DefaultExcelProperties() {
-    }
 
     public static final String CATEGORY = "category";               //java.util.String
     public static final String CONTENT_STATUS = "contentStatus";    //java.util.String
@@ -19,4 +17,7 @@ public final class DefaultExcelProperties {
     public static final String SUBJECT = "subject";                 //java.util.String
     public static final String TITLE = "title";                     //java.util.String
     public static final String REVISION = "revision";               //java.util.String
+
+    private DefaultExcelProperties() {
+    }
 }

@@ -8,4 +8,4 @@ mvn dependency:copy-dependencies -DoutputDirectory=jshell/dependencies/ >/dev/nu
 
 DEPS=$(ls -d -1 jshell/dependencies/** | tr '\n' ':')
 
-jshell --class-path ${DEPS}target/poiji.jar jshell/snippets
+jshell --class-path "${DEPS}target/poiji.jar" jshell/snippets

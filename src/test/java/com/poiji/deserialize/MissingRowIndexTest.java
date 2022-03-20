@@ -26,7 +26,7 @@ public class MissingRowIndexTest {
 
     private void emptyLineTest(String excelFilePath) {
         List<OrganisationByName> organisations = Poiji.fromExcel(
-                new File("src/test/resources/missing-row-1.xlsx"),
+                new File(excelFilePath),
                 OrganisationByName.class,
                 PoijiOptions.PoijiOptionsBuilder.settings()
                         .sheetName("Organisation")
@@ -48,9 +48,9 @@ public class MissingRowIndexTest {
         nullLineTest("src/test/resources/missing-row-2.xls");
     }
 
-    private void nullLineTest(String s) {
+    private void nullLineTest(String excelFilePath) {
         List<OrganisationByName> organisations = Poiji.fromExcel(
-                new File("src/test/resources/missing-row-2.xlsx"),
+                new File(excelFilePath),
                 OrganisationByName.class,
                 PoijiOptions.PoijiOptionsBuilder.settings()
                         .sheetName("Organisation")
