@@ -133,14 +133,6 @@ public class DefaultCasting implements Casting {
         }
     }
 
-    private String[] parseArrayList(String value, PoijiOptions options, String sheetName, int row, int col) {
-        try {
-            return value.split(options.getListDelimiter());
-        } catch (Exception e) {
-            return onError(value, sheetName, row, col, e, options.preferNullOverDefault() ? null : new String[]{});
-        }
-    }
-
     private Date dateValue(String value, String sheetName, int row, int col, PoijiOptions options) {
 
         //ISSUE #57

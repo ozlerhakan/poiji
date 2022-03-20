@@ -366,7 +366,7 @@ public final class Poiji {
                                      final PoijiOptions options,
                                      final Consumer<? super T> consumer) {
         Objects.requireNonNull(sheet);
-        final Unmarshaller unmarshaller = UnmarshallerHelper.SheetInstance(sheet, options);
+        final Unmarshaller unmarshaller = UnmarshallerHelper.sheetInstance(sheet, options);
         unmarshaller.unmarshal(type, consumer);
     }
 
@@ -376,9 +376,9 @@ public final class Poiji {
         String extension = files.getExtension(file.getName());
 
         if (XLS_EXTENSION.equals(extension)) {
-            return UnmarshallerHelper.HSSFInstance(poijiFile, options);
+            return UnmarshallerHelper.hssfInstance(poijiFile, options);
         } else if (XLSX_EXTENSION.equals(extension)) {
-            return UnmarshallerHelper.XSSFInstance(poijiFile, options);
+            return UnmarshallerHelper.xssfInstance(poijiFile, options);
         } else {
             throw new InvalidExcelFileExtension("Invalid file extension (" + extension + "), expected .xls or .xlsx");
         }
@@ -388,9 +388,9 @@ public final class Poiji {
         final PoijiInputStream<?> poijiInputStream = new PoijiInputStream<>(inputStream);
 
         if (excelType == PoijiExcelType.XLS) {
-            return UnmarshallerHelper.HSSFInstance(poijiInputStream, options);
+            return UnmarshallerHelper.hssfInstance(poijiInputStream, options);
         } else if (excelType == PoijiExcelType.XLSX) {
-            return UnmarshallerHelper.XSSFInstance(poijiInputStream, options);
+            return UnmarshallerHelper.xssfInstance(poijiInputStream, options);
         } else {
             throw new InvalidExcelFileExtension("Invalid file extension (" + excelType + "), expected .xls or .xlsx");
         }

@@ -82,11 +82,9 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
             while (iter.hasNext()) {
                 try (InputStream stream = iter.next()) {
                     WorkBookSheet wbs = sheets.get(sheetCounter);
-                    if (wbs.getState().equals("visible")) {
-                        if (iter.getSheetName().equalsIgnoreCase(sheetName)) {
-                            processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
-                            return;
-                        }
+                    if (wbs.getState().equals("visible") && iter.getSheetName().equalsIgnoreCase(sheetName)) {
+                        processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
+                        return;
                     }
                 }
                 sheetCounter++;

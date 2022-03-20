@@ -20,15 +20,15 @@ public class OrgWithUnknownCells {
     @ExcelUnknownCells
     private Map<String, String> unknownCells;
 
-    public Map<String, String> getUnknownCells() {
-        return unknownCells;
-    }
-
     @ExcelCell(2)
     private String name;
 
     @ExcelCell(3)
     private String customerExternalId;
+
+    public Map<String, String> getUnknownCells() {
+        return unknownCells;
+    }
 
     public int getRowIndex() {
         return rowIndex;

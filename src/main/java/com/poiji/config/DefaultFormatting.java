@@ -4,18 +4,16 @@ import com.poiji.option.PoijiOptions;
 
 public class DefaultFormatting implements Formatting {
 
-    public DefaultFormatting() {
-    }
-
     @Override
     public String transform(PoijiOptions options, String value) {
+        String valueNorm = value;
         if (options.getCaseInsensitive()) {
-            value = value.toLowerCase();
+            valueNorm = valueNorm.toLowerCase();
         }
         if (options.getIgnoreWhitespaces()) {
-            value = value.trim();
+            valueNorm = valueNorm.trim();
         }
-        return value;
+        return valueNorm;
     }
 
 }
