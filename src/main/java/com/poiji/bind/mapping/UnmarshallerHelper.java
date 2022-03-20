@@ -11,23 +11,23 @@ import org.apache.poi.ss.usermodel.Sheet;
  */
 public final class UnmarshallerHelper {
 
-    public static Unmarshaller HSSFInstance(PoijiFile<?> poijiFile, PoijiOptions options) {
+    public static Unmarshaller hssfInstance(PoijiFile<?> poijiFile, PoijiOptions options) {
         return new HSSFUnmarshallerFile(poijiFile, options);
     }
 
-    public static Unmarshaller HSSFInstance(PoijiInputStream<?> poijiInputStream, PoijiOptions options) {
+    public static Unmarshaller hssfInstance(PoijiInputStream<?> poijiInputStream, PoijiOptions options) {
         return new HSSFUnmarshallerStream(poijiInputStream, options);
     }
 
-    public static Unmarshaller XSSFInstance(PoijiFile<?> poijiFile, PoijiOptions options) {
+    public static Unmarshaller xssfInstance(PoijiFile<?> poijiFile, PoijiOptions options) {
         return new XSSFUnmarshallerFile(poijiFile, options);
     }
 
-    public static Unmarshaller XSSFInstance(PoijiInputStream<?> poijiInputStream, PoijiOptions options) {
+    public static Unmarshaller xssfInstance(PoijiInputStream<?> poijiInputStream, PoijiOptions options) {
         return new XSSFUnmarshallerStream(poijiInputStream, options);
     }
 
-    public static Unmarshaller SheetInstance(Sheet sheet, PoijiOptions options) {
+    public static Unmarshaller sheetInstance(Sheet sheet, PoijiOptions options) {
         return new SheetUnmarshaller(sheet, options);
     }
 }

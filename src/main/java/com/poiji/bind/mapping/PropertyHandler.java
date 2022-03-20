@@ -7,17 +7,17 @@ import org.apache.poi.ooxml.POIXMLProperties;
 import java.lang.reflect.Field;
 import java.util.stream.Stream;
 
-import static com.poiji.util.DefaultExcelProperties.CATEGORY;
-import static com.poiji.util.DefaultExcelProperties.CONTENT_STATUS;
-import static com.poiji.util.DefaultExcelProperties.CREATED;
-import static com.poiji.util.DefaultExcelProperties.CREATOR;
-import static com.poiji.util.DefaultExcelProperties.DESCRIPTION;
-import static com.poiji.util.DefaultExcelProperties.KEYWORDS;
-import static com.poiji.util.DefaultExcelProperties.LAST_PRINTED;
-import static com.poiji.util.DefaultExcelProperties.MODIFIED;
-import static com.poiji.util.DefaultExcelProperties.REVISION;
-import static com.poiji.util.DefaultExcelProperties.SUBJECT;
-import static com.poiji.util.DefaultExcelProperties.TITLE;
+import static com.poiji.util.DefaultExcelPropertiesHelper.CATEGORY;
+import static com.poiji.util.DefaultExcelPropertiesHelper.CONTENT_STATUS;
+import static com.poiji.util.DefaultExcelPropertiesHelper.CREATED;
+import static com.poiji.util.DefaultExcelPropertiesHelper.CREATOR;
+import static com.poiji.util.DefaultExcelPropertiesHelper.DESCRIPTION;
+import static com.poiji.util.DefaultExcelPropertiesHelper.KEYWORDS;
+import static com.poiji.util.DefaultExcelPropertiesHelper.LAST_PRINTED;
+import static com.poiji.util.DefaultExcelPropertiesHelper.MODIFIED;
+import static com.poiji.util.DefaultExcelPropertiesHelper.REVISION;
+import static com.poiji.util.DefaultExcelPropertiesHelper.SUBJECT;
+import static com.poiji.util.DefaultExcelPropertiesHelper.TITLE;
 
 public final class PropertyHandler {
 

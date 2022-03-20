@@ -12,9 +12,6 @@ public final class PoijiNumberFormat {
 
     private final SortedMap<Short, String> numberFormats = new TreeMap<>();
 
-    public PoijiNumberFormat() {
-    }
-
     public void putNumberFormat(short index, String fmt) {
         numberFormats.put(index, fmt);
     }

@@ -90,6 +90,6 @@ public class FromExcelSheetTest {
         XSSFWorkbook xssfWorkbook = new XSSFWorkbook(fileInputStream);
         Workbook workbook = new SXSSFWorkbook(xssfWorkbook);
         Sheet sheet = workbook.getSheetAt(0);
-        List<CellFormatModel> result = Poiji.fromExcel(sheet, CellFormatModel.class);
+        Poiji.fromExcel(sheet, CellFormatModel.class);
     }
 }
