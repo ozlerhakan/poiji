@@ -378,85 +378,18 @@ public final class Poiji {
         toExcel(sheet, objects, type, PoijiOptionsBuilder.settings().build());
     }
 
+    /**
+     * @param sheet Apache POI sheet; target sheet, which should be written to
+     * @param objects a collection of objects, which should be written
+     * @param type type of these objects
+     * @param options PoijiOptions
+     * @param <T> type of these objects
+     */
     public static <T> void toExcel(final Sheet sheet,
                                    final Collection<T> objects,
                                    final Class<T> type,
                                    final PoijiOptions options) {
-        Field[] fields = type.getDeclaredFields();
-        List<Field> headers = new ArrayList<>();
-
-        int rowIndex = 0;
-        Row header = sheet.createRow(rowIndex);
-        for (int i = 0; i < fields.length; i++) {
-            Field field = fields[i];
-            field.setAccessible(true);
-            ExcelCellName[] annotations = field.getAnnotationsByType(ExcelCellName.class);
-            for (ExcelCellName annotation : annotations) {
-                headers.add(field);
-                Cell cell = header.createCell(i);
-                cell.setCellValue(annotation.value());
-                break;
-            }
-        }
-
-        for (T dto : objects) {
-            Row dataRow = sheet.createRow(++rowIndex);
-            int cellIndex = 0;
-            for (Field field : headers) {
-                Cell cell = dataRow.createCell(cellIndex++);
-                Object object;
-                try {
-                    object = field.get(dto);
-                } catch (IllegalAccessException e) {
-                    throw new PoijiException("Error during processing POJO to Excel", e);
-                }
-                setCellValue(cell, object, field.getType(), options);
-            }
-        }
-    }
-
-    private static void setCellValue(Cell cell, Object value, Class<?> clazz, PoijiOptions options) {
-        Workbook wb = cell.getSheet().getWorkbook();
-        if (clazz.equals(String.class)) {
-            cell.setCellValue((String) value);
-        } else if (clazz.equals(Double.class) || clazz.getName().equals("double")) {
-            cell.setCellValue((Double) value);
-        } else if (clazz.equals(Integer.class) || clazz.getName().equals("int")) {
-            cell.setCellValue((Integer) value);
-        } else if (clazz.equals(Short.class) || clazz.getName().equals("short")) {
-            cell.setCellValue((Short) value);
-        } else if (clazz.equals(Long.class) || clazz.getName().equals("long")) {
-            cell.setCellValue((Long) value);
-        } else if (clazz.equals(Float.class) || clazz.getName().equals("float")) {
-            cell.setCellValue((Float) value);
-        } else if (clazz.equals(Boolean.class) || clazz.getName().equals("boolean")) {
-            cell.setCellValue((Boolean) value);
-        } else if (clazz.equals(LocalDate.class)) {
-            CellStyle cellStyle = wb.createCellStyle();
-            CreationHelper createHelper = wb.getCreationHelper();
-            cellStyle.setDataFormat(
-                    createHelper.createDataFormat().getFormat(options.dateFormatter().toString()));
-            cell.setCellValue((LocalDate) value);
-            cell.setCellStyle(cellStyle);
-        } else if (clazz.equals(LocalDateTime.class)) {
-            CellStyle cellStyle = wb.createCellStyle();
-            CreationHelper createHelper = wb.getCreationHelper();
-            cellStyle.setDataFormat(
-                    createHelper.createDataFormat().getFormat(options.dateTimeFormatter().toString()));
-            cell.setCellValue((LocalDateTime) value);
-            cell.setCellStyle(cellStyle);
-        } else if (clazz.equals(Date.class)) {
-            CellStyle cellStyle = wb.createCellStyle();
-            CreationHelper createHelper = wb.getCreationHelper();
-            cellStyle.setDataFormat(
-                    createHelper.createDataFormat().getFormat(options.dateTimeFormatter().toString()));
-            cell.setCellValue((Date) value);
-            cell.setCellStyle(cellStyle);
-        } else if (clazz.equals(Calendar.class)) {
-            cell.setCellValue((Calendar) value);
-        } else if (clazz.equals(RichTextString.class)) {
-            cell.setCellValue((RichTextString) value);
-        } else throw new IllegalArgumentException("Illegal type of cell: " + clazz.getName());
+        PoijiWriter.toExcel(sheet, objects, type, options);
     }
 
     private static Unmarshaller deserializer(final File file, final PoijiOptions options) {

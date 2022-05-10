@@ -4,6 +4,11 @@ import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.parser.BooleanParser;
 import com.poiji.parser.Parsers;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.RichTextString;
+import org.apache.poi.ss.usermodel.Workbook;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -311,6 +316,56 @@ public class DefaultCasting implements Casting {
         } else {
             throw new PoijiException("logging not enabled");
         }
+    }
+
+    /**
+     * @param cell target cell, which should be set value
+     * @param value target value
+     * @param clazz class of value
+     * @param options PoijiOptions
+     */
+    public static void setCellValueByClass(Cell cell, Object value, Class<?> clazz, PoijiOptions options) {
+        Workbook wb = cell.getSheet().getWorkbook();
+        if (clazz.equals(String.class)) {
+            cell.setCellValue((String) value);
+        } else if (clazz.equals(Double.class) || clazz.getName().equals("double")) {
+            cell.setCellValue((Double) value);
+        } else if (clazz.equals(Integer.class) || clazz.getName().equals("int")) {
+            cell.setCellValue((Integer) value);
+        } else if (clazz.equals(Short.class) || clazz.getName().equals("short")) {
+            cell.setCellValue((Short) value);
+        } else if (clazz.equals(Long.class) || clazz.getName().equals("long")) {
+            cell.setCellValue((Long) value);
+        } else if (clazz.equals(Float.class) || clazz.getName().equals("float")) {
+            cell.setCellValue((Float) value);
+        } else if (clazz.equals(Boolean.class) || clazz.getName().equals("boolean")) {
+            cell.setCellValue((Boolean) value);
+        } else if (clazz.equals(LocalDate.class)) {
+            CellStyle cellStyle = wb.createCellStyle();
+            CreationHelper createHelper = wb.getCreationHelper();
+            cellStyle.setDataFormat(
+                    createHelper.createDataFormat().getFormat(options.dateFormatter().toString()));
+            cell.setCellValue((LocalDate) value);
+            cell.setCellStyle(cellStyle);
+        } else if (clazz.equals(LocalDateTime.class)) {
+            CellStyle cellStyle = wb.createCellStyle();
+            CreationHelper createHelper = wb.getCreationHelper();
+            cellStyle.setDataFormat(
+                    createHelper.createDataFormat().getFormat(options.dateTimeFormatter().toString()));
+            cell.setCellValue((LocalDateTime) value);
+            cell.setCellStyle(cellStyle);
+        } else if (clazz.equals(Date.class)) {
+            CellStyle cellStyle = wb.createCellStyle();
+            CreationHelper createHelper = wb.getCreationHelper();
+            cellStyle.setDataFormat(
+                    createHelper.createDataFormat().getFormat(options.dateTimeFormatter().toString()));
+            cell.setCellValue((Date) value);
+            cell.setCellStyle(cellStyle);
+        } else if (clazz.equals(Calendar.class)) {
+            cell.setCellValue((Calendar) value);
+        } else if (clazz.equals(RichTextString.class)) {
+            cell.setCellValue((RichTextString) value);
+        } else throw new IllegalArgumentException("Illegal type of cell: " + clazz.getName());
     }
 
 }
