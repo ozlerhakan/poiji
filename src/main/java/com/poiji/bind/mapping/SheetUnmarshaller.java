@@ -28,10 +28,10 @@ public final class SheetUnmarshaller extends HSSFUnmarshaller {
     public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
 
         Workbook workbook = workbook();
-        if (workbook instanceof HSSFWorkbook) {
-            baseFormulaEvaluator = HSSFFormulaEvaluator.create((HSSFWorkbook) workbook, null, null);
-        } else if (workbook instanceof XSSFWorkbook) {
-            baseFormulaEvaluator = XSSFFormulaEvaluator.create((XSSFWorkbook) workbook, null, null);
+        if (workbook instanceof HSSFWorkbook hssfWorkbook) {
+            baseFormulaEvaluator = HSSFFormulaEvaluator.create(hssfWorkbook, null, null);
+        } else if (workbook instanceof XSSFWorkbook xssfWorkbook) {
+            baseFormulaEvaluator = XSSFFormulaEvaluator.create(xssfWorkbook, null, null);
         } else {
             throw new PoijiException("Workbook is not supported.");
         }

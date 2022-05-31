@@ -15,7 +15,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -208,27 +207,27 @@ public class DefaultCasting implements Casting {
         if (fieldType == Integer.class) {
             return Stream.of(valueList)
                     .map(rv -> primitiveIntegerValue(rv, sheetName, row, col))
-                    .collect(Collectors.toList());
+                    .toList();
         } else if (fieldType == BigDecimal.class) {
             return Stream.of(valueList)
                     .map(rv -> bigDecimalValue(rv, sheetName, row, col, options))
-                    .collect(Collectors.toList());
+                    .toList();
         } else if (fieldType == Long.class) {
             return Stream.of(valueList)
                     .map(rv -> longValue(rv, sheetName, row, col, options))
-                    .collect(Collectors.toList());
+                    .toList();
         } else if (fieldType == Double.class) {
             return Stream.of(valueList)
                     .map(rv -> doubleValue(rv, sheetName, row, col, options))
-                    .collect(Collectors.toList());
+                    .toList();
         } else if (fieldType == Boolean.class) {
             return Stream.of(valueList)
                     .map(rv -> booleanValue(rv, sheetName, row, col, options))
-                    .collect(Collectors.toList());
+                    .toList();
         } else if (fieldType == Float.class) {
             return Stream.of(valueList)
                     .map(rv -> floatValue(rv, sheetName, row, col, options))
-                    .collect(Collectors.toList());
+                    .toList();
         } else {
             return Arrays.asList(valueList);
         }
