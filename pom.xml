@@ -52,8 +52,8 @@
 
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-enforcer-plugin.version>1.2</maven-enforcer-plugin.version>
-        <jdk.source>11</jdk.source>
-        <jdk.target>11</jdk.target>
+        <jdk.source>17</jdk.source>
+        <jdk.target>17</jdk.target>
 
         <maven.version>3.0.4</maven.version>
     </properties>
@@ -141,7 +141,7 @@
                             <goal>jar</goal>
                         </goals>
                         <configuration>
-                            <source>11</source>
+                            <source>${jdk.source}</source>
                             <detectJavaApiLink>false</detectJavaApiLink>
                         </configuration>
                     </execution>
