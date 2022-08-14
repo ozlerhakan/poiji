@@ -52,13 +52,13 @@ class XSSFSheetXMLPoijiHandler extends XSSFSheetXMLHandler {
                         !"e".equals(cellType) &&
                         !"inlineStr".equals(cellType) &&
                         !"s".equals(cellType) &&
-                        !"str".equals(cellType)) {
-                    if (cellStyleStr != null) {
-                        int styleIndex = Integer.parseInt(cellStyleStr);
+                        !"str".equals(cellType) &&
+                        cellStyleStr != null) {
+                    int styleIndex = Integer.parseInt(cellStyleStr);
 
-                        if (poijiOptions.isDisableXLSXNumberCellFormat()) {
-                            attributes2.removeAttribute(styleIndex);
-                        }
+                    if (poijiOptions.isDisableXLSXNumberCellFormat() &&
+                            attributes2.getLength() > styleIndex) {
+                        attributes2.removeAttribute(styleIndex);
                     }
                 }
             }
