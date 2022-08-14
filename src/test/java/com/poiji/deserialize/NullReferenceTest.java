@@ -11,6 +11,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class NullReferenceTest {
 
@@ -22,6 +23,7 @@ public class NullReferenceTest {
 
         assertNotNull(result);
         assertThat(result.size(), is(20));
+        assertNull(result.get(0).getPmercado());
 
     }
 }
