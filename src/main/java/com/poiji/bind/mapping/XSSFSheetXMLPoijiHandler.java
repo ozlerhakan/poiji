@@ -57,7 +57,9 @@ class XSSFSheetXMLPoijiHandler extends XSSFSheetXMLHandler {
                         int styleIndex = Integer.parseInt(cellStyleStr);
 
                         if (poijiOptions.isDisableXLSXNumberCellFormat()) {
-                            attributes2.removeAttribute(styleIndex);
+                            if (attributes2.getLength() > styleIndex) {
+                                attributes2.removeAttribute(styleIndex);
+                            }
                         }
                     }
                 }

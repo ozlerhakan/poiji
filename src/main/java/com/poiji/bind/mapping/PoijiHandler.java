@@ -199,6 +199,10 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     @Override
     public void cell(String cellReference, String formattedValue, XSSFComment comment) {
+        if (cellReference == null) {
+            // TODO hidden log required; a cell reference could return null
+            return;
+        }
         final CellAddress cellAddress = new CellAddress(cellReference);
         int row = cellAddress.getRow();
         int headerStart = options.getHeaderStart();
