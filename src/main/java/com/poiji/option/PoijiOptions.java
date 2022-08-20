@@ -49,6 +49,7 @@ public final class PoijiOptions {
     private Formatting formatting;
     private Locale locale;
     private boolean rawData;
+    private boolean mandatoryColumnsApplyToCellValues;
 
     public PoijiNumberFormat getPoijiNumberFormat() {
         return numberFormat;
@@ -299,6 +300,15 @@ public final class PoijiOptions {
         return this;
     }
 
+    public boolean isMandatoryColumnsApplyToCellValues() {
+        return mandatoryColumnsApplyToCellValues;
+    }
+
+    public PoijiOptions setMandatoryColumnsApplyToCellValues(boolean mandatoryColumnsApplyToCellValues) {
+        this.mandatoryColumnsApplyToCellValues = mandatoryColumnsApplyToCellValues;
+        return this;
+    }
+
     public static class PoijiOptionsBuilder {
 
         private int sheetIndex;
@@ -327,6 +337,7 @@ public final class PoijiOptions {
         private String listDelimiter = "\\s*,\\s*";
         private Locale locale = Locale.US;
         private boolean rawData;
+        private boolean mandatoryColumnsApplyToCellValues;
 
         private PoijiOptionsBuilder() {
         }
@@ -440,7 +451,8 @@ public final class PoijiOptions {
                     .setListDelimiter(listDelimiter)
                     .setFormatting(formatting)
                     .setLocale(locale)
-                    .setRawData(rawData);
+                    .setRawData(rawData)
+                    .setMandatoryColumnsApplyToCellValues(mandatoryColumnsApplyToCellValues);
 
         }
 
@@ -620,6 +632,7 @@ public final class PoijiOptions {
          * Default - false.
          *
          * @param caseInsensitive true or false
+         * @return this
          */
         public PoijiOptionsBuilder caseInsensitive(final boolean caseInsensitive) {
             this.caseInsensitive = caseInsensitive;
@@ -631,6 +644,7 @@ public final class PoijiOptions {
          * Default - false.
          *
          * @param ignoreWhitespaces true or false
+         * @return this
          */
         public PoijiOptionsBuilder ignoreWhitespaces(final boolean ignoreWhitespaces) {
             this.ignoreWhitespaces = ignoreWhitespaces;
@@ -642,6 +656,7 @@ public final class PoijiOptions {
          * This option should be enabled for debugging purpose.
          *
          * @param cellFormat poiji cell format instance
+         * @return this
          */
         public PoijiOptionsBuilder poijiLogCellFormat(final PoijiLogCellFormat cellFormat) {
             this.cellFormat = cellFormat;
@@ -652,6 +667,7 @@ public final class PoijiOptions {
          * Change the default cell formats of a xlsx excel file by overriding
          *
          * @param numberFormat poiji number format instance
+         * @return this
          */
         public PoijiOptionsBuilder poijiNumberFormat(final PoijiNumberFormat numberFormat) {
             this.numberFormat = numberFormat;
@@ -701,6 +717,17 @@ public final class PoijiOptions {
          */
         public PoijiOptionsBuilder rawData(boolean status) {
             this.rawData = status;
+            return this;
+        }
+
+        /**
+         * Use this option to apply the mandatory column constraint to cell values as well.
+         *
+         * @param mandatoryColumnsApplyToCellValues set true to apply the mandatory column constraint to cell values as well.
+         * @return this
+         */
+        public PoijiOptionsBuilder mandatoryColumnsApplyToCellValues(boolean mandatoryColumnsApplyToCellValues) {
+            this.mandatoryColumnsApplyToCellValues = mandatoryColumnsApplyToCellValues;
             return this;
         }
     }
