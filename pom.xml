@@ -45,15 +45,15 @@
     </issueManagement>
 
     <properties>
-        <apache.poi.version>5.2.1</apache.poi.version>
+        <apache.poi.version>5.2.3</apache.poi.version>
         <junit.version>4.13.2</junit.version>
         <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-enforcer-plugin.version>1.2</maven-enforcer-plugin.version>
-        <jdk.source>17</jdk.source>
-        <jdk.target>17</jdk.target>
+        <jdk.source>11</jdk.source>
+        <jdk.target>11</jdk.target>
 
         <maven.version>3.0.4</maven.version>
     </properties>
@@ -67,7 +67,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-          <version>4.13.1</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
