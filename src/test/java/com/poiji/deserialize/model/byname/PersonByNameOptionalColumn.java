@@ -12,22 +12,26 @@ public class PersonByNameOptionalColumn {
     @ExcelCellName("Name")
     protected String name;
 
+    // This column can be either required or not.
     @ExcelCellName("Address")
     protected String address;
 
-    @ExcelCellName("Mobile")
+    // This column can be either required or not.
+    @ExcelCellName(value = "Mobile", mandatoryHeader = false, mandatoryCell = false)
     protected String mobile;
 
-    @ExcelCellName("Email")
+    // This header along with values belonging to its cells will be required.
+    @ExcelCellName(value = "Email", mandatoryHeader = true, mandatoryCell = true)
     protected String email;
 
-    @ExcelCellName(value = "This column will be missing", mandatory = false)
+    @ExcelCellName(value = "This column will be missing. We ignore it.", mandatoryHeader = false)
     protected String missingColumn;
 
-    @ExcelCell(value = 6, mandatory = false)
+    @ExcelCellName(value = "This column will be missing. We ignore it.", mandatoryHeader = false)
     protected String missingColumn6;
 
-    @ExcelCell(value = 7, mandatory = false)
+    // This column will be missing. We ignore it.
+    @ExcelCell(value = 7, mandatoryHeader = false)
     protected String missingColumn7;
 
     @ExcelRow

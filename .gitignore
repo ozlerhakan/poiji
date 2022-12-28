@@ -197,3 +197,5 @@ poiji.iml
 .settings
 .attach_pid*
 .~lock.*
+
+*.json

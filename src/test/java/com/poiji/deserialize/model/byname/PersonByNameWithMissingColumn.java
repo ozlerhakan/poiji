@@ -20,7 +20,7 @@ public class PersonByNameWithMissingColumn {
     @ExcelCellName("Email")
     protected String email;
 
-    @ExcelCellName("This column will be missing")
+    @ExcelCellName(value = "This column will be missing", mandatoryHeader = true)
     protected String missingColumn;
 
     @ExcelRow
