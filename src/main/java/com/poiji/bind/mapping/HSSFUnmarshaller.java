@@ -189,21 +189,13 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
                 Class<?> fieldType = field.getType();
                 Object fieldInstance = ReflectUtil.newInstanceOf(fieldType);
                 for (Field fieldField : fieldType.getDeclaredFields()) {
-                    try {
-                        mappedColumnIndices.add(tailSetFieldValue(currentRow, fieldInstance, fieldField));
-                    } catch (PoijiRowSpecificException poijiRowException) {
-                        errors.add(poijiRowException);
-                    }
+                    mapColumns(currentRow, fieldInstance, mappedColumnIndices, errors, fieldField);
                 }
                 setFieldData(instance, field, fieldInstance);
             } else if (field.getAnnotation(ExcelUnknownCells.class) != null) {
                 unknownCells.add(field);
             } else {
-                try {
-                    mappedColumnIndices.add(tailSetFieldValue(currentRow, instance, field));
-                } catch (PoijiRowSpecificException poijiRowException) {
-                    errors.add(poijiRowException);
-                }
+                mapColumns(currentRow, instance, mappedColumnIndices, errors, field);
             }
             if (!errors.isEmpty()) {
                 throw new PoijiMultiRowException("Problem(s) occurred while reading data", errors);
@@ -222,6 +214,19 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
         unknownCells.forEach(field -> setFieldData(instance, field, excelUnknownCellsMap));
 
         return instance;
+    }
+
+    private <T> void mapColumns(
+            Row currentRow,
+            T instance,
+            List<Integer> mappedColumnIndices,
+            List<PoijiRowSpecificException> errors,
+            Field field) {
+        try {
+            mappedColumnIndices.add(tailSetFieldValue(currentRow, instance, field));
+        } catch (PoijiRowSpecificException poijiRowException) {
+            errors.add(poijiRowException);
+        }
     }
 
     private <T> Integer tailSetFieldValue(Row currentRow, T instance, Field field) {

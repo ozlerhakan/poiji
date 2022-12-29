@@ -24,21 +24,9 @@ public class PoijiMultiRowException extends PoijiException {
 
     public static class PoijiRowSpecificException extends RuntimeException {
 
-        private final Integer rowNum;
-
         public PoijiRowSpecificException(String columnName, String fieldName, Integer rowNum) {
             super("Cell value of column '" + columnName + "' is null,"
-                    + " so cannot be applied to mandatory field '" + fieldName + "'.");
-            this.rowNum = rowNum;
-        }
-
-        public Integer getRowNum() {
-            return rowNum;
-        }
-
-        @Override
-        public String toString() {
-            return super.toString() + " ;Row " + getRowNum();
+                    + " so cannot be applied to mandatory field '" + fieldName + "'. ;Row " + rowNum);
         }
     }
 }
