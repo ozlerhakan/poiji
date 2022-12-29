@@ -27,52 +27,46 @@ final class WorkBookContentHandler implements ContentHandler {
 
     @Override
     public void setDocumentLocator(Locator locator) {
-        //no-op
+        // no-op
     }
 
     @Override
     public void startDocument() {
-        //no-op
+        // no-op
     }
 
     @Override
     public void endDocument() {
-        //no-op
+        // no-op
     }
 
     @Override
     public void startPrefixMapping(String prefix, String uri) {
-        //no-op
+        // no-op
     }
 
     @Override
     public void endPrefixMapping(String prefix) {
-        //no-op
+        // no-op
     }
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes atts) {
 
-        //there are multiple elements to an excel xml layout
-        //we only care about the sheet infor
+        // there are multiple elements to an excel xml layout
+        // we only care about the sheet infor
         if ("x:sheet".equals(qName) || "sheet".equals(qName)) {
             individualSheet = new WorkBookSheet();
 
-            //loop throught all the attributes and add to the new sheet
+            // loop throught all the attributes and add to the new sheet
             for (int i = 0; i < atts.getLength(); i++) {
-                //examples
-                //Attribute: name:Sheet3
-                //Attribute: sheetId:3
-                //Attribute: state:hidden
-                if (atts.getQName(i).equals("name")) {
-                    individualSheet.setName(atts.getValue(i));
-                }
-                if (atts.getQName(i).equals("sheetId")) {
-                    individualSheet.setSheetId(atts.getValue(i));
-                }
+                // examples
+                // Attribute: name:Sheet3
+                // Attribute: sheetId:3
+                // Attribute: state:hidden
                 if (atts.getQName(i).equals("state")) {
                     String state = atts.getValue(i);
-                    if (!options.ignoreHiddenSheets()){
+                    if (!options.ignoreHiddenSheets()) {
                         state = "visible";
                     }
                     individualSheet.setState(state);
@@ -84,8 +78,9 @@ final class WorkBookContentHandler implements ContentHandler {
     @Override
     public void endElement(String uri, String localName, String qName) {
 
-        //onces finished reading the element, if end of sheet, add to array of work books sheets so can loop them later
-        //set this sheet to null as its not needed any more
+        // onces finished reading the element, if end of sheet, add to array of work
+        // books sheets so can loop them later
+        // set this sheet to null as its not needed any more
         if ("x:sheet".equals(qName) || "sheet".equals(qName)) {
             sheets.add(individualSheet);
             individualSheet = null;
@@ -95,22 +90,22 @@ final class WorkBookContentHandler implements ContentHandler {
 
     @Override
     public void characters(char[] ch, int start, int length) {
-        //no-op
+        // no-op
     }
 
     @Override
     public void ignorableWhitespace(char[] ch, int start, int length) {
-        //no-op
+        // no-op
     }
 
     @Override
     public void processingInstruction(String target, String data) {
-        //no-op
+        // no-op
     }
 
     @Override
     public void skippedEntity(String name) {
-        //no-op
+        // no-op
     }
 
 }
