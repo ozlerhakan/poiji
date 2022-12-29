@@ -252,7 +252,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
         } else {
             ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
             if (excelCellName != null) {
-                annotationDetail.setMandatoryCell(excelCellName.mandatoryHeader());
+                annotationDetail.setMandatoryCell(excelCellName.mandatoryCell());
                 annotationDetail.setColumnName(excelCellName.value());
                 final String titleName = formatting.transform(options, excelCellName.value());
                 Integer column = titleToIndex.get(titleName);

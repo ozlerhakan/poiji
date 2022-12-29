@@ -46,14 +46,14 @@ public final class AnnotationUtil {
 
                 BiPredicate<String, String> comparator = String::equals;
 
-                Set<Integer> missingExcelCells = excelCells.stream()
+                Set<Integer> missingExcelCellHeaders = excelCells.stream()
                                 .filter(excelCell -> indexToTitle.get(excelCell.value()) == null)
                                 .filter(excelCell -> options.getHeaderCount() != 0)
                                 .filter(ExcelCell::mandatoryHeader)
                                 .map(ExcelCell::value)
                                 .collect(Collectors.toSet());
 
-                Set<String> missingHeaders = excelCellNames.stream()
+                Set<String> missingExcelCellNameHeaders = excelCellNames.stream()
                                 .filter(excelCell -> options.getHeaderCount() != 0)
                                 .filter(excelCellName -> titleToIndex.keySet().stream()
                                                 .noneMatch(title -> comparator.test(
@@ -63,15 +63,15 @@ public final class AnnotationUtil {
                                 .map(ExcelCellName::value)
                                 .collect(Collectors.toSet());
 
-                long totalMissingColumns = missingHeaders.size() + missingExcelCells.size();
+                long totalMissingColumns = missingExcelCellNameHeaders.size() + missingExcelCellHeaders.size();
                 if (totalMissingColumns != 0) {
                         String message = "Some headers are missing in the sheet: ";
-                        if (!missingHeaders.isEmpty()) {
-                                message += missingHeaders;
+                        if (!missingExcelCellNameHeaders.isEmpty()) {
+                                message += missingExcelCellNameHeaders;
                         }
-                        if (!missingExcelCells.isEmpty()) {
+                        if (!missingExcelCellHeaders.isEmpty()) {
                                 StringBuilder missingMessage = new StringBuilder();
-                                missingExcelCells.stream()
+                                missingExcelCellHeaders.stream()
                                                 .map(i -> String.join(" ", " missing index column on ",
                                                                 String.valueOf(i)))
                                                 .forEach(missingMessage::append);
