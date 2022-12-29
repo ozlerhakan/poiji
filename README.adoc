@@ -629,7 +629,12 @@ String fieldName;
 
 [NOTE]
 ====
-This feature is only compatible with XLS excel files.
+The `mandatoryHeader` field is compatible with XLS and XLSX files.
+====
+
+[NOTE]
+====
+The `mandatoryCell` field works **only** with XLS files.
 ====
 
 === Debug Cells Formats
