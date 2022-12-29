@@ -26,13 +26,19 @@ public class PoijiMultiRowException extends PoijiException {
 
         private final Integer rowNum;
 
-        public PoijiRowSpecificException(String message, Integer rowNum) {
-            super(message);
+        public PoijiRowSpecificException(String columnName, String fieldName, Integer rowNum) {
+            super("Cell value of column '" + columnName + "' is null,"
+                    + " so cannot be applied to mandatory field '" + fieldName + "'.");
             this.rowNum = rowNum;
         }
 
         public Integer getRowNum() {
             return rowNum;
+        }
+
+        @Override
+        public String toString() {
+            return super.toString() + " ;Row " + getRowNum();
         }
     }
 }

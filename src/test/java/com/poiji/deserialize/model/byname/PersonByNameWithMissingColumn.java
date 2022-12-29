@@ -1,5 +1,6 @@
 package com.poiji.deserialize.model.byname;
 
+import com.poiji.annotation.ExcelCell;
 import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelRow;
 
@@ -22,6 +23,9 @@ public class PersonByNameWithMissingColumn {
 
     @ExcelCellName(value = "This column will be missing", mandatoryHeader = true)
     protected String missingColumn;
+
+    @ExcelCell(value = 6, mandatoryHeader = true)
+    protected String missingColumn2;
 
     @ExcelRow
     protected int row;

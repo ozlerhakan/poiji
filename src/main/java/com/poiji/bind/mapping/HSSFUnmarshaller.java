@@ -194,11 +194,6 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
                     } catch (PoijiRowSpecificException poijiRowException) {
                         errors.add(poijiRowException);
                     }
-                    try {
-                        mappedColumnIndices.add(tailSetFieldValue(currentRow, fieldInstance, fieldField));
-                    } catch (PoijiRowSpecificException poijiRowException) {
-                        errors.add(poijiRowException);
-                    }
                 }
                 setFieldData(instance, field, fieldInstance);
             } else if (field.getAnnotation(ExcelUnknownCells.class) != null) {
@@ -280,9 +275,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
                     options);
             setFieldData(instance, field, data);
         } else if (annotationDetail.isMandatoryCell()) {
-            throw new PoijiRowSpecificException(
-                    "Cell value of column '" + annotationDetail.getColumnName() + "' is null,"
-                            + " so cannot be applied to mandatory field '" + field.getName() + "'.",
+            throw new PoijiRowSpecificException(annotationDetail.getColumnName(), field.getName(),
                     currentRow.getRowNum());
         }
     }

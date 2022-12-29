@@ -72,7 +72,7 @@ public final class AnnotationUtil {
                         if (!missingExcelCellHeaders.isEmpty()) {
                                 StringBuilder missingMessage = new StringBuilder();
                                 missingExcelCellHeaders.stream()
-                                                .map(i -> String.join(" ", " missing index column on ",
+                                                .map(i -> String.join(" ", " missing index column on",
                                                                 String.valueOf(i)))
                                                 .forEach(missingMessage::append);
                                 message += missingMessage;
