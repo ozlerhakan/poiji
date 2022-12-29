@@ -4,10 +4,10 @@ import com.poiji.annotation.ExcelCellName;
 
 public class PersonBTest {
 
-    @ExcelCellName("NameB")
+    @ExcelCellName(value = "NameB", mandatoryCell = true)
     private String name;
 
-    @ExcelCellName("AgeB")
+    @ExcelCellName(value = "AgeB", mandatoryCell = false)
     private Integer age;
 
     @ExcelCellName("CityB")

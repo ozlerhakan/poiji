@@ -2,8 +2,8 @@
 :toclevels: 2
 
 = Poiji
-:version: v3.1.9
-:branch: 3.1.9
+:version: v3.2.0
+:branch: 3.2.0
 
 image:https://github.com/ozlerhakan/poiji/actions/workflows/maven.yml/badge.svg["Build Status"] image:https://app.codacy.com/project/badge/Grade/64f7e2cb9e604807b62334a4cfc3952d["Codacy code quality",link="https://www.codacy.com/gh/ozlerhakan/poiji/dashboard?utm_source=github.com&utm_medium=referral&utm_content=ozlerhakan/poiji&utm_campaign=Badge_Grade"]
 image:https://codecov.io/gh/ozlerhakan/poiji/branch/{branch}/graph/badge.svg?token=MN6V6xOWBq["Codecov",link="https://codecov.io/gh/ozlerhakan/poiji"] image:https://img.shields.io/badge/apache.poi-5.2.1-brightgreen.svg[] image:https://app.fossa.com/api/projects/git%2Bgithub.com%2Fozlerhakan%2Fpoiji.svg?type=shield["FOSSA Status",link="https://app.fossa.com/projects/git%2Bgithub.com%2Fozlerhakan%2Fpoiji?ref=badge_shield"]
@@ -25,7 +25,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 <dependency>
   <groupId>com.github.ozlerhakan</groupId>
   <artifactId>poiji</artifactId>
-  <version>3.1.9</version>
+  <version>3.2.0</version>
 </dependency>
 ----
 
@@ -33,7 +33,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    compile 'com.github.ozlerhakan:poiji:3.1.9'
+    compile 'com.github.ozlerhakan:poiji:3.2.0'
 }
 ----
 
@@ -613,19 +613,29 @@ and the one for the second row has `{ENCODING=flac, BITRATE=1500}`.
 
 Note that If you use the `PoijiOptionsBuilder#caseInsensitive(true)` option, the ExcelUnknownCells map will be parsed with lowercase.
 
-=== Optional Mandatory Columns
+=== Optional Mandatory Headers and Cells
 
-By default `@ExcelCellName` and `@ExcelCell` expect their related excel columns exist in a given excel file, otherwise a `HeaderMissingException` will be thrown.
-
-You can change this behavior by using the `mandatory` parameter on each annotation:
+As of 3.2.0, `@ExcelCellName` and `@ExcelCell` are given to provide `mandatoryHeader` and `mandatoryCell` fields, meaning we can be more specific by declaring rules in headers or cells or both in excel files. `mandatoryHeader` expects the labeled excel column exists in a given excel file, while `mandatoryCell` looks into the values of the mentioned header/column. If any of the options is active and your excel breaks the rule, either a `HeaderMissingException` or `PoijiMultiRowException`  will be thrown accordingly.
 
 ----
-@ExcelCellName(value = "COLUMN NAME", mandatory = false)
-String missingColumn;
+// default behavior
+@ExcelCellName(value = "COLUMN_NAME", mandatoryHeader = false, mandatoryCell = false)
+String fieldName;
 
-@ExcelCell(value = COLUMN_INDEX, mandatory = false)
-String missingColumn;
+// default behavior
+@ExcelCell(value = COLUMN_INDEX, mandatoryHeader = false, mandatoryCell = false)
+String fieldName;
 ----
+
+[NOTE]
+====
+The `mandatoryHeader` field is compatible with XLS and XLSX files.
+====
+
+[NOTE]
+====
+The `mandatoryCell` field works **only** with XLS files.
+====
 
 === Debug Cells Formats
 

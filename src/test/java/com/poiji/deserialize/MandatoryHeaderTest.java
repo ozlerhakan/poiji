@@ -15,27 +15,28 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @RunWith(Parameterized.class)
-public class MandatoryNamedColumnsTest {
+public class MandatoryHeaderTest {
 
     private String path;
 
-    public MandatoryNamedColumnsTest(String path) {
+    public MandatoryHeaderTest(String path) {
         this.path = path;
     }
 
     @Parameterized.Parameters(name = "{index}: ({0})={1}")
     public static Iterable<Object[]> queries() {
-        return Arrays.asList(new Object[][]{
-                {"src/test/resources/person.xlsx"},
-                {"src/test/resources/person.xls"}
+        return Arrays.asList(new Object[][] {
+                { "src/test/resources/person.xlsx" },
+                { "src/test/resources/person.xls" }
         });
     }
 
     @Test
     public void testExcelSuccessOptionalColumn() {
-        List<PersonByNameOptionalColumn> response = Poiji.fromExcel(new File(path), PersonByNameOptionalColumn.class, PoijiOptions.PoijiOptionsBuilder
-                .settings()
-                .build());
+        List<PersonByNameOptionalColumn> response = Poiji.fromExcel(new File(path), PersonByNameOptionalColumn.class,
+                PoijiOptions.PoijiOptionsBuilder
+                        .settings()
+                        .build());
         assertThat(response, notNullValue());
     }
 

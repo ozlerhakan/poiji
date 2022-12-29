@@ -22,9 +22,9 @@ public class MandatoryNamedColumnsExceptionTest {
 
     @Parameterized.Parameters(name = "{index}: ({0})={1}")
     public static Iterable<Object[]> queries() {
-        return Arrays.asList(new Object[][]{
-                {"src/test/resources/person.xlsx"},
-                {"src/test/resources/person.xls"}
+        return Arrays.asList(new Object[][] {
+                { "src/test/resources/person.xlsx" },
+                { "src/test/resources/person.xls" }
         });
     }
 

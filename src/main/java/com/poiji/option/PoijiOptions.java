@@ -365,7 +365,8 @@ public final class PoijiOptions {
         }
 
         /**
-         * set a date time formatter, default date time formatter is "dd/M/yyyy HH:mm:ss"
+         * set a date time formatter, default date time formatter is "dd/M/yyyy
+         * HH:mm:ss"
          * for java.time.LocalDateTime
          *
          * @param dateTimeFormatter date time formatter
@@ -401,8 +402,10 @@ public final class PoijiOptions {
         }
 
         /**
-         * Set the {@link Locale} used by Apache Poi and PoiJ. Default is {@link Locale#ENGLISH}.
-         * This setting is only used by Apache Poi thread and PoiJ. See {@link org.apache.poi.util.LocaleUtil}
+         * Set the {@link Locale} used by Apache Poi and PoiJ. Default is
+         * {@link Locale#ENGLISH}.
+         * This setting is only used by Apache Poi thread and PoiJ. See
+         * {@link org.apache.poi.util.LocaleUtil}
          * for more details.
          *
          * @param locale Locale
@@ -484,7 +487,8 @@ public final class PoijiOptions {
         }
 
         /**
-         * limit a number of rows after the header &amp; skipped rows row. The header &amp; skipped rows are not counted.
+         * limit a number of rows after the header &amp; skipped rows row. The header
+         * &amp; skipped rows are not counted.
          *
          * @param limit number
          * @return this
@@ -587,7 +591,8 @@ public final class PoijiOptions {
          * use to start reading header titles, incase the
          * header is not in row 0.
          *
-         * @param headerStart an index number of the excel header to start reading header
+         * @param headerStart an index number of the excel header to start reading
+         *                    header
          * @return this
          */
         public PoijiOptionsBuilder headerStart(int headerStart) {
@@ -604,7 +609,8 @@ public final class PoijiOptions {
          * Set 0 to indicate that no header in the excel file.
          * Default - 1.
          *
-         * @param headerCount an index number of the excel header to start reading header
+         * @param headerCount an index number of the excel header to start reading
+         *                    header
          * @return this
          */
         public PoijiOptionsBuilder headerCount(int headerCount) {
@@ -616,10 +622,12 @@ public final class PoijiOptions {
         }
 
         /**
-         * Permits case insensitive column names mapping for annotation {@link ExcelCellName}.
+         * Permits case insensitive column names mapping for annotation
+         * {@link ExcelCellName}.
          * Default - false.
          *
          * @param caseInsensitive true or false
+         * @return this
          */
         public PoijiOptionsBuilder caseInsensitive(final boolean caseInsensitive) {
             this.caseInsensitive = caseInsensitive;
@@ -627,10 +635,12 @@ public final class PoijiOptions {
         }
 
         /**
-         * Ignore white space before and after column names for annotation {@link ExcelCellName}.
+         * Ignore white space before and after column names for annotation
+         * {@link ExcelCellName}.
          * Default - false.
          *
          * @param ignoreWhitespaces true or false
+         * @return this
          */
         public PoijiOptionsBuilder ignoreWhitespaces(final boolean ignoreWhitespaces) {
             this.ignoreWhitespaces = ignoreWhitespaces;
@@ -638,10 +648,12 @@ public final class PoijiOptions {
         }
 
         /**
-         * Add cell format option to see each internal cell's excel format for files ending with xlsx format.
+         * Add cell format option to see each internal cell's excel format for files
+         * ending with xlsx format.
          * This option should be enabled for debugging purpose.
          *
          * @param cellFormat poiji cell format instance
+         * @return this
          */
         public PoijiOptionsBuilder poijiLogCellFormat(final PoijiLogCellFormat cellFormat) {
             this.cellFormat = cellFormat;
@@ -652,6 +664,7 @@ public final class PoijiOptions {
          * Change the default cell formats of a xlsx excel file by overriding
          *
          * @param numberFormat poiji number format instance
+         * @return this
          */
         public PoijiOptionsBuilder poijiNumberFormat(final PoijiNumberFormat numberFormat) {
             this.numberFormat = numberFormat;
@@ -659,7 +672,8 @@ public final class PoijiOptions {
         }
 
         /**
-         * Disable the cell format of all the number cells of an excel file ending with xlsx
+         * Disable the cell format of all the number cells of an excel file ending with
+         * xlsx
          *
          * @return this
          */
@@ -679,7 +693,6 @@ public final class PoijiOptions {
             return this;
         }
 
-
         /**
          * Use a custom excel header format implementation
          *
@@ -694,7 +707,8 @@ public final class PoijiOptions {
         }
 
         /**
-         * Use this option to get the underlying/original/non-visible/raw cell value. The cell must be a numeric type.
+         * Use this option to get the underlying/original/non-visible/raw cell value.
+         * The cell must be a numeric type.
          *
          * @param status set true to retrieve the underlying data in the excel file.
          * @return this
