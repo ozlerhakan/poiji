@@ -134,17 +134,20 @@ public class DefaultCasting implements Casting {
         }
     }
 
+    /*
+     * 
+     * ISSUE #57
+     * if a date regex has been specified then it wont be null
+     * so then make sure the string matches the pattern
+     * if it doesn't, fall back to default
+     * else continue to turn string into java date
+     * 
+     * the reason for this is sometime Java will manage to parse a string to a
+     * date object without any exceptions but since the string was not an exact
+     * match you get a very strange date
+     */
     private Date dateValue(String value, String sheetName, int row, int col, PoijiOptions options) {
 
-        // ISSUE #57
-        // if a date regex has been specified then it wont be null
-        // so then make sure the string matches the pattern
-        // if it doesn't, fall back to default
-        // else continue to turn string into java date
-
-        // the reason for this is sometime Java will manage to parse a string to a date
-        // object without any exceptions but since the string was not an exact match you
-        // get a very strange date
         if (options.getDateRegex() != null && !value.matches(options.getDateRegex())) {
             return options.preferNullOverDefault() ? null : Calendar.getInstance().getTime();
         } else {
@@ -159,17 +162,19 @@ public class DefaultCasting implements Casting {
         }
     }
 
+    /*
+     * ISSUE #57
+     * if a date regex has been specified then it wont be null
+     * so then make sure the string matches the pattern
+     * if it doesn't, fall back to default
+     * else continue to turn string into java date
+     * 
+     * the reason for this is sometime java will manage to parse a string to a
+     * date object without any exceptions but since the string was not an exact
+     * match you get a very strange date
+     * 
+     */
     private LocalDate localDateValue(String value, String sheetName, int row, int col, PoijiOptions options) {
-
-        // ISSUE #57
-        // if a date regex has been specified then it wont be null
-        // so then make sure the string matches the pattern
-        // if it doesn't, fall back to default
-        // else continue to turn string into java date
-
-        // the reason for this is sometime java will manage to parse a string to a date
-        // object without any exceptions but since the string was not an exact match you
-        // get a very strange date
         if (options.getDateRegex() != null && !value.matches(options.getDateRegex())) {
             return options.preferNullOverDefault() ? null : LocalDate.now();
         } else {
