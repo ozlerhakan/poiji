@@ -63,6 +63,19 @@ public class DefaultCastingTest {
     }
 
     @Test
+    public void castLocalDateUnmatchedDateRegexPreferNotNull() {
+
+        PoijiOptions options = PoijiOptionsBuilder.settings()
+                .dateRegex("\\d{2}\\/\\d{2}\\/\\d{4}")
+                .preferNullOverDefault(false)
+                .build();
+
+        LocalDate testLocalDate = (LocalDate) casting.castValue(LocalDate.class, "05-01-2016", options);
+
+        assertNotNull(testLocalDate);
+    }
+
+    @Test
     public void castDate() throws Exception {
 
         PoijiOptions options = PoijiOptionsBuilder.settings().datePattern("dd/MM/yyyy").build();
@@ -215,6 +228,18 @@ public class DefaultCastingTest {
                 options);
 
         assertEquals(expectedDate.toLocalDate(), actualDate.toLocalDate());
+    }
+
+    @Test
+    public void invalidValueLocalDateTimeWhenRegexNotMatchPreferNull() {
+        PoijiOptions options = PoijiOptionsBuilder.settings().dateTimeRegex("d{2}/d{2}/d{4} d{2}:d{2}:d{2}")
+                .preferNullOverDefault(true)
+                .build();
+
+        LocalDateTime actualDate = (LocalDateTime) casting.castValue(LocalDateTime.class, "01/8/2023 10:00:00",
+                options);
+
+        assertNull(actualDate);
     }
 
     @Test
