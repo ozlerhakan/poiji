@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -133,16 +134,20 @@ public class DefaultCasting implements Casting {
         }
     }
 
+    /*
+     * 
+     * ISSUE #57
+     * if a date regex has been specified then it wont be null
+     * so then make sure the string matches the pattern
+     * if it doesn't, fall back to default
+     * else continue to turn string into java date
+     * 
+     * the reason for this is sometime Java will manage to parse a string to a
+     * date object without any exceptions but since the string was not an exact
+     * match you get a very strange date
+     */
     private Date dateValue(String value, String sheetName, int row, int col, PoijiOptions options) {
 
-        //ISSUE #57
-        //if a date regex has been specified then it wont be null
-        //so then make sure the string matches the pattern
-        //if it doesn't, fall back to default
-        //else continue to turn string into java date
-
-        //the reason for this is sometime Java will manage to parse a string to a date object
-        //without any exceptions but since the string was not an exact match you get a very strange date
         if (options.getDateRegex() != null && !value.matches(options.getDateRegex())) {
             return options.preferNullOverDefault() ? null : Calendar.getInstance().getTime();
         } else {
@@ -151,21 +156,25 @@ public class DefaultCasting implements Casting {
                 sdf.setLenient(options.getDateLenient());
                 return sdf.parse(value);
             } catch (ParseException e) {
-                return onError(value, sheetName, row, col, e, options.preferNullOverDefault() ? null : Calendar.getInstance().getTime());
+                return onError(value, sheetName, row, col, e,
+                        options.preferNullOverDefault() ? null : Calendar.getInstance().getTime());
             }
         }
     }
 
+    /*
+     * ISSUE #57
+     * if a date regex has been specified then it wont be null
+     * so then make sure the string matches the pattern
+     * if it doesn't, fall back to default
+     * else continue to turn string into java date
+     * 
+     * the reason for this is sometime java will manage to parse a string to a
+     * date object without any exceptions but since the string was not an exact
+     * match you get a very strange date
+     * 
+     */
     private LocalDate localDateValue(String value, String sheetName, int row, int col, PoijiOptions options) {
-
-        //ISSUE #57
-        //if a date regex has been specified then it wont be null
-        //so then make sure the string matches the pattern
-        //if it doesn't, fall back to default
-        //else continue to turn string into java date
-
-        //the reason for this is sometime java will manage to parse a string to a date object
-        //without any exceptions but since the string was not an exact match you get a very strange date
         if (options.getDateRegex() != null && !value.matches(options.getDateRegex())) {
             return options.preferNullOverDefault() ? null : LocalDate.now();
         } else {
@@ -184,18 +193,19 @@ public class DefaultCasting implements Casting {
             try {
                 return LocalDateTime.parse(value, options.dateTimeFormatter());
             } catch (DateTimeParseException e) {
-                return onError(value, sheetName, row, col, e, options.preferNullOverDefault() ? null : LocalDateTime.now());
+                return onError(value, sheetName, row, col, e,
+                        options.preferNullOverDefault() ? null : LocalDateTime.now());
             }
         }
     }
-
 
     private Object enumValue(String value, String sheetName, int row, int col, Class<?> type) {
         return Arrays.stream(type.getEnumConstants())
                 .filter(o -> ((Enum<?>) o).name().equals(value))
                 .findFirst()
                 .orElseGet(() -> {
-                    IllegalArgumentException e = new IllegalArgumentException("No enumeration " + type.getSimpleName() + "." + value);
+                    IllegalArgumentException e = new IllegalArgumentException(
+                            "No enumeration " + type.getSimpleName() + "." + value);
                     return onError(value, sheetName, row, col, e, null);
                 });
     }
@@ -204,33 +214,34 @@ public class DefaultCasting implements Casting {
         final ParameterizedType genericType = (ParameterizedType) field.getGenericType();
         final Type fieldType = genericType.getActualTypeArguments()[0];
         String[] valueList = value.split(options.getListDelimiter());
+        Stream<String> valueStream = Stream.of(valueList).filter(Predicate.not(String::isEmpty));
 
         if (fieldType == Integer.class) {
-            return Stream.of(valueList)
+            return valueStream
                     .map(rv -> primitiveIntegerValue(rv, sheetName, row, col))
                     .collect(Collectors.toList());
         } else if (fieldType == BigDecimal.class) {
-            return Stream.of(valueList)
+            return valueStream
                     .map(rv -> bigDecimalValue(rv, sheetName, row, col, options))
                     .collect(Collectors.toList());
         } else if (fieldType == Long.class) {
-            return Stream.of(valueList)
+            return valueStream
                     .map(rv -> longValue(rv, sheetName, row, col, options))
                     .collect(Collectors.toList());
         } else if (fieldType == Double.class) {
-            return Stream.of(valueList)
+            return valueStream
                     .map(rv -> doubleValue(rv, sheetName, row, col, options))
                     .collect(Collectors.toList());
         } else if (fieldType == Boolean.class) {
-            return Stream.of(valueList)
+            return valueStream
                     .map(rv -> booleanValue(rv, sheetName, row, col, options))
                     .collect(Collectors.toList());
         } else if (fieldType == Float.class) {
-            return Stream.of(valueList)
+            return valueStream
                     .map(rv -> floatValue(rv, sheetName, row, col, options))
                     .collect(Collectors.toList());
         } else {
-            return Arrays.asList(valueList);
+            return valueStream.collect(Collectors.toList());
         }
     }
 
@@ -240,7 +251,8 @@ public class DefaultCasting implements Casting {
         return getValueObject(field, row, col, options, rawValue, fieldType);
     }
 
-    protected Object getValueObject(Field field, int row, int col, PoijiOptions options, String rawValue, Class<?> fieldType) {
+    protected Object getValueObject(Field field, int row, int col, PoijiOptions options, String rawValue,
+            Class<?> fieldType) {
         String sheetName = options.getSheetName();
         String value = options.trimCellValue() ? rawValue.trim() : rawValue;
 
@@ -289,11 +301,10 @@ public class DefaultCasting implements Casting {
 
         } else if (fieldType.isEnum()) {
             o = enumValue(value, sheetName, row, col, fieldType);
-
-        } else if (value.isEmpty()) {
-            o = options.preferNullOverDefault() ? null : value;
         } else if (fieldType == List.class) {
             o = castListValue(value, sheetName, row, col, field, options);
+        } else if (value.isEmpty()) {
+            o = options.preferNullOverDefault() ? null : value;
         } else {
             o = value;
 

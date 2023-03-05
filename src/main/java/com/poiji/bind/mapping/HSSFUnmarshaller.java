@@ -197,9 +197,9 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
             } else {
                 mapColumns(currentRow, instance, mappedColumnIndices, errors, field);
             }
-            if (!errors.isEmpty()) {
-                throw new PoijiMultiRowException("Problem(s) occurred while reading data", errors);
-            }
+        }
+        if (!errors.isEmpty()) {
+            throw new PoijiMultiRowException("Problem(s) occurred while reading data", errors);
         }
 
         Map<String, String> excelUnknownCellsMap = StreamSupport

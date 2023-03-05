@@ -63,6 +63,19 @@ public class DefaultCastingTest {
     }
 
     @Test
+    public void castLocalDateUnmatchedDateRegexPreferNotNull() {
+
+        PoijiOptions options = PoijiOptionsBuilder.settings()
+                .dateRegex("\\d{2}\\/\\d{2}\\/\\d{4}")
+                .preferNullOverDefault(false)
+                .build();
+
+        LocalDate testLocalDate = (LocalDate) casting.castValue(LocalDate.class, "05-01-2016", options);
+
+        assertNotNull(testLocalDate);
+    }
+
+    @Test
     public void castDate() throws Exception {
 
         PoijiOptions options = PoijiOptionsBuilder.settings().datePattern("dd/MM/yyyy").build();
@@ -187,9 +200,46 @@ public class DefaultCastingTest {
 
         LocalDateTime expectedDate = LocalDateTime.of(2018, 8, 1, 10, 00, 00);
 
-        LocalDateTime actualDate = (LocalDateTime) casting.castValue(LocalDateTime.class, "01/08/2018 10:00:00", options);
+        LocalDateTime actualDate = (LocalDateTime) casting.castValue(LocalDateTime.class, "01/08/2018 10:00:00",
+                options);
 
         assertEquals(expectedDate, actualDate);
+    }
+
+    @Test
+    public void invalidValueLocalDateTime() {
+        PoijiOptions options = PoijiOptionsBuilder.settings().build();
+
+        LocalDateTime expectedDate = LocalDateTime.now();
+
+        LocalDateTime actualDate = (LocalDateTime) casting.castValue(LocalDateTime.class, "", options);
+
+        assertEquals(expectedDate.toLocalDate(), actualDate.toLocalDate());
+    }
+
+    @Test
+    public void invalidValueLocalDateTimeWhenRegexNotMatch() {
+        PoijiOptions options = PoijiOptionsBuilder.settings().dateTimeRegex("d{2}/d{2}/d{4} d{2}:d{2}:d{2}")
+                .build();
+
+        LocalDateTime expectedDate = LocalDateTime.now();
+
+        LocalDateTime actualDate = (LocalDateTime) casting.castValue(LocalDateTime.class, "01/8/2023 10:00:00",
+                options);
+
+        assertEquals(expectedDate.toLocalDate(), actualDate.toLocalDate());
+    }
+
+    @Test
+    public void invalidValueLocalDateTimeWhenRegexNotMatchPreferNull() {
+        PoijiOptions options = PoijiOptionsBuilder.settings().dateTimeRegex("d{2}/d{2}/d{4} d{2}:d{2}:d{2}")
+                .preferNullOverDefault(true)
+                .build();
+
+        LocalDateTime actualDate = (LocalDateTime) casting.castValue(LocalDateTime.class, "01/8/2023 10:00:00",
+                options);
+
+        assertNull(actualDate);
     }
 
     @Test
@@ -199,7 +249,6 @@ public class DefaultCastingTest {
 
         assertEquals(BigDecimal.valueOf(81.56), testVal);
     }
-
 
     @Test
     public void castEnum() {
@@ -228,14 +277,14 @@ public class DefaultCastingTest {
     }
 
     @Test
-    //ISSUE #55 : additional functionality, trim string values
+    // ISSUE #55 : additional functionality, trim string values
     public void trimStringDefault() {
         String testVal = (String) casting.castValue(String.class, "    value    ", options);
         assertEquals("    value    ", testVal);
     }
 
     @Test
-    //ISSUE #55 : additional functionality, trim string values
+    // ISSUE #55 : additional functionality, trim string values
     public void trimStringTrue() {
         PoijiOptions options = PoijiOptionsBuilder.settings().build().setTrimCellValue(true);
         String testVal = (String) casting.castValue(String.class, "    value    ", options);
@@ -243,7 +292,7 @@ public class DefaultCastingTest {
     }
 
     @Test
-    //ISSUE #55 : additional functionality, trim string values
+    // ISSUE #55 : additional functionality, trim string values
     public void trimStringFalse() {
         PoijiOptions options = PoijiOptionsBuilder.settings().build().setTrimCellValue(false);
         String testVal = (String) casting.castValue(String.class, "    value    ", options);
