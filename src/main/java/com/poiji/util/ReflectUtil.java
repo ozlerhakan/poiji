@@ -20,7 +20,7 @@ public final class ReflectUtil {
         T obj;
         try {
             Constructor<T> constructor = type.getDeclaredConstructor();
-            if (!constructor.isAccessible()) {
+            if (!constructor.canAccess(null)) {
                 constructor.setAccessible(true);
             }
             obj = constructor.newInstance();
@@ -32,12 +32,13 @@ public final class ReflectUtil {
     }
 
     /**
-     * Finds a particular annotation on a class and checks subtypes marked with ExcelCellRange recursively.
+     * Finds a particular annotation on a class and checks subtypes marked with
+     * ExcelCellRange recursively.
      * <p>
      * Recursively does not refer to super classes.
      */
     static <T, A extends Annotation> Collection<A> findRecursivePoijiAnnotations(Class<T> typeToInspect,
-                                                                                 Class<A> annotationType) {
+            Class<A> annotationType) {
         List<A> annotations = new ArrayList<>();
 
         for (Field field : typeToInspect.getDeclaredFields()) {
