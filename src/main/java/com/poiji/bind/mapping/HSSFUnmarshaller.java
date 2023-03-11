@@ -99,12 +99,12 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
                     errors.add(poijiRowException);
                 }
             }
-            if (!errors.isEmpty()) {
-                List<PoijiRowSpecificException> allErrors = errors.stream()
-                        .flatMap((PoijiMultiRowException e) -> e.getErrors().stream())
-                        .collect(Collectors.toList());
-                throw new PoijiMultiRowException("Problem(s) occurred while reading data", allErrors);
-            }
+        }
+        if (!errors.isEmpty()) {
+            List<PoijiRowSpecificException> allErrors = errors.stream()
+                    .flatMap((PoijiMultiRowException e) -> e.getErrors().stream())
+                    .collect(Collectors.toList());
+            throw new PoijiMultiRowException("Problem(s) occurred while reading data", allErrors);
         }
     }
 
