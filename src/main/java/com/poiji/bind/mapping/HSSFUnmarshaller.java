@@ -271,7 +271,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
                 cell.setCellStyle(null);
             }
             String value;
-            if (options.isRawData() && cell.getCellType() == CellType.NUMERIC) {
+            if (options.isRawData() && isCellNumeric(cell)) {
                 value = NumberToTextConverter.toText(cell.getNumericCellValue());
             } else {
                 value = dataFormatter.formatCellValue(cell, baseFormulaEvaluator);
@@ -283,6 +283,12 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
             throw new PoijiRowSpecificException(annotationDetail.getColumnName(), field.getName(),
                     currentRow.getRowNum());
         }
+    }
+
+    private boolean isCellNumeric(Cell cell) {
+        return (cell.getCellType() == CellType.NUMERIC ||
+            (cell.getCellType() == CellType.FORMULA &&
+                cell.getCachedFormulaResultType() == CellType.NUMERIC));
     }
 
     private <T> void setFieldData(T instance, Field field, Object data) {
