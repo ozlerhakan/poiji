@@ -129,7 +129,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                             }
                             String index = indexToTitle.get(column);
                             if (index == null) {
-                                excelUnknownCellsMap.put(String.valueOf(column), content);
+                                excelUnknownCellsMap.put(valueOf(column), content);
                             } else {
                                 excelUnknownCellsMap.put(indexToTitle.get(column), content);
                             }

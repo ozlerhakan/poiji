@@ -219,7 +219,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
                     .stream(Spliterators.spliteratorUnknownSize(currentRow.cellIterator(), Spliterator.ORDERED), false)
                     .filter(cell -> !mappedColumnIndices.contains(cell.getColumnIndex()))
                     .collect(Collectors.toMap(
-                            cell -> String.valueOf(cell.getColumnIndex()),
+                            cell -> valueOf(cell.getColumnIndex()),
                             Object::toString));
             unknownCells.forEach(field -> setFieldData(instance, field, excelUnknownCellsMap));
         }
