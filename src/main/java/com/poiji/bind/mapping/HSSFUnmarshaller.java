@@ -210,7 +210,6 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
             Map<String, String> excelUnknownCellsMap = StreamSupport
                     .stream(Spliterators.spliteratorUnknownSize(currentRow.cellIterator(), Spliterator.ORDERED), false)
                     .filter(cell -> !mappedColumnIndices.contains(cell.getColumnIndex()))
-                    .filter(cell -> !cell.toString().isEmpty())
                     .collect(Collectors.toMap(
                             cell -> indexToTitle.get(cell.getColumnIndex()),
                             Object::toString));
@@ -219,7 +218,6 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
             Map<String, String> excelUnknownCellsMap = StreamSupport
                     .stream(Spliterators.spliteratorUnknownSize(currentRow.cellIterator(), Spliterator.ORDERED), false)
                     .filter(cell -> !mappedColumnIndices.contains(cell.getColumnIndex()))
-                    .filter(cell -> !cell.toString().isEmpty())
                     .collect(Collectors.toMap(
                             cell -> String.valueOf(cell.getColumnIndex()),
                             Object::toString));
@@ -300,8 +298,8 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
 
     private boolean isCellNumeric(Cell cell) {
         return (cell.getCellType() == CellType.NUMERIC ||
-            (cell.getCellType() == CellType.FORMULA &&
-                cell.getCachedFormulaResultType() == CellType.NUMERIC));
+                (cell.getCellType() == CellType.FORMULA &&
+                        cell.getCachedFormulaResultType() == CellType.NUMERIC));
     }
 
     private <T> void setFieldData(T instance, Field field, Object data) {
