@@ -202,16 +202,29 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
             throw new PoijiMultiRowException("Problem(s) occurred while reading data", errors);
         }
 
-        Map<String, String> excelUnknownCellsMap = StreamSupport
-                .stream(Spliterators.spliteratorUnknownSize(currentRow.cellIterator(), Spliterator.ORDERED), false)
-                .filter(cell -> indexToTitle.size() != 0)
-                .filter(cell -> !mappedColumnIndices.contains(cell.getColumnIndex()))
-                .filter(cell -> !cell.toString().isEmpty())
-                .collect(Collectors.toMap(
-                        cell -> indexToTitle.get(cell.getColumnIndex()),
-                        Object::toString));
+        if (unknownCells.isEmpty()) {
+            return instance;
+        }
 
-        unknownCells.forEach(field -> setFieldData(instance, field, excelUnknownCellsMap));
+        if (!indexToTitle.isEmpty()) {
+            Map<String, String> excelUnknownCellsMap = StreamSupport
+                    .stream(Spliterators.spliteratorUnknownSize(currentRow.cellIterator(), Spliterator.ORDERED), false)
+                    .filter(cell -> !mappedColumnIndices.contains(cell.getColumnIndex()))
+                    .filter(cell -> !cell.toString().isEmpty())
+                    .collect(Collectors.toMap(
+                            cell -> indexToTitle.get(cell.getColumnIndex()),
+                            Object::toString));
+            unknownCells.forEach(field -> setFieldData(instance, field, excelUnknownCellsMap));
+        } else {
+            Map<String, String> excelUnknownCellsMap = StreamSupport
+                    .stream(Spliterators.spliteratorUnknownSize(currentRow.cellIterator(), Spliterator.ORDERED), false)
+                    .filter(cell -> !mappedColumnIndices.contains(cell.getColumnIndex()))
+                    .filter(cell -> !cell.toString().isEmpty())
+                    .collect(Collectors.toMap(
+                            cell -> String.valueOf(cell.getColumnIndex()),
+                            Object::toString));
+            unknownCells.forEach(field -> setFieldData(instance, field, excelUnknownCellsMap));
+        }
 
         return instance;
     }
