@@ -45,6 +45,13 @@ public class PoijiOptionsTest {
     }
 
     @Test
+    public void shouldPrintDateFormatter() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/M/yyyy HH:mm:ss");
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().dateTimeFormatter(formatter).build();
+        assertThat(options.dateTimeFormatter().toString(), equalTo(formatter.toString()));
+    }
+
+    @Test
     public void shouldUseUsLocaleWhenNotSpecified() {
         PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().build();
 
