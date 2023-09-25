@@ -127,9 +127,15 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                             } else {
                                 excelUnknownCellsMap = (Map<String, String>) field.get(instance);
                             }
-                            excelUnknownCellsMap.put(indexToTitle.get(column), content);
+                            String index = indexToTitle.get(column);
+                            if (index == null) {
+                                excelUnknownCellsMap.put(valueOf(column), content);
+                            } else {
+                                excelUnknownCellsMap.put(indexToTitle.get(column), content);
+                            }
                         } catch (IllegalAccessException e) {
-                            throw new IllegalCastException("Could not read content of field " + field.getName() + " on Object {" + instance + "}");
+                            throw new IllegalCastException("Could not read content of field " + field.getName()
+                                    + " on Object {" + instance + "}");
                         }
                     }
                 });
@@ -167,7 +173,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                 excelCellNameAnnotations.add(excelCellName);
                 final String titleName = formatting.transform(options, excelCellName.value());
                 final Integer titleColumn = titleToIndex.get(titleName);
-                //Fix both columns mapped to name passing this condition below
+                // Fix both columns mapped to name passing this condition below
                 if (titleColumn != null && titleColumn == column) {
                     Object o = casting.castValue(field, content, internalRow, column, options);
                     ReflectUtil.setFieldData(field, o, ins);
@@ -234,7 +240,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     @Override
     public void headerFooter(String text, boolean isHeader, String tagName) {
-        //no-op
+        // no-op
     }
 
     @Override

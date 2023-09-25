@@ -37,6 +37,7 @@ public class FromExcelSheetTest {
         assertThat(result, notNullValue());
         CellFormatModel cellFormatModel = result.get(1);
         assertThat(cellFormatModel.getAge(), is(40));
+        workbook.close();
     }
 
     @Test
@@ -51,8 +52,8 @@ public class FromExcelSheetTest {
         assertThat(result, notNullValue());
         CellFormatModel cellFormatModel = result.get(1);
         assertThat(cellFormatModel.getAge(), is(40));
+        workbook.close();
     }
-
 
     @Test
     public void shouldMapXLSXSheetWithOptions() throws IOException {
@@ -61,11 +62,13 @@ public class FromExcelSheetTest {
         FileInputStream fileInputStream = new FileInputStream(file);
         Workbook workbook = new XSSFWorkbook(fileInputStream);
         Sheet sheet = workbook.getSheetAt(0);
-        List<CellFormatModel> result = Poiji.fromExcel(sheet, CellFormatModel.class, PoijiOptions.PoijiOptionsBuilder.settings().build());
+        List<CellFormatModel> result = Poiji.fromExcel(sheet, CellFormatModel.class,
+                PoijiOptions.PoijiOptionsBuilder.settings().build());
 
         assertThat(result, notNullValue());
         CellFormatModel cellFormatModel = result.get(1);
         assertThat(cellFormatModel.getAge(), is(40));
+        workbook.close();
     }
 
     @Test
@@ -76,7 +79,9 @@ public class FromExcelSheetTest {
         Workbook workbook = new XSSFWorkbook(fileInputStream);
         Sheet sheet = workbook.getSheetAt(0);
 
-        Poiji.fromExcel(sheet, CellFormatModel.class, PoijiOptions.PoijiOptionsBuilder.settings().build(), this::printout);
+        Poiji.fromExcel(sheet, CellFormatModel.class, PoijiOptions.PoijiOptionsBuilder.settings().build(),
+                this::printout);
+        workbook.close();
     }
 
     private void printout(CellFormatModel instance) {
@@ -91,5 +96,6 @@ public class FromExcelSheetTest {
         Workbook workbook = new SXSSFWorkbook(xssfWorkbook);
         Sheet sheet = workbook.getSheetAt(0);
         Poiji.fromExcel(sheet, CellFormatModel.class);
+        workbook.close();
     }
 }

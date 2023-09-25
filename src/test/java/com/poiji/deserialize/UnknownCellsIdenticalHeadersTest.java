@@ -19,79 +19,108 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @RunWith(Parameterized.class)
 public class UnknownCellsIdenticalHeadersTest {
 
-    private String path;
+        private String path;
 
-    public UnknownCellsIdenticalHeadersTest(String path) {
-        this.path = path;
-    }
+        public UnknownCellsIdenticalHeadersTest(String path) {
+                this.path = path;
+        }
 
-    @Parameterized.Parameters
-    public static List<String> excel() {
-        return Arrays.asList(
-                "src/test/resources/unknown-cells-identical-headers.xlsx",
-                "src/test/resources/unknown-cells-identical-headers.xls"
-        );
-    }
+        @Parameterized.Parameters
+        public static List<String> excel() {
+                return Arrays.asList("src/test/resources/unknown-cells-identical-headers.xlsx",
+                                "src/test/resources/unknown-cells-identical-headers.xls");
+        }
 
-    @Test
-    public void byName() {
-        List<OrgWithUnknownCellsByName> organisations = Poiji.fromExcel(
-                new File(path),
-                OrgWithUnknownCellsByName.class,
-                PoijiOptions.PoijiOptionsBuilder.settings()
-                        .sheetName("Organisation")
-                        .build()
-        );
+        @Test
+        public void byName() {
+                List<OrgWithUnknownCellsByName> organisations = Poiji.fromExcel(
+                                new File(path),
+                                OrgWithUnknownCellsByName.class,
+                                PoijiOptions.PoijiOptionsBuilder.settings()
+                                                .sheetName("Organisation")
+                                                .build());
 
-        assertThat(organisations, notNullValue());
-        assertThat(organisations.size(), is(2));
+                assertThat(organisations, notNullValue());
+                assertThat(organisations.size(), is(2));
 
-        OrgWithUnknownCellsByName firstRow = organisations.stream()
-                .filter(org -> org.getId().equals("CrEaTe"))
-                .findFirst()
-                .get();
-        assertThat(firstRow.getUnknownCells().size(), is(2));
-        assertThat(firstRow.getUnknownCells().get("Tag"), is("testTag"));
-        assertThat(firstRow.getUnknownCells().get("Tag@5"), is("rndTag"));
+                OrgWithUnknownCellsByName firstRow = organisations.stream()
+                                .filter(org -> org.getId().equals("CrEaTe"))
+                                .findFirst()
+                                .get();
+                assertThat(firstRow.getUnknownCells().size(), is(2));
+                assertThat(firstRow.getUnknownCells().get("Tag"), is("testTag"));
+                assertThat(firstRow.getUnknownCells().get("Tag@5"), is("rndTag"));
 
+                OrgWithUnknownCellsByName secondRow = organisations.stream()
+                                .filter(org -> org.getId().equals("8d9e6430-8626-4556-8004-079085d2df2d"))
+                                .findFirst()
+                                .get();
+                assertThat(secondRow.getUnknownCells().size(), is(2));
+                assertThat(secondRow.getUnknownCells().get("Tag"), is("testTag2"));
+                assertThat(secondRow.getUnknownCells().get("Tag@5"), is("rndTag2"));
+        }
 
-        OrgWithUnknownCellsByName secondRow = organisations.stream()
-                .filter(org -> org.getId().equals("8d9e6430-8626-4556-8004-079085d2df2d"))
-                .findFirst()
-                .get();
-        assertThat(secondRow.getUnknownCells().size(), is(2));
-        assertThat(secondRow.getUnknownCells().get("Tag"), is("testTag2"));
-        assertThat(secondRow.getUnknownCells().get("Tag@5"), is("rndTag2"));
-    }
+        @Test
+        public void byIndex() {
+                List<OrgWithUnknownCells> organisations = Poiji.fromExcel(
+                                new File(path),
+                                OrgWithUnknownCells.class,
+                                PoijiOptions.PoijiOptionsBuilder.settings()
+                                                .sheetName("Organisation")
+                                                .build());
 
-    @Test
-    public void byIndex() {
-        List<OrgWithUnknownCells> organisations = Poiji.fromExcel(
-                new File(path),
-                OrgWithUnknownCells.class,
-                PoijiOptions.PoijiOptionsBuilder.settings()
-                        .sheetName("Organisation")
-                        .build()
-        );
+                assertThat(organisations, notNullValue());
+                assertThat(organisations.size(), is(2));
 
-        assertThat(organisations, notNullValue());
-        assertThat(organisations.size(), is(2));
+                OrgWithUnknownCells firstRow = organisations.stream()
+                                .filter(org -> org.getId().equals("CrEaTe"))
+                                .findFirst()
+                                .get();
+                assertThat(firstRow.getUnknownCells().size(), is(2));
+                assertThat(firstRow.getUnknownCells().get("Tag"), is("testTag"));
+                assertThat(firstRow.getUnknownCells().get("Tag@5"), is("rndTag"));
 
-        OrgWithUnknownCells firstRow = organisations.stream()
-                .filter(org -> org.getId().equals("CrEaTe"))
-                .findFirst()
-                .get();
-        assertThat(firstRow.getUnknownCells().size(), is(2));
-        assertThat(firstRow.getUnknownCells().get("Tag"), is("testTag"));
-        assertThat(firstRow.getUnknownCells().get("Tag@5"), is("rndTag"));
+                OrgWithUnknownCells secondRow = organisations.stream()
+                                .filter(org -> org.getId().equals("8d9e6430-8626-4556-8004-079085d2df2d"))
+                                .findFirst()
+                                .get();
+                assertThat(secondRow.getUnknownCells().size(), is(2));
+                assertThat(secondRow.getUnknownCells().get("Tag"), is("testTag2"));
+                assertThat(secondRow.getUnknownCells().get("Tag@5"), is("rndTag2"));
+        }
 
+        @Test
+        public void byIndexNoHeader() {
+                List<OrgWithUnknownCells> organisations = Poiji.fromExcel(
+                                new File(path),
+                                OrgWithUnknownCells.class,
+                                PoijiOptions.PoijiOptionsBuilder.settings()
+                                                .sheetName("Organisation")
+                                                .skip(1)
+                                                .headerCount(0)
+                                                .build());
 
-        OrgWithUnknownCells secondRow = organisations.stream()
-                .filter(org -> org.getId().equals("8d9e6430-8626-4556-8004-079085d2df2d"))
-                .findFirst()
-                .get();
-        assertThat(secondRow.getUnknownCells().size(), is(2));
-        assertThat(secondRow.getUnknownCells().get("Tag"), is("testTag2"));
-        assertThat(secondRow.getUnknownCells().get("Tag@5"), is("rndTag2"));
-    }
+                assertThat(organisations, notNullValue());
+                assertThat(organisations.size(), is(2));
+
+                OrgWithUnknownCells firstRow = organisations.stream()
+                                .filter(org -> org.getId().equals("CrEaTe"))
+                                .findFirst()
+                                .get();
+                assertThat(firstRow.getUnknownCells().size(), is(2));
+                assertThat(firstRow.getUnknownCells().get("Tag") == null ? firstRow.getUnknownCells().get("4")
+                                : firstRow.getUnknownCells().get("Tag"), is("testTag"));
+                assertThat(firstRow.getUnknownCells().get("Tag@5") == null ? firstRow.getUnknownCells().get("5")
+                                : firstRow.getUnknownCells().get("Tag@5"), is("rndTag"));
+
+                OrgWithUnknownCells secondRow = organisations.stream()
+                                .filter(org -> org.getId().equals("8d9e6430-8626-4556-8004-079085d2df2d"))
+                                .findFirst()
+                                .get();
+                assertThat(secondRow.getUnknownCells().size(), is(2));
+                assertThat(secondRow.getUnknownCells().get("Tag") == null ? secondRow.getUnknownCells().get("4")
+                                : secondRow.getUnknownCells().get("Tag"), is("testTag2"));
+                assertThat(secondRow.getUnknownCells().get("Tag@5") == null ? secondRow.getUnknownCells().get("5")
+                                : secondRow.getUnknownCells().get("Tag@5"), is("rndTag2"));
+        }
 }
