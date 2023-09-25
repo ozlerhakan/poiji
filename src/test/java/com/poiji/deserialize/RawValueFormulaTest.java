@@ -1,7 +1,7 @@
 package com.poiji.deserialize;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.RowModelFormula;
@@ -27,9 +27,9 @@ public class RawValueFormulaTest {
 
     @Parameterized.Parameters(name = "{index}: ({0})={1}")
     public static Iterable<Object[]> queries() {
-        return Arrays.asList(new Object[][]{
-                {"src/test/resources/raw_value_formula.xls"},
-                {"src/test/resources/raw_value_formula.xlsx"},
+        return Arrays.asList(new Object[][] {
+                { "src/test/resources/raw_value_formula.xls" },
+                { "src/test/resources/raw_value_formula.xlsx" },
         });
     }
 
