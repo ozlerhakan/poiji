@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Created by hakan on 02/08/2018
@@ -28,9 +28,9 @@ public class RawValueTest {
 
     @Parameterized.Parameters(name = "{index}: ({0})={1}")
     public static Iterable<Object[]> queries() {
-        return Arrays.asList(new Object[][]{
-                {"src/test/resources/raw_value.xls"},
-                {"src/test/resources/raw_value.xlsx"},
+        return Arrays.asList(new Object[][] {
+                { "src/test/resources/raw_value.xls" },
+                { "src/test/resources/raw_value.xlsx" },
         });
     }
 
