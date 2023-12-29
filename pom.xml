@@ -44,7 +44,7 @@
     </issueManagement>
 
     <properties>
-        <apache.poi.version>5.2.3</apache.poi.version>
+        <apache.poi.version>5.2.5</apache.poi.version>
         <junit.version>4.13.2</junit.version>
         <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
