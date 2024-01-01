@@ -49,8 +49,8 @@
         <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
-        <maven-enforcer-plugin.version>1.2</maven-enforcer-plugin.version>
+        <maven-release-plugin.version>3.0.1</maven-release-plugin.version>
+        <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
         <jdk.source>11</jdk.source>
         <jdk.target>11</jdk.target>
 
@@ -86,6 +86,10 @@
         <finalName>${project.artifactId}</finalName>
 
         <plugins>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.1</version>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -125,7 +129,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.3.2</version>
+                <version>3.6.3</version>
                 <dependencies>
                     <dependency>
                         <groupId>commons-lang</groupId>
@@ -150,7 +154,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.6</version>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
