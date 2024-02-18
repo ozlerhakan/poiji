@@ -1,5 +1,6 @@
 package com.poiji.util;
 
+import com.poiji.deserialize.model.InventoryData;
 import com.poiji.deserialize.model.Student;
 import com.poiji.deserialize.model.byid.Employee;
 import com.poiji.deserialize.model.byid.Person;
@@ -125,5 +126,18 @@ public final class Data {
         student.setPhone("456");
         students.add(student);
         return students;
+    }
+
+
+    public static List<InventoryData> unmarshallingInventoryData() {
+        InventoryData record1 = new InventoryData();
+        record1.setId(1);
+        record1.setAuthor("Peter");
+
+        InventoryData record2 = new InventoryData();
+        record2.setId(2);
+        record2.setAuthor("Maria");
+
+        return List.of(record1, record2);
     }
 }

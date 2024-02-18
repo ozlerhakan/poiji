@@ -36,6 +36,7 @@ import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -273,10 +274,20 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
         return annotationDetail;
     }
 
-    private Integer findTitleColumn(ExcelCellName excelCellName) {
+    public Integer findTitleColumn(ExcelCellName excelCellName) {
         if (!StringUtil.isBlank(excelCellName.value())) {
             final String titleName = formatting.transform(options, excelCellName.value());
             return titleToIndex.get(titleName);
+        }
+
+        if (!StringUtil.isBlank(excelCellName.expression())) {
+            final String titleName = formatting.transform(options, excelCellName.expression());
+            Pattern pattern = Pattern.compile(titleName);
+            return titleToIndex.entrySet().stream()
+                    .filter(entry -> pattern.matcher(entry.getKey()).matches())
+                    .findFirst()
+                    .map(Map.Entry::getValue)
+                    .orElse(null);
         }
 
         return null;

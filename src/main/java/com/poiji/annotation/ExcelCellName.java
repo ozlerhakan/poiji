@@ -16,7 +16,7 @@ public @interface ExcelCellName {
 
     /**
      * Specifies the column name where the corresponding value is mapped from the
-     * excel data
+     * Excel data
      *
      * @return column name
      */
@@ -35,4 +35,12 @@ public @interface ExcelCellName {
      * @return mandatory cell signal. Default is false.
      */
     boolean mandatoryCell() default false;
+
+    /**
+     * Specifies the column regular expression where the corresponding value is mapped from the
+     * Excel data
+     *
+     * @return column regular expression
+     */
+    String expression() default "";
 }

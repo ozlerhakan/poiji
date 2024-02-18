@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static java.lang.String.valueOf;
@@ -184,10 +185,20 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         return false;
     }
 
-    private Integer findTitleColumn(ExcelCellName excelCellName) {
+    public Integer findTitleColumn(ExcelCellName excelCellName) {
         if (!StringUtil.isBlank(excelCellName.value())) {
             final String titleName = formatting.transform(options, excelCellName.value());
             return titleToIndex.get(titleName);
+        }
+
+        if (!StringUtil.isBlank(excelCellName.expression())) {
+            final String titleName = formatting.transform(options, excelCellName.expression());
+            Pattern pattern = Pattern.compile(titleName);
+            return titleToIndex.entrySet().stream()
+                    .filter(entry -> pattern.matcher(entry.getKey()).matches())
+                    .findFirst()
+                    .map(Map.Entry::getValue)
+                    .orElse(null);
         }
 
         return null;
