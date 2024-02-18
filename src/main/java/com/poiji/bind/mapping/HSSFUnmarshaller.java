@@ -25,6 +25,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.NumberToTextConverter;
+import org.apache.poi.util.StringUtil;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -265,12 +266,20 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
             if (excelCellName != null) {
                 annotationDetail.setMandatoryCell(excelCellName.mandatoryCell());
                 annotationDetail.setColumnName(excelCellName.value());
-                final String titleName = formatting.transform(options, excelCellName.value());
-                Integer column = titleToIndex.get(titleName);
+                Integer column = findTitleColumn(excelCellName);
                 annotationDetail.setColumn(column);
             }
         }
         return annotationDetail;
+    }
+
+    private Integer findTitleColumn(ExcelCellName excelCellName) {
+        if (!StringUtil.isBlank(excelCellName.value())) {
+            final String titleName = formatting.transform(options, excelCellName.value());
+            return titleToIndex.get(titleName);
+        }
+
+        return null;
     }
 
     private <T> void constructTypeValue(Row currentRow, T instance, Field field,

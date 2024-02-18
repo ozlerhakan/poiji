@@ -12,6 +12,7 @@ import com.poiji.option.PoijiOptions;
 import com.poiji.util.AnnotationUtil;
 import com.poiji.util.ReflectUtil;
 import org.apache.poi.ss.util.CellAddress;
+import org.apache.poi.util.StringUtil;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.usermodel.XSSFComment;
 
@@ -171,8 +172,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
             if (excelCellName != null) {
                 excelCellNameAnnotations.add(excelCellName);
-                final String titleName = formatting.transform(options, excelCellName.value());
-                final Integer titleColumn = titleToIndex.get(titleName);
+                final Integer titleColumn = findTitleColumn(excelCellName);
                 // Fix both columns mapped to name passing this condition below
                 if (titleColumn != null && titleColumn == column) {
                     Object o = casting.castValue(field, content, internalRow, column, options);
@@ -182,6 +182,15 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             }
         }
         return false;
+    }
+
+    private Integer findTitleColumn(ExcelCellName excelCellName) {
+        if (!StringUtil.isBlank(excelCellName.value())) {
+            final String titleName = formatting.transform(options, excelCellName.value());
+            return titleToIndex.get(titleName);
+        }
+
+        return null;
     }
 
     @Override
