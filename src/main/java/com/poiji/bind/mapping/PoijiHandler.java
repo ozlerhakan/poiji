@@ -169,19 +169,20 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                 ReflectUtil.setFieldData(field, o, ins);
                 return true;
             }
-        } else {
-            ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
-            if (excelCellName != null) {
-                excelCellNameAnnotations.add(excelCellName);
-                final Integer titleColumn = findTitleColumn(excelCellName);
-                // Fix both columns mapped to name passing this condition below
-                if (titleColumn != null && titleColumn == column) {
-                    Object o = casting.castValue(field, content, internalRow, column, options);
-                    ReflectUtil.setFieldData(field, o, ins);
-                    return true;
-                }
+        }
+
+        ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
+        if (excelCellName != null) {
+            excelCellNameAnnotations.add(excelCellName);
+            final Integer titleColumn = findTitleColumn(excelCellName);
+            // Fix both columns mapped to name passing this condition below
+            if (titleColumn != null && titleColumn == column) {
+                Object o = casting.castValue(field, content, internalRow, column, options);
+                ReflectUtil.setFieldData(field, o, ins);
+                return true;
             }
         }
+
         return false;
     }
 

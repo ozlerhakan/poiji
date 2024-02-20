@@ -251,7 +251,6 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
     }
 
     private FieldAnnotationDetail getFieldColumn(final Field field) {
-        ExcelCell index = field.getAnnotation(ExcelCell.class);
         DisableCellFormatXLS disableCellFormat = field.getAnnotation(DisableCellFormatXLS.class);
         final FieldAnnotationDetail annotationDetail = new FieldAnnotationDetail();
 
@@ -259,17 +258,18 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
             annotationDetail.setDisabledCellFormat(disableCellFormat.value());
         }
 
+        ExcelCell index = field.getAnnotation(ExcelCell.class);
         if (index != null) {
             annotationDetail.setColumn(index.value());
             annotationDetail.setMandatoryCell(index.mandatoryCell());
-        } else {
-            ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
-            if (excelCellName != null) {
-                annotationDetail.setMandatoryCell(excelCellName.mandatoryCell());
-                annotationDetail.setColumnName(excelCellName.value());
-                Integer column = findTitleColumn(excelCellName);
-                annotationDetail.setColumn(column);
-            }
+        }
+
+        ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
+        if (excelCellName != null) {
+            annotationDetail.setMandatoryCell(excelCellName.mandatoryCell());
+            annotationDetail.setColumnName(excelCellName.value());
+            Integer column = findTitleColumn(excelCellName);
+            annotationDetail.setColumn(column);
         }
         return annotationDetail;
     }
