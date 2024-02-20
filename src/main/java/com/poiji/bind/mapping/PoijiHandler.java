@@ -5,6 +5,7 @@ import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelCellRange;
 import com.poiji.annotation.ExcelRow;
 import com.poiji.annotation.ExcelUnknownCells;
+import com.poiji.annotation.ExcelCellsJoinedByName;
 import com.poiji.config.Casting;
 import com.poiji.config.Formatting;
 import com.poiji.exception.IllegalCastException;
@@ -179,6 +180,19 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             if (titleColumn != null && titleColumn == column) {
                 Object o = casting.castValue(field, content, internalRow, column, options);
                 ReflectUtil.setFieldData(field, o, ins);
+                return true;
+            }
+        }
+
+        ExcelCellsJoinedByName excelCellsJoinedByName = field.getAnnotation(ExcelCellsJoinedByName.class);
+        if (excelCellsJoinedByName != null) {
+            String titleColumn = indexToTitle.get(column).replaceAll("@[0-9]+", "");
+
+            String expression = excelCellsJoinedByName.expression();
+            Pattern pattern = Pattern.compile(expression);
+            if (pattern.matcher(titleColumn).matches()) {
+                Object o = casting.castValue(field, content, internalRow, column, options);
+                ReflectUtil.putFieldMultiValueMapData(field, titleColumn, o, ins);
                 return true;
             }
         }

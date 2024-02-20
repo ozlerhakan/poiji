@@ -6,6 +6,7 @@ import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelCellRange;
 import com.poiji.annotation.ExcelRow;
 import com.poiji.annotation.ExcelUnknownCells;
+import com.poiji.annotation.ExcelCellsJoinedByName;
 import com.poiji.bind.Unmarshaller;
 import com.poiji.config.Casting;
 import com.poiji.config.Formatting;
@@ -15,6 +16,8 @@ import com.poiji.exception.PoijiMultiRowException.PoijiRowSpecificException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.AnnotationUtil;
 import com.poiji.util.ReflectUtil;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.formula.BaseFormulaEvaluator;
@@ -247,6 +250,14 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
         if (annotationDetail.getColumn() != null) {
             constructTypeValue(currentRow, instance, field, annotationDetail);
         }
+
+        if (CollectionUtils.isNotEmpty(annotationDetail.getColumns())) {
+            for (Integer column : annotationDetail.getColumns()) {
+                annotationDetail.setColumn(column);
+                constructTypeValue(currentRow, instance, field, annotationDetail);
+            }
+        }
+
         return annotationDetail.getColumn();
     }
 
@@ -271,6 +282,23 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
             Integer column = findTitleColumn(excelCellName);
             annotationDetail.setColumn(column);
         }
+
+        ExcelCellsJoinedByName excelCellsJoinedByName = field.getAnnotation(ExcelCellsJoinedByName.class);
+        if (excelCellsJoinedByName != null) {
+            String expression = excelCellsJoinedByName.expression();
+            Pattern pattern = Pattern.compile(expression);
+
+            List<Integer> columns = indexToTitle.entrySet().stream()
+                    .filter(entry -> pattern.matcher(
+                                    entry.getValue().replaceAll("@[0-9]+", ""))
+                            .matches())
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+
+            annotationDetail.setColumns(columns);
+            annotationDetail.setMultiValueMap(CollectionUtils.isNotEmpty(columns));
+        }
+
         return annotationDetail;
     }
 
@@ -309,7 +337,14 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
             }
             Object data = casting.castValue(field, value, currentRow.getRowNum(), annotationDetail.getColumn(),
                     options);
-            setFieldData(instance, field, data);
+
+            if (!annotationDetail.isMultiValueMap()) {
+                setFieldData(instance, field, data);
+            } else {
+                String titleColumn = indexToTitle.get(annotationDetail.getColumn());
+                titleColumn = titleColumn.replaceAll("@[0-9]+", "");
+                putFieldMultiValueMapData(instance, field, titleColumn, data);
+            }
         } else if (annotationDetail.isMandatoryCell()) {
             throw new PoijiRowSpecificException(annotationDetail.getColumnName(), field.getName(),
                     currentRow.getRowNum());
@@ -328,6 +363,16 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
             field.set(instance, data);
         } catch (IllegalAccessException e) {
             throw new IllegalCastException("Unexpected cast type {" + data + "} of field" + field.getName());
+        }
+    }
+
+    public void putFieldMultiValueMapData(Object instance, Field field, String columnName, Object o) {
+        try {
+            field.setAccessible(true);
+            MultiValuedMap<String, Object> multiValuedMap = (MultiValuedMap<String, Object>) field.get(instance);
+            multiValuedMap.put(columnName, o);
+        } catch (ClassCastException | IllegalAccessException e) {
+            throw new IllegalCastException("Unexpected cast type {" + o + "} of field" + field.getName());
         }
     }
 
@@ -357,6 +402,10 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
         private String columnName;
         private boolean disabledCellFormat;
         private boolean mandatoryCell;
+
+        private List<Integer> columns;
+
+        private boolean multiValueMap;
 
         Integer getColumn() {
             return column;
@@ -390,6 +439,21 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
             this.mandatoryCell = mandatoryCell;
         }
 
+        public List<Integer> getColumns() {
+            return columns;
+        }
+
+        public void setColumns(List<Integer> columns) {
+            this.columns = columns;
+        }
+
+        public boolean isMultiValueMap() {
+            return multiValueMap;
+        }
+
+        public void setMultiValueMap(boolean multiValueMap) {
+            this.multiValueMap = multiValueMap;
+        }
     }
 
 }

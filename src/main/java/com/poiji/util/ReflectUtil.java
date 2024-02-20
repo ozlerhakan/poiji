@@ -3,6 +3,7 @@ package com.poiji.util;
 import com.poiji.annotation.ExcelCellRange;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.PoijiInstantiationException;
+import org.apache.commons.collections4.MultiValuedMap;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -61,6 +62,17 @@ public final class ReflectUtil {
             field.setAccessible(true);
             field.set(instance, o);
         } catch (IllegalAccessException e) {
+            throw new IllegalCastException("Unexpected cast type {" + o + "} of field" + field.getName());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void putFieldMultiValueMapData(Field field, String columnName, Object o, Object instance) {
+        try {
+            field.setAccessible(true);
+            MultiValuedMap<String, Object> multiValuedMap = (MultiValuedMap<String, Object>) field.get(instance);
+            multiValuedMap.put(columnName, o);
+        } catch (ClassCastException | IllegalAccessException e) {
             throw new IllegalCastException("Unexpected cast type {" + o + "} of field" + field.getName());
         }
     }
