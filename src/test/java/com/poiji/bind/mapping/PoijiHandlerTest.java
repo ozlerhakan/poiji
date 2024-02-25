@@ -24,19 +24,22 @@ public class PoijiHandlerTest {
 
     @Parameterized.Parameters(name = "{index}: ({0})={1}")
     public static Iterable<Object[]> queries() {
-        return List.of(new Object[][]{
+        return List.of(new Object[][] {
                 {
                         "id"
                 },
                 {
                         "author"
                 },
+                { "empty" }
         });
     }
 
     @Test
     public void shouldFindTitleColumn() {
-        PoijiHandler<InventoryData> poijiHandler = new PoijiHandler<>(InventoryData.class, PoijiOptions.PoijiOptionsBuilder.settings().build(), o -> {});
+        PoijiHandler<InventoryData> poijiHandler = new PoijiHandler<>(InventoryData.class,
+                PoijiOptions.PoijiOptionsBuilder.settings().build(), o -> {
+                });
 
         Integer titleColumn = poijiHandler.findTitleColumn(annotation);
 
