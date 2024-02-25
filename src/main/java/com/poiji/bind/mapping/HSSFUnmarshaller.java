@@ -290,7 +290,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
 
             List<Integer> columns = indexToTitle.entrySet().stream()
                     .filter(entry -> pattern.matcher(
-                                    entry.getValue().replaceAll("@[0-9]+", ""))
+                            entry.getValue().replaceAll("@[0-9]+", ""))
                             .matches())
                     .map(Map.Entry::getKey)
                     .collect(Collectors.toList());
@@ -317,7 +317,6 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
                     .map(Map.Entry::getValue)
                     .orElse(null);
         }
-
         return null;
     }
 

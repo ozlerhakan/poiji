@@ -24,19 +24,21 @@ public class HSSFUnmarshallerTest {
 
     @Parameterized.Parameters(name = "{index}: ({0})={1}")
     public static Iterable<Object[]> queries() {
-        return List.of(new Object[][]{
+        return List.of(new Object[][] {
                 {
                         "id"
                 },
                 {
                         "author"
                 },
+                { "empty" }
         });
     }
 
     @Test
     public void shouldFindTitleColumn() {
-        HSSFUnmarshallerFile hssfUnmarshallerFile = new HSSFUnmarshallerFile(null, PoijiOptions.PoijiOptionsBuilder.settings().build());
+        HSSFUnmarshallerFile hssfUnmarshallerFile = new HSSFUnmarshallerFile(null,
+                PoijiOptions.PoijiOptionsBuilder.settings().build());
 
         Integer titleColumn = hssfUnmarshallerFile.findTitleColumn(annotation);
 

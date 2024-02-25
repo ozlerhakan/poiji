@@ -14,6 +14,9 @@ public class InventoryData {
     @ExcelCellName(value = "", expression = "Author|Composer")
     private String author;
 
+    @ExcelCellName(value = "")
+    private String empty;
+
     public void setId(Integer id) {
         this.id = id;
     }
@@ -32,8 +35,10 @@ public class InventoryData {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         InventoryData that = (InventoryData) o;
         return Objects.equals(id, that.id) && Objects.equals(author, that.author);
     }
