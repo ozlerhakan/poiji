@@ -72,7 +72,7 @@ public final class ReflectUtil {
             field.setAccessible(true);
             MultiValuedMap<String, Object> multiValuedMap = (MultiValuedMap<String, Object>) field.get(instance);
             multiValuedMap.put(columnName, o);
-        } catch (ClassCastException | IllegalAccessException e) {
+        } catch (IllegalAccessException | IllegalAccessError e) {
             throw new IllegalCastException("Unexpected cast type {" + o + "} of field" + field.getName());
         }
     }

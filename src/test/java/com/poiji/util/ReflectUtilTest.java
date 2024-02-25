@@ -1,10 +1,13 @@
 package com.poiji.util;
 
+import com.poiji.annotation.ExcelCellsJoinedByName;
 import com.poiji.exception.PoijiExcelType;
 import com.poiji.exception.PoijiInstantiationException;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.ReflectPermission;
 
 import static org.junit.Assert.assertNotNull;
@@ -49,7 +52,18 @@ public class ReflectUtilTest {
         ReflectUtil.newInstanceOf(PoijiExcelType.class);
     }
 
+    @Test(expected = ClassCastException.class)
+    public void illegalCast() throws NoSuchFieldException, SecurityException {
+        PackageModel pm = new PackageModel();
+        Object o = "new_value";
+        Field field = PackageModel.class.getDeclaredField("field");
+
+        ReflectUtil.putFieldMultiValueMapData(field, "Artist", o, pm);
+    }
+
     static class PackageModel {
+        @ExcelCellsJoinedByName(expression = "Artist")
+        private String field = "";
     }
 
     static class PackageModelWithPrivateConstructor {
