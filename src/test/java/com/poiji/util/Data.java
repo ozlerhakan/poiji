@@ -1,9 +1,12 @@
 package com.poiji.util;
 
+import com.poiji.deserialize.model.Album;
+import com.poiji.deserialize.model.InventoryData;
 import com.poiji.deserialize.model.Student;
 import com.poiji.deserialize.model.byid.Employee;
 import com.poiji.deserialize.model.byid.Person;
 import com.poiji.deserialize.model.byid.Sample;
+import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -125,5 +128,37 @@ public final class Data {
         student.setPhone("456");
         students.add(student);
         return students;
+    }
+
+
+    public static List<InventoryData> unmarshallingInventoryData() {
+        InventoryData record1 = new InventoryData();
+        record1.setId(1);
+        record1.setAuthor("Peter");
+
+        InventoryData record2 = new InventoryData();
+        record2.setId(2);
+        record2.setAuthor("Maria");
+
+        return List.of(record1, record2);
+    }
+
+
+    public static List<Album> unmarshallingAlbums() {
+        ArrayListValuedHashMap<String, String> artists = new ArrayListValuedHashMap<>();
+
+        artists.put("Artist", "Michael Jackson");
+        artists.put("Artist", "Lionel Richie");
+        artists.put("Artist", "Stevie Wonder");
+
+        ArrayListValuedHashMap<String, String> tracks = new ArrayListValuedHashMap<>();
+        tracks.put("Track1", "We are the World");
+        tracks.put("Track2", "We are the World (instrumental)");
+
+        Album album = new Album();
+        album.setArtists(artists);
+        album.setTracks(tracks);
+
+        return List.of(album);
     }
 }

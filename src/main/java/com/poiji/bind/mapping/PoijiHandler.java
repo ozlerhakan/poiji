@@ -5,6 +5,7 @@ import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelCellRange;
 import com.poiji.annotation.ExcelRow;
 import com.poiji.annotation.ExcelUnknownCells;
+import com.poiji.annotation.ExcelCellsJoinedByName;
 import com.poiji.config.Casting;
 import com.poiji.config.Formatting;
 import com.poiji.exception.IllegalCastException;
@@ -12,6 +13,7 @@ import com.poiji.option.PoijiOptions;
 import com.poiji.util.AnnotationUtil;
 import com.poiji.util.ReflectUtil;
 import org.apache.poi.ss.util.CellAddress;
+import org.apache.poi.util.StringUtil;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.usermodel.XSSFComment;
 
@@ -21,6 +23,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static java.lang.String.valueOf;
@@ -167,21 +170,53 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                 ReflectUtil.setFieldData(field, o, ins);
                 return true;
             }
-        } else {
-            ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
-            if (excelCellName != null) {
-                excelCellNameAnnotations.add(excelCellName);
-                final String titleName = formatting.transform(options, excelCellName.value());
-                final Integer titleColumn = titleToIndex.get(titleName);
-                // Fix both columns mapped to name passing this condition below
-                if (titleColumn != null && titleColumn == column) {
-                    Object o = casting.castValue(field, content, internalRow, column, options);
-                    ReflectUtil.setFieldData(field, o, ins);
-                    return true;
-                }
+        }
+
+        ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
+        if (excelCellName != null) {
+            excelCellNameAnnotations.add(excelCellName);
+            final Integer titleColumn = findTitleColumn(excelCellName);
+            // Fix both columns mapped to name passing this condition below
+            if (titleColumn != null && titleColumn == column) {
+                Object o = casting.castValue(field, content, internalRow, column, options);
+                ReflectUtil.setFieldData(field, o, ins);
+                return true;
             }
         }
+
+        ExcelCellsJoinedByName excelCellsJoinedByName = field.getAnnotation(ExcelCellsJoinedByName.class);
+        if (excelCellsJoinedByName != null) {
+            String titleColumn = indexToTitle.get(column).replaceAll("@[0-9]+", "");
+
+            String expression = excelCellsJoinedByName.expression();
+            Pattern pattern = Pattern.compile(expression);
+            if (pattern.matcher(titleColumn).matches()) {
+                Object o = casting.castValue(field, content, internalRow, column, options);
+                ReflectUtil.putFieldMultiValueMapData(field, titleColumn, o, ins);
+                return true;
+            }
+        }
+
         return false;
+    }
+
+    public Integer findTitleColumn(ExcelCellName excelCellName) {
+        if (!StringUtil.isBlank(excelCellName.value())) {
+            final String titleName = formatting.transform(options, excelCellName.value());
+            return titleToIndex.get(titleName);
+        }
+
+        if (!StringUtil.isBlank(excelCellName.expression())) {
+            final String titleName = formatting.transform(options, excelCellName.expression());
+            Pattern pattern = Pattern.compile(titleName);
+            return titleToIndex.entrySet().stream()
+                    .filter(entry -> pattern.matcher(entry.getKey()).matches())
+                    .findFirst()
+                    .map(Map.Entry::getValue)
+                    .orElse(null);
+        }
+
+        return null;
     }
 
     @Override
