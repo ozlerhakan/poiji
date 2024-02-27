@@ -271,24 +271,31 @@ public class Person {
     @ExcelCellName("Email")
     protected String email;
 
+    @ExcelCellName(value = "", expression = "Surname|Second name")  <2>
+    private String surname;
+
 }
 ----
 1. We need to specify the `name` of the column for which the corresponding value is looked. By default, `@ExcelCellName` is case-sensitive and the excel file should't contain duplicated column names. However, you can manipulate this feature using `PoijiOptionsBuilder#caseInsensitive(boolean)` and you can ignore white spaces using `PoijiOptionsBuilder#ignoreWhitespaces(boolean)`.
+2. In rare situations a column can have synonyms, especially when the column was renamed and backward compatibility is needed.
+Here we specify the `expression` leaving the column `name` empty.
 
 For example, here is the excel (`person.xls`) file we want to use:
 
 |===
-| Name |Address |Age |Email
+| Name |Address |Age |Email |Surname
 
 |Joe
 |San Francisco, CA
 |30
 |joe@doe.com
+|Doe
 
 |Sophie
 |Costa Mesa, CA
 |20
 |sophie@doe.com
+|Doe
 
 |===
 
@@ -302,6 +309,7 @@ Person person = people.get(0);
 // San Francisco, CA
 // 30
 // joe@doe.com
+// Doe
 ----
 
 Given that the first column always stands for the names of people, you're able to combine the `ExcelCell` annotation with `ExcelCellName` in your object model:
