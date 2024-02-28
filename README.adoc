@@ -382,6 +382,82 @@ Car car = cars.get(0);
 // 4
 ----
 
+=== Annotation ExcelCellsJoinedByName
+
+Using `ExcelCellsJoinedByName` we can read columns which name meets same regular expression. Values will be combined as a multi valued map.
+
+Please pay attention the variable must be initialized explicitly.
+
+[source,java]
+----
+public class Album {
+
+    @ExcelCellsJoinedByName(expression = "Artist")  <1>
+    private MultiValuedMap<String, String> artists = new ArrayListValuedHashMap<>();
+
+    @ExcelCellsJoinedByName(expression = "Track[0-9]+")  <2>
+    private MultiValuedMap<String, String> tracks = new ArrayListValuedHashMap<>();
+
+}
+----
+1. Here we map multiple columns with `name` _Artist_.
+2. Here we map multiple columns with `name` _Track1_, _Track2_, _Track3_, etc.
+
+For example, here is the excel (`album.xls`) file we want to use:
+
+|===
+| Artist |Artist |Artist |Track1 |Track2
+
+|Michael Jackson
+|Lionel Richie
+|Stevie Wonder
+|We are the World
+|We are the World (instrumental)
+
+|artist 1
+|artist 1
+|artist 1
+|track 1
+|track 1
+
+|===
+
+[source,java]
+----
+List<Album> albums = Poiji.fromExcel(new File("album.xls"), Album.class);
+albums.size();
+// 2
+Album album1 = albums.get(0);
+// artists = { Artist = [Michael Jackson, Lionel Richie, Stevie Wonder] }
+// tracks = { Track1 = [We are the World], Track2 = [We are the World (instrumental)] }
+Album album2 = albums.get(1);
+// artists = {Artist = [artist 1, artist 1, artist 1] }
+// tracks = {Track2 = [track 1], Track1=[track 1] }
+----
+
+Json presentation for `album1` will be as follows
+
+[source,json]
+----
+{
+  "artists": {
+    "Artist": [
+      "Michael Jackson",
+      "Lionel Richie",
+      "Stevie Wonder"
+    ]
+  },
+  "tracks": {
+    "Track1": [
+      "We are the World"
+    ],
+    "Track2": [
+      "We are the World (instrumental)"
+    ]
+  }
+}
+----
+
 === ExcelCellRange Annotation
 
 Consider you have a table like below:
