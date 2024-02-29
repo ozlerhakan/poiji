@@ -3,6 +3,7 @@ package com.poiji.deserialize;
 import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.byname.MandatoryMissingCells;
 import com.poiji.exception.PoijiMultiRowException;
+import com.poiji.exception.PoijiMultiRowException.PoijiRowSpecificException;
 import com.poiji.option.PoijiOptions;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -13,14 +14,28 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class MandatoryCellsExceptionTest {
 
-    @Test(expected = PoijiMultiRowException.class)
+    @Test
     public void testExcelMandatoryColumn() {
-        Poiji.fromExcel(createDummyExcel(), MandatoryMissingCells.class, PoijiOptions.PoijiOptionsBuilder
-                .settings()
-                .build());
+        try {
+            Poiji.fromExcel(createDummyExcel(), MandatoryMissingCells.class, PoijiOptions.PoijiOptionsBuilder
+                    .settings()
+                    .build());
+        } catch (PoijiMultiRowException e) {
+            List<PoijiRowSpecificException> errors = e.getErrors();
+            assertEquals(1, errors.size());
+            assertEquals("Address", errors.get(0).getColumnName());
+            assertEquals("address", errors.get(0).getFieldName());
+            assertEquals((Integer) 1, errors.get(0).getRowNum());
+            return;
+        }
+        fail("Expected exception: " + PoijiMultiRowException.class.getName());
     }
 
     private Sheet createDummyExcel() {
