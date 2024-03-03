@@ -77,7 +77,7 @@ public final class AnnotationUtil {
                                                 .forEach(missingMessage::append);
                                 message += missingMessage;
                         }
-                        throw new HeaderMissingException(message);
+                        throw new HeaderMissingException(message, missingExcelCellHeaders, missingExcelCellNameHeaders);
                 }
         }
 }

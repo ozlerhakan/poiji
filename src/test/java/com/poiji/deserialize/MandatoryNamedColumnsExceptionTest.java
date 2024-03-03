@@ -10,6 +10,10 @@ import org.junit.runners.Parameterized;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 @RunWith(Parameterized.class)
 public class MandatoryNamedColumnsExceptionTest {
@@ -28,10 +32,17 @@ public class MandatoryNamedColumnsExceptionTest {
         });
     }
 
-    @Test(expected = HeaderMissingException.class)
+    @Test
     public void testExcelMandatoryColumn() {
-        Poiji.fromExcel(new File(path), PersonByNameWithMissingColumn.class, PoijiOptions.PoijiOptionsBuilder
-                .settings()
-                .build());
+        try {
+            Poiji.fromExcel(new File(path), PersonByNameWithMissingColumn.class, PoijiOptions.PoijiOptionsBuilder
+                    .settings()
+                    .build());
+        } catch (HeaderMissingException e) {
+            assertEquals(Set.of(6), e.getMissingExcelCellHeaders());
+            assertEquals(Set.of("This column will be missing"), e.getMissingExcelCellNameHeaders());
+            return;
+        }
+        fail("Expected exception: " + HeaderMissingException.class.getName());
     }
 }
