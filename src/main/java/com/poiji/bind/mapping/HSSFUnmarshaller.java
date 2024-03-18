@@ -324,7 +324,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
             FieldAnnotationDetail annotationDetail) {
         Cell cell = currentRow.getCell(annotationDetail.getColumn());
 
-        if (cell != null) {
+        if (cell != null && cell.getCellType() != CellType.BLANK) {
             if (annotationDetail.isDisabledCellFormat()) {
                 cell.setCellStyle(null);
             }

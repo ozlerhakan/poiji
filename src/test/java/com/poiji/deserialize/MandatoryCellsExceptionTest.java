@@ -12,6 +12,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,12 +21,24 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+@RunWith(Parameterized.class)
 public class MandatoryCellsExceptionTest {
+
+    private final Sheet sheet;
+
+    public MandatoryCellsExceptionTest(Sheet sheet) {
+        this.sheet = sheet;
+    }
+
+    @Parameterized.Parameters
+    public static List<Sheet> sheets() {
+        return List.of(createDummyExcel(true), createDummyExcel(false));
+    }
 
     @Test
     public void testExcelMandatoryColumn() {
         try {
-            Poiji.fromExcel(createDummyExcel(), MandatoryMissingCells.class, PoijiOptions.PoijiOptionsBuilder
+            Poiji.fromExcel(sheet, MandatoryMissingCells.class, PoijiOptions.PoijiOptionsBuilder
                     .settings()
                     .build());
         } catch (PoijiMultiRowException e) {
@@ -38,7 +52,7 @@ public class MandatoryCellsExceptionTest {
         fail("Expected exception: " + PoijiMultiRowException.class.getName());
     }
 
-    private Sheet createDummyExcel() {
+    private static Sheet createDummyExcel(boolean addBlank) {
 
         Workbook workbook = new HSSFWorkbook();
         Sheet sheet = workbook.createSheet("Example");
@@ -52,6 +66,10 @@ public class MandatoryCellsExceptionTest {
         Row dataRow = sheet.createRow(1);
         Cell dataCell1 = dataRow.createCell(0);
         dataCell1.setCellValue("Paul");
+        if (addBlank) {
+            Cell dataCell2 = dataRow.createCell(1);
+            dataCell2.setBlank();
+        }
 
         try {
             workbook.close();
