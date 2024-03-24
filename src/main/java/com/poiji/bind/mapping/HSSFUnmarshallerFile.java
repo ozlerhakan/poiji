@@ -3,6 +3,7 @@ package com.poiji.bind.mapping;
 import com.poiji.bind.PoijiFile;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
@@ -24,7 +25,9 @@ final class HSSFUnmarshallerFile extends HSSFUnmarshaller {
     @Override
     protected Workbook workbook() {
         try {
-            return WorkbookFactory.create(poijiFile.file(), options.getPassword(), true);
+            Workbook workbook = WorkbookFactory.create(poijiFile.file(), options.getPassword(), true);
+            workbook.setMissingCellPolicy(Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+            return workbook;
         } catch (IOException e) {
             throw new PoijiException("Problem occurred while creating HSSFWorkbook", e);
         }
