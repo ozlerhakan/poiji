@@ -710,7 +710,7 @@ The `mandatoryHeader` field is compatible with XLS and XLSX files.
 
 [NOTE]
 ====
-The `mandatoryCell` field works **only** with XLS files.
+The `mandatoryCell` field works **only** with XLS files and `Sheet` instances. XLS workbooks are opened with `RETURN_BLANK_AS_NULL` missing cell policy. If passing a `Sheet` instance it is up for the caller to make sure the missing cell policy of the parent workbook is set accordingly.
 ====
 
 === Debug Cells Formats
