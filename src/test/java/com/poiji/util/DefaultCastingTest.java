@@ -266,6 +266,12 @@ public class DefaultCastingTest {
         assertEquals(BigDecimal.valueOf(81.56891), testVal);
     }
 
+    @Test
+    public void castEmptyString() {
+        Object testVal = casting.castValue(String.class, "", options);
+        assertEquals("", testVal);
+    }
+
     static class MyConfig extends DefaultCasting {
         Object castValue(Class<?> fieldType, String value, PoijiOptions options) {
             return getValueObject(null, -1, -1, options, value, fieldType);
