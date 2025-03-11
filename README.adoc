@@ -608,17 +608,23 @@ You can create your own casting implementation without relying on the default Po
 
 [source,java]
 ----
-public class MyCasting implements Casting {
+import com.poiji.config.DefaultCasting;
+
+public class ModifiedBooleanCasting extends DefaultCasting {
     @Override
-    public Object castValue(Class<?> fieldType, String value, PoijiOptions options) {
-       return value.trim();
+    Boolean booleanValue(String value, String sheetName, int row, int col, PoijiOptions options) {
+        if (!value.equals("y") && !value.equals("n")) {
+            return onError(value, sheetName, row, col, bpe, options.preferNullOverDefault() ? null : false);
+        } else {
+            return value.equals("y");
+        }
     }
 }
 
 public class Person {
 
     @ExcelCell(0)
-    protected String employeeId;
+    protected Boolean employed;
 
     @ExcelCell(1)
     protected String name;
@@ -634,7 +640,7 @@ Then you can add your custom implementation with the `withCasting` method:
 [source,java]
 ----
  PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
-                .withCasting(new MyCasting())
+                .withCasting(new ModifiedBooleanCasting())
                 .build();
 
 List<Person> people = Poiji.fromExcel(excel, Person.class, options);
