@@ -35,7 +35,7 @@ public class DefaultCasting implements Casting {
         this.errorLoggingEnabled = errorLoggingEnabled;
     }
 
-    private <T> T onError(String value, String sheetName, int row, int col, Exception exception, T defaultValue) {
+    protected <T> T onError(String value, String sheetName, int row, int col, Exception exception, T defaultValue) {
         logError(value, defaultValue, sheetName, row, col, exception);
         return defaultValue;
     }
@@ -46,7 +46,7 @@ public class DefaultCasting implements Casting {
         }
     }
 
-    private Boolean primitiveBooleanValue(String value, String sheetName, int row, int col) {
+    protected Boolean primitiveBooleanValue(String value, String sheetName, int row, int col) {
         try {
             return Parsers.booleans().parse(value);
         } catch (BooleanParser.BooleanParseException bpe) {
@@ -54,7 +54,7 @@ public class DefaultCasting implements Casting {
         }
     }
 
-    private Boolean booleanValue(String value, String sheetName, int row, int col, PoijiOptions options) {
+    protected Boolean booleanValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
             return Parsers.booleans().parse(value);
         } catch (BooleanParser.BooleanParseException bpe) {
@@ -62,7 +62,7 @@ public class DefaultCasting implements Casting {
         }
     }
 
-    private int primitiveIntegerValue(String value, String sheetName, int row, int col) {
+    protected int primitiveIntegerValue(String value, String sheetName, int row, int col) {
         try {
             return Parsers.integers().parse(value).intValue();
         } catch (NumberFormatException nfe) {
@@ -70,7 +70,7 @@ public class DefaultCasting implements Casting {
         }
     }
 
-    private Integer integerValue(String value, String sheetName, int row, int col, PoijiOptions options) {
+    protected Integer integerValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
             return Parsers.integers().parse(value).intValue();
         } catch (NumberFormatException nfe) {
@@ -78,7 +78,7 @@ public class DefaultCasting implements Casting {
         }
     }
 
-    private long primitiveLongValue(String value, String sheetName, int row, int col) {
+    protected long primitiveLongValue(String value, String sheetName, int row, int col) {
         try {
             return Parsers.longs().parse(value).longValue();
         } catch (NumberFormatException nfe) {
@@ -86,7 +86,7 @@ public class DefaultCasting implements Casting {
         }
     }
 
-    private Long longValue(String value, String sheetName, int row, int col, PoijiOptions options) {
+    protected Long longValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
             return Parsers.longs().parse(value).longValue();
         } catch (NumberFormatException nfe) {
@@ -94,7 +94,7 @@ public class DefaultCasting implements Casting {
         }
     }
 
-    private double primitiveDoubleValue(String value, String sheetName, int row, int col, PoijiOptions options) {
+    protected double primitiveDoubleValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
             return Parsers.numbers(options.getLocale()).parse(value).doubleValue();
         } catch (NumberFormatException nfe) {
@@ -102,7 +102,7 @@ public class DefaultCasting implements Casting {
         }
     }
 
-    private Double doubleValue(String value, String sheetName, int row, int col, PoijiOptions options) {
+    protected Double doubleValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
             return Parsers.numbers(options.getLocale()).parse(value).doubleValue();
         } catch (NumberFormatException nfe) {
@@ -110,7 +110,7 @@ public class DefaultCasting implements Casting {
         }
     }
 
-    private float primitiveFloatValue(String value, String sheetName, int row, int col, PoijiOptions options) {
+    protected float primitiveFloatValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
             return Parsers.numbers(options.getLocale()).parse(value).floatValue();
         } catch (NumberFormatException nfe) {
@@ -118,7 +118,7 @@ public class DefaultCasting implements Casting {
         }
     }
 
-    private Float floatValue(String value, String sheetName, int row, int col, PoijiOptions options) {
+    protected Float floatValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
             return Parsers.numbers(options.getLocale()).parse(value).floatValue();
         } catch (NumberFormatException nfe) {
@@ -126,7 +126,7 @@ public class DefaultCasting implements Casting {
         }
     }
 
-    private BigDecimal bigDecimalValue(String value, String sheetName, int row, int col, PoijiOptions options) {
+    protected BigDecimal bigDecimalValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
             return Parsers.bigDecimals(options.getLocale()).parse(value);
         } catch (NumberFormatException | IllegalStateException e) {
@@ -146,7 +146,7 @@ public class DefaultCasting implements Casting {
      * date object without any exceptions but since the string was not an exact
      * match you get a very strange date
      */
-    private Date dateValue(String value, String sheetName, int row, int col, PoijiOptions options) {
+    protected Date dateValue(String value, String sheetName, int row, int col, PoijiOptions options) {
 
         if (options.getDateRegex() != null && !value.matches(options.getDateRegex())) {
             return options.preferNullOverDefault() ? null : Calendar.getInstance().getTime();
@@ -174,7 +174,7 @@ public class DefaultCasting implements Casting {
      * match you get a very strange date
      * 
      */
-    private LocalDate localDateValue(String value, String sheetName, int row, int col, PoijiOptions options) {
+    protected LocalDate localDateValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         if (options.getDateRegex() != null && !value.matches(options.getDateRegex())) {
             return options.preferNullOverDefault() ? null : LocalDate.now();
         } else {
@@ -186,7 +186,7 @@ public class DefaultCasting implements Casting {
         }
     }
 
-    private LocalDateTime localDateTimeValue(String value, String sheetName, int row, int col, PoijiOptions options) {
+    protected LocalDateTime localDateTimeValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         if (options.getDateTimeRegex() != null && !value.matches(options.getDateTimeRegex())) {
             return options.preferNullOverDefault() ? null : LocalDateTime.now();
         } else {
@@ -199,7 +199,7 @@ public class DefaultCasting implements Casting {
         }
     }
 
-    private Object enumValue(String value, String sheetName, int row, int col, Class<?> type) {
+    protected Object enumValue(String value, String sheetName, int row, int col, Class<?> type) {
         return Arrays.stream(type.getEnumConstants())
                 .filter(o -> ((Enum<?>) o).name().equals(value))
                 .findFirst()
@@ -210,7 +210,7 @@ public class DefaultCasting implements Casting {
                 });
     }
 
-    private Object castListValue(String value, String sheetName, int row, int col, Field field, PoijiOptions options) {
+    protected Object castListValue(String value, String sheetName, int row, int col, Field field, PoijiOptions options) {
         final ParameterizedType genericType = (ParameterizedType) field.getGenericType();
         final Type fieldType = genericType.getActualTypeArguments()[0];
         String[] valueList = value.split(options.getListDelimiter());
