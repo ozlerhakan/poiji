@@ -13,7 +13,7 @@ public final class DefaultCastingError {
 
     private Exception exception;
 
-    DefaultCastingError(String value, Object defaultValue, String sheetName, int row, int column, Exception exception) {
+    public DefaultCastingError(String value, Object defaultValue, String sheetName, int row, int column, Exception exception) {
         this.value = value;
         this.defaultValue = defaultValue;
         this.sheetName = sheetName;
