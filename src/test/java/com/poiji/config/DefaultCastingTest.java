@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.*;
 public class DefaultCastingTest {
 
     @Test
-    public void valueMethods_shouldBeProtectedOrPublic() {
+    public void valueMethodsShouldBeProtectedOrPublic() {
         Method[] allMethods = DefaultCasting.class.getMethods();
         for (Method method : allMethods) {
             if (method.getName().endsWith("Value")) {
