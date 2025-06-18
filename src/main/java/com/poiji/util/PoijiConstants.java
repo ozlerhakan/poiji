@@ -9,6 +9,7 @@ public final class PoijiConstants {
 
     public static final String DEFAULT_DATE_PATTERN = "dd/M/yyyy";
     public static final DateTimeFormatter DEFAULT_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/M/yyyy");
+    public static final DateTimeFormatter DEFAULT_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
     public static final DateTimeFormatter DEFAULT_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/M/yyyy HH:mm:ss");
     public static final String XLS_EXTENSION = ".xls";
     public static final String XLSX_EXTENSION = ".xlsx";
