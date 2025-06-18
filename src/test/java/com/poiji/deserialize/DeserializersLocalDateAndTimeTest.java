@@ -53,4 +53,181 @@ public class DeserializersLocalDateAndTimeTest {
         assertTrue("No casting errors expected", castingErrors.isEmpty());
     }
 
+    @Test
+    public void successfulDateRegex() {
+        final var errorLoggingCasting = new DefaultCasting(true);
+        final var options = PoijiOptionsBuilder.settings()
+                .dateFormatter(DateTimeFormatter.ISO_LOCAL_DATE)
+                .dateRegex("\\d{4}-\\d{2}-\\d{2}")
+                .withCasting(errorLoggingCasting)
+                .build();
+        final var actualEvents = Poiji.fromExcel(new File(path), Event.class, options);
+        final var expectedEvents = unmarshallingEvents();
+        final var castingErrors = errorLoggingCasting.getErrors();
+
+
+        assertNotNull(actualEvents);
+        assertEquals("Expected to read 3 events from the file", 3, actualEvents.size());
+        assertEquals(expectedEvents, actualEvents);
+        assertTrue("No casting errors expected", castingErrors.isEmpty());
+    }
+
+    @Test
+    public void failureDateRegex() {
+        final var errorLoggingCasting = new DefaultCasting(true);
+        final var options = PoijiOptionsBuilder.settings()
+                .dateFormatter(DateTimeFormatter.ISO_LOCAL_DATE)
+                .dateRegex("\\d{2}-\\d{2}-\\d{4}")
+                .withCasting(errorLoggingCasting)
+                .build();
+        final var actualEvents = Poiji.fromExcel(new File(path), Event.class, options);
+        final var unexpectedEvents = unmarshallingEvents();
+        final var castingErrors = errorLoggingCasting.getErrors();
+
+
+        assertNotNull(actualEvents);
+        assertEquals("Expected to read 3 events from the file", 3, actualEvents.size());
+
+        assertNotEquals(unexpectedEvents.get(0), actualEvents.get(0));
+        assertNotEquals(unexpectedEvents.get(1), actualEvents.get(1));
+        assertNotEquals(unexpectedEvents.get(2), actualEvents.get(2));
+        assertNotEquals(unexpectedEvents, actualEvents);
+        assertTrue("No casting errors expected", castingErrors.isEmpty());
+    }
+
+    @Test
+    public void successfulTimeRegex() {
+        final var errorLoggingCasting = new DefaultCasting(true);
+        final var options = PoijiOptionsBuilder.settings()
+                .dateFormatter(DateTimeFormatter.ISO_LOCAL_DATE)
+                .timeRegex("\\d{2}:\\d{2}:\\d{2}")
+                .withCasting(errorLoggingCasting)
+                .build();
+        final var actualEvents = Poiji.fromExcel(new File(path), Event.class, options);
+        final var expectedEvents = unmarshallingEvents();
+        final var castingErrors = errorLoggingCasting.getErrors();
+
+
+        assertNotNull(actualEvents);
+        assertEquals("Expected to read 3 events from the file", 3, actualEvents.size());
+        assertEquals(expectedEvents, actualEvents);
+        assertTrue("No casting errors expected", castingErrors.isEmpty());
+    }
+
+    @Test
+    public void failureTimeRegex() {
+        final var errorLoggingCasting = new DefaultCasting(true);
+        final var options = PoijiOptionsBuilder.settings()
+                .dateFormatter(DateTimeFormatter.ISO_LOCAL_DATE)
+                .timeRegex("\\d{2}:\\d{2}")
+                .withCasting(errorLoggingCasting)
+                .build();
+        final var actualEvents = Poiji.fromExcel(new File(path), Event.class, options);
+        final var unexpectedEvents = unmarshallingEvents();
+        final var castingErrors = errorLoggingCasting.getErrors();
+
+
+        assertNotNull(actualEvents);
+        assertEquals("Expected to read 3 events from the file", 3, actualEvents.size());
+
+        assertNotEquals(unexpectedEvents.get(0), actualEvents.get(0));
+        assertNotEquals(unexpectedEvents.get(1), actualEvents.get(1));
+        assertNotEquals(unexpectedEvents.get(2), actualEvents.get(2));
+        assertNotEquals(unexpectedEvents, actualEvents);
+        assertTrue("No casting errors expected", castingErrors.isEmpty());
+    }
+
+    @Test
+    public void successfulDateFormatter() {
+        final var errorLoggingCasting = new DefaultCasting(true);
+        final var options = PoijiOptionsBuilder.settings()
+                .dateFormatter(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                .withCasting(errorLoggingCasting)
+                .build();
+        final var actualEvents = Poiji.fromExcel(new File(path), Event.class, options);
+        final var expectedEvents = unmarshallingEvents();
+        final var castingErrors = errorLoggingCasting.getErrors();
+
+
+        assertNotNull(actualEvents);
+        assertEquals("Expected to read 3 events from the file", 3, actualEvents.size());
+        assertEquals(expectedEvents, actualEvents);
+        assertTrue("No casting errors expected", castingErrors.isEmpty());
+    }
+
+    @Test
+    public void failureDateFormatter() {
+        final var errorLoggingCasting = new DefaultCasting(true);
+        final var options = PoijiOptionsBuilder.settings()
+                .dateFormatter(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+                .withCasting(errorLoggingCasting)
+                .build();
+        final var actualEvents = Poiji.fromExcel(new File(path), Event.class, options);
+        final var unexpectedEvents = unmarshallingEvents();
+        final var castingErrors = errorLoggingCasting.getErrors();
+
+
+        assertNotNull(actualEvents);
+        assertEquals("Expected to read 3 events from the file", 3, actualEvents.size());
+
+        assertNotEquals(unexpectedEvents.get(0), actualEvents.get(0));
+        assertNotEquals(unexpectedEvents.get(1), actualEvents.get(1));
+        assertNotEquals(unexpectedEvents.get(2), actualEvents.get(2));
+        assertNotEquals(unexpectedEvents, actualEvents);
+
+        assertEquals("Expect 3 casting errors", 3, castingErrors.size());
+        for (DefaultCastingError error : castingErrors) {
+            assertThat("DateTimeParseException is expected due to wrong formatter provided",
+                    error.getException(),
+                    instanceOf(DateTimeParseException.class));
+        }
+    }
+
+    @Test
+    public void successfulTimeFormatter() {
+        final var errorLoggingCasting = new DefaultCasting(true);
+        final var options = PoijiOptionsBuilder.settings()
+                .dateFormatter(DateTimeFormatter.ISO_LOCAL_DATE)
+                .timeFormatter(DateTimeFormatter.ofPattern("HH:mm:ss"))
+                .withCasting(errorLoggingCasting)
+                .build();
+        final var actualEvents = Poiji.fromExcel(new File(path), Event.class, options);
+        final var expectedEvents = unmarshallingEvents();
+        final var castingErrors = errorLoggingCasting.getErrors();
+
+
+        assertNotNull(actualEvents);
+        assertEquals("Expected to read 3 events from the file", 3, actualEvents.size());
+        assertEquals(expectedEvents, actualEvents);
+        assertTrue("No casting errors expected", castingErrors.isEmpty());
+    }
+
+    @Test
+    public void failureTimeFormatter() {
+        final var errorLoggingCasting = new DefaultCasting(true);
+        final var options = PoijiOptionsBuilder.settings()
+                .dateFormatter(DateTimeFormatter.ISO_LOCAL_DATE)
+                .timeFormatter(DateTimeFormatter.ofPattern("h:mm a"))
+                .withCasting(errorLoggingCasting)
+                .build();
+        final var actualEvents = Poiji.fromExcel(new File(path), Event.class, options);
+        final var unexpectedEvents = unmarshallingEvents();
+        final var castingErrors = errorLoggingCasting.getErrors();
+
+        assertNotNull(actualEvents);
+        assertEquals("Expected to read 3 events from the file", 3, actualEvents.size());
+
+        assertNotEquals(unexpectedEvents.get(0), actualEvents.get(0));
+        assertNotEquals(unexpectedEvents.get(1), actualEvents.get(1));
+        assertNotEquals(unexpectedEvents.get(2), actualEvents.get(2));
+        assertNotEquals(unexpectedEvents, actualEvents);
+
+        assertEquals("Expect 3 casting errors", 3, castingErrors.size());
+        for (DefaultCastingError error : castingErrors) {
+            assertThat("DateTimeParseException is expected due to wrong formatter provided",
+                    error.getException(),
+                    instanceOf(DateTimeParseException.class));
+        }
+    }
+
 }
