@@ -60,17 +60,23 @@ com.poiji.option.PoijiOptions.PoijiOptionsBuilder
     #build()
     #dateLenient(boolean)
     #dateRegex(String)
+    #timeRegex(String)
+    #dateTimeRegex(String)
     #datePattern(String)
+    #dateFormatter(java.time.format.DateTimeFormatter)
+    #timeFormatter(java.time.format.DateTimeFormatter)
     #dateTimeFormatter(java.time.format.DateTimeFormatter)
     #ignoreHiddenSheets(boolean)
     #password(String)
     #preferNullOverDefault(boolean)
     #settings(int)
     #sheetIndex(int)
+    #sheetName(String)
     #skip(int)
     #limit(int)
     #trimCellValue(boolean)
     #headerStart(int)
+    #headerCount(int)
     #withCasting(Casting)
     #withFormatting(Formatting)
     #caseInsensitive(boolean)
@@ -124,7 +130,7 @@ public class Employee {
 ----
 <1> Optionally, we can access the index of each row item by using the `ExcelRow` annotation. Annotated variable should be of type `int`, `double`, `float` or `long`.
 <2> A field must be annotated with `@ExcelCell` along with its property in order to get the value from the right coordinate in the target excel sheet.
-<3> An annotated field can be either protected, private or public modifier. The field may be either of `boolean`, `int`, `long`, `float`, `double`, or their wrapper classes. You can add a field of `java.util.Date`, `java.time.LocalDate`, `java.time.LocalDateTime` and `String` as well.
+<3> An annotated field can be either protected, private or public modifier. The field may be either of `boolean`, `int`, `long`, `float`, `double`, or their wrapper classes. You can add a field of `java.util.Date`, `java.time.LocalDate`, `java.time.LocalTime`, `java.time.LocalDateTime` and `String` as well.
 <4> If one column contains multiple value, you can get them using a List field. A List field can store items which is of type `BigDecimal`, `Long`, `Double`, `Float`, `Integer`, `Boolean` and `String`.
 
 This is the excel file (`employees.xlsx`) we want to map to a list of `Employee` instance:
