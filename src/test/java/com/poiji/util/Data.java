@@ -1,6 +1,7 @@
 package com.poiji.util;
 
 import com.poiji.deserialize.model.Album;
+import com.poiji.deserialize.model.Event;
 import com.poiji.deserialize.model.InventoryData;
 import com.poiji.deserialize.model.Student;
 import com.poiji.deserialize.model.byid.Employee;
@@ -8,6 +9,8 @@ import com.poiji.deserialize.model.byid.Person;
 import com.poiji.deserialize.model.byid.Sample;
 import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -160,5 +163,24 @@ public final class Data {
         album.setTracks(tracks);
 
         return List.of(album);
+    }
+
+    public static List<Event> unmarshallingEvents() {
+        final var event1 = new Event();
+        event1.setName("Order placed");
+        event1.setDate(LocalDate.of(2025, 6, 10));
+        event1.setTime(LocalTime.of(16, 2, 45));
+
+        final var event2 = new Event();
+        event2.setName("Order paid");
+        event2.setDate(LocalDate.of(2025, 6, 11));
+        event2.setTime(LocalTime.of(2, 2, 2));
+
+        final var event3 = new Event();
+        event3.setName("Order shipped");
+        event3.setDate(LocalDate.of(2025, 6, 15));
+        event3.setTime(LocalTime.of(9, 45));
+
+        return List.of(event1, event2, event3);
     }
 }
