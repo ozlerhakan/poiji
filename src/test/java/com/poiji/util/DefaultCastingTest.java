@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.Locale;
 
@@ -303,6 +304,31 @@ public class DefaultCastingTest {
         PoijiOptions options = PoijiOptionsBuilder.settings().build().setTrimCellValue(false);
         String testVal = (String) casting.castValue(String.class, "    value    ", options);
         assertEquals("    value    ", testVal);
+    }
+
+    @Test
+    public void invalidValueLocalTimeWhenRegexNotMatchPreferNull() {
+        PoijiOptions options = PoijiOptionsBuilder.settings().dateTimeRegex("d{2}/d{2}/d{4} d{2}:d{2}:d{2}")
+                .preferNullOverDefault(true)
+                .build();
+
+        LocalDateTime actualDate = (LocalDateTime) casting.castValue(LocalTime.class, "01/8/2023 10:00:00",
+                options);
+
+        assertNull(actualDate);
+    }
+
+    @Test
+    public void castLocalTimeUnmatchedDateRegexPreferNotNull() {
+
+        PoijiOptions options = PoijiOptionsBuilder.settings()
+                .dateRegex("\\d{2}\\/\\d{2}\\/\\d{4}")
+                .preferNullOverDefault(false)
+                .build();
+
+        LocalDate testLocalDate = (LocalDate) casting.castValue(LocalDate.class, "05-01-2016", options);
+
+        assertNotNull(testLocalDate);
     }
 
 }
