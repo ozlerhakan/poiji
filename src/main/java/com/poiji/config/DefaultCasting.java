@@ -13,6 +13,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.Predicate;
@@ -199,6 +200,21 @@ public class DefaultCasting implements Casting {
         }
     }
 
+    protected LocalTime localTimeValue(String value, String sheetName, int row, int col, PoijiOptions options) {
+        // Returning LocalTime.now() as a default value is not obvious and error-prone. I'd rather return null but to
+        //  be consistent with existing code, I keep returning LocalTime.now()
+        if (options.getTimeRegex() != null && !value.matches(options.getTimeRegex())) {
+            return options.preferNullOverDefault() ? null : LocalTime.now();
+        } else {
+            try {
+                return LocalTime.parse(value, options.timeFormatter());
+            } catch (DateTimeParseException e) {
+                return onError(value, sheetName, row, col, e,
+                        options.preferNullOverDefault() ? null : LocalTime.now());
+            }
+        }
+    }
+
     protected Object enumValue(String value, String sheetName, int row, int col, Class<?> type) {
         return Arrays.stream(type.getEnumConstants())
                 .filter(o -> ((Enum<?>) o).name().equals(value))
@@ -299,6 +315,8 @@ public class DefaultCasting implements Casting {
         } else if (fieldType == LocalDateTime.class) {
             o = localDateTimeValue(value, sheetName, row, col, options);
 
+        } else if (fieldType == LocalTime.class) {
+            o = localTimeValue(value, sheetName, row, col, options);
         } else if (fieldType.isEnum()) {
             o = enumValue(value, sheetName, row, col, fieldType);
         } else if (fieldType == List.class) {

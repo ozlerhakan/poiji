@@ -17,6 +17,7 @@ import java.util.Objects;
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_FORMATTER;
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_PATTERN;
 import static com.poiji.util.PoijiConstants.DEFAULT_DATE_TIME_FORMATTER;
+import static com.poiji.util.PoijiConstants.DEFAULT_TIME_FORMATTER;
 
 /**
  * Created by hakan on 17/01/2017.
@@ -28,6 +29,7 @@ public final class PoijiOptions {
     private int sheetIndex;
     private String password;
     private String dateRegex;
+    private String timeRegex;
     private String dateTimeRegex;
     private String datePattern;
     private boolean dateLenient;
@@ -35,6 +37,7 @@ public final class PoijiOptions {
     private boolean ignoreHiddenSheets;
     private boolean preferNullOverDefault;
     private DateTimeFormatter dateFormatter;
+    private DateTimeFormatter timeFormatter;
     private DateTimeFormatter dateTimeFormatter;
     private Casting casting;
     private int headerStart;
@@ -96,6 +99,11 @@ public final class PoijiOptions {
         return this;
     }
 
+    private PoijiOptions setTimeFormatter(DateTimeFormatter timeFormatter) {
+        this.timeFormatter = timeFormatter;
+        return this;
+    }
+
     private PoijiOptions setDateTimeFormatter(DateTimeFormatter dateTimeFormatter) {
         this.dateTimeFormatter = dateTimeFormatter;
         return this;
@@ -121,6 +129,10 @@ public final class PoijiOptions {
 
     public DateTimeFormatter dateFormatter() {
         return dateFormatter;
+    }
+
+    public DateTimeFormatter timeFormatter() {
+        return timeFormatter;
     }
 
     public DateTimeFormatter dateTimeFormatter() {
@@ -182,6 +194,15 @@ public final class PoijiOptions {
 
     private PoijiOptions setDateRegex(String dateRegex) {
         this.dateRegex = dateRegex;
+        return this;
+    }
+
+    public String getTimeRegex() {
+        return timeRegex;
+    }
+
+    private PoijiOptions setTimeRegex(String timeRegex) {
+        this.timeRegex = timeRegex;
         return this;
     }
 
@@ -304,6 +325,7 @@ public final class PoijiOptions {
         private int sheetIndex;
         private String password;
         private String dateRegex;
+        private String timeRegex;
         private String dateTimeRegex;
         private boolean dateLenient;
         private boolean trimCellValue;
@@ -311,6 +333,7 @@ public final class PoijiOptions {
         private boolean preferNullOverDefault;
         private String datePattern = DEFAULT_DATE_PATTERN;
         private DateTimeFormatter dateFormatter = DEFAULT_DATE_FORMATTER;
+        private DateTimeFormatter timeFormatter = DEFAULT_TIME_FORMATTER;
         private DateTimeFormatter dateTimeFormatter = DEFAULT_DATE_TIME_FORMATTER;
         private Casting casting = new DefaultCasting();
         private Formatting formatting = new DefaultFormatting();
@@ -361,6 +384,19 @@ public final class PoijiOptions {
          */
         public PoijiOptionsBuilder dateFormatter(DateTimeFormatter dateFormatter) {
             this.dateFormatter = dateFormatter;
+            return this;
+        }
+
+        /**
+         * set a time formatter, default time formatter
+         * is {@link com.poiji.util.PoijiConstants#DEFAULT_TIME_FORMATTER}
+         * for {@link java.time.LocalTime}
+         *
+         * @param timeFormatter time formatter
+         * @return this
+         */
+        public PoijiOptionsBuilder timeFormatter(DateTimeFormatter timeFormatter) {
+            this.timeFormatter = timeFormatter;
             return this;
         }
 
@@ -423,12 +459,14 @@ public final class PoijiOptions {
                     .setPreferNullOverDefault(preferNullOverDefault)
                     .setDatePattern(datePattern)
                     .setDateFormatter(dateFormatter)
+                    .setTimeFormatter(timeFormatter)
                     .setDateTimeFormatter(dateTimeFormatter)
                     .setSheetIndex(sheetIndex)
                     .setSheetName(sheetName)
                     .setIgnoreHiddenSheets(ignoreHiddenSheets)
                     .setTrimCellValue(trimCellValue)
                     .setDateRegex(dateRegex)
+                    .setTimeRegex(timeRegex)
                     .setDateTimeRegex(dateTimeRegex)
                     .setDateLenient(dateLenient)
                     .setHeaderStart(headerStart)
@@ -545,6 +583,18 @@ public final class PoijiOptions {
          */
         public PoijiOptionsBuilder dateRegex(String dateRegex) {
             this.dateRegex = dateRegex;
+            return this;
+        }
+
+        /**
+         * Time regex, if you would like to specify a regex pattern the time must be
+         * in, e.g. {@literal \\d{2}:\\d{2}:\\d{2} }.
+         *
+         * @param timeRegex time regex pattern
+         * @return this
+         */
+        public PoijiOptionsBuilder timeRegex(String timeRegex) {
+            this.timeRegex = timeRegex;
             return this;
         }
 
