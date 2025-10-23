@@ -203,6 +203,57 @@ PoijiOptions options = PoijiOptionsBuilder.settings()
 1. Poiji should look at the second (zero-based index) sheet of your excel file.
 == Documentation
 
+=== Java Records Support
+
+Starting with version 4.9.0, Poiji supports Java Records (Java 16+). Records provide a concise way to declare data carrier classes with immutable fields.
+
+[source,java]
+----
+public record EmployeeRecord(
+    @ExcelCellName("ID")
+    long employeeId,
+    
+    @ExcelCellName("NAME")
+    String name,
+    
+    @ExcelCellName("SURNAME")
+    String surname,
+    
+    @ExcelCellName("AGE")
+    int age,
+    
+    @ExcelCellName("SINGLE")
+    boolean single,
+    
+    @ExcelRow
+    int row
+) {}
+----
+
+Use records just like regular classes with Poiji:
+
+[source,java]
+----
+List<EmployeeRecord> employees = Poiji.fromExcel(
+    new File("employees.xlsx"), 
+    EmployeeRecord.class
+);
+
+EmployeeRecord firstEmployee = employees.get(0);
+// Access fields using record accessor methods
+System.out.println(firstEmployee.name());
+System.out.println(firstEmployee.age());
+----
+
+Records work with all annotations including:
+
+* `@ExcelCell` - Map by column index
+* `@ExcelCellName` - Map by column name
+* `@ExcelRow` - Capture row number
+* `@ExcelUnknownCells` - Capture unmapped cells
+
+Records work with both XLS and XLSX formats and support all standard Poiji options.
+
 === Prefer Default Value
 
 If you want a date field to return `null` rather than a default date, use `PoijiOptionsBuilder` with the `preferNullOverDefault` method as follows:
