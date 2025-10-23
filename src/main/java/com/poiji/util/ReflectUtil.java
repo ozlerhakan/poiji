@@ -56,7 +56,14 @@ public final class ReflectUtil {
             for (int i = 0; i < components.length; i++) {
                 RecordComponent component = components[i];
                 parameterTypes[i] = component.getType();
-                args[i] = recordValues.get(component.getName());
+                Object value = recordValues.get(component.getName());
+                
+                // If value is null, use default values for primitives
+                if (value == null && component.getType().isPrimitive()) {
+                    value = getDefaultValue(component.getType());
+                }
+                
+                args[i] = value;
             }
 
             Constructor<T> constructor = type.getDeclaredConstructor(parameterTypes);
@@ -67,6 +74,30 @@ public final class ReflectUtil {
         } catch (Exception ex) {
             throw new PoijiInstantiationException("Cannot create a new instance of record " + type.getName(), ex);
         }
+    }
+
+    /**
+     * Returns the default value for a primitive type.
+     */
+    private static Object getDefaultValue(Class<?> type) {
+        if (type == boolean.class) {
+            return false;
+        } else if (type == byte.class) {
+            return (byte) 0;
+        } else if (type == short.class) {
+            return (short) 0;
+        } else if (type == int.class) {
+            return 0;
+        } else if (type == long.class) {
+            return 0L;
+        } else if (type == float.class) {
+            return 0.0f;
+        } else if (type == double.class) {
+            return 0.0;
+        } else if (type == char.class) {
+            return '\0';
+        }
+        return null;
     }
 
     /**
