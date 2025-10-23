@@ -172,8 +172,139 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
     }
 
     <T> T deserializeRowToInstance(Row currentRow, Class<T> type) {
-        T instance = ReflectUtil.newInstanceOf(type);
-        return setFieldValuesFromRowIntoInstance(currentRow, type, instance);
+        if (ReflectUtil.isRecord(type)) {
+            return deserializeRowToRecordInstance(currentRow, type);
+        } else {
+            T instance = ReflectUtil.newInstanceOf(type);
+            return setFieldValuesFromRowIntoInstance(currentRow, type, instance);
+        }
+    }
+
+    private <T> T deserializeRowToRecordInstance(Row currentRow, Class<T> type) {
+        Map<String, Object> recordValues = new HashMap<>();
+        setFieldValuesFromRowIntoRecordMap(currentRow, type, recordValues);
+        return ReflectUtil.newRecordInstance(type, recordValues);
+    }
+
+    private <T> void setFieldValuesFromRowIntoRecordMap(Row currentRow, Class<? super T> subclass, Map<String, Object> recordValues) {
+        if (subclass == null) {
+            return;
+        }
+        setFieldValuesFromRowIntoRecordMap(currentRow, subclass.getSuperclass(), recordValues);
+        tailSetFieldValueForRecord(currentRow, subclass, recordValues);
+    }
+
+    private <T> void tailSetFieldValueForRecord(Row currentRow, Class<? super T> type, Map<String, Object> recordValues) {
+        List<Integer> mappedColumnIndices = new ArrayList<>();
+        List<Field> unknownCells = new ArrayList<>();
+        List<PoijiRowSpecificException> errors = new ArrayList<>();
+
+        for (Field field : type.getDeclaredFields()) {
+            if (field.getModifiers() == 25) {
+                continue;
+            }
+            if (field.getAnnotation(ExcelRow.class) != null) {
+                final int rowNum = currentRow.getRowNum();
+                final Object data = casting.castValue(field, valueOf(rowNum), rowNum, -1, options);
+                recordValues.put(field.getName(), data);
+            } else if (field.getAnnotation(ExcelCellRange.class) != null) {
+                Class<?> fieldType = field.getType();
+                Object fieldInstance = ReflectUtil.newInstanceOf(fieldType);
+                for (Field fieldField : fieldType.getDeclaredFields()) {
+                    mapColumns(currentRow, fieldInstance, mappedColumnIndices, errors, fieldField);
+                }
+                recordValues.put(field.getName(), fieldInstance);
+            } else if (field.getAnnotation(ExcelUnknownCells.class) != null) {
+                unknownCells.add(field);
+            } else {
+                mapColumnsForRecord(currentRow, recordValues, mappedColumnIndices, errors, field);
+            }
+        }
+        if (!errors.isEmpty()) {
+            throw new PoijiMultiRowException("Problem(s) occurred while reading data", errors);
+        }
+
+        if (unknownCells.isEmpty()) {
+            return;
+        }
+
+        if (!indexToTitle.isEmpty()) {
+            Map<String, String> excelUnknownCellsMap = StreamSupport
+                    .stream(Spliterators.spliteratorUnknownSize(currentRow.cellIterator(), Spliterator.ORDERED), false)
+                    .filter(cell -> !mappedColumnIndices.contains(cell.getColumnIndex()))
+                    .collect(Collectors.toMap(
+                            cell -> indexToTitle.get(cell.getColumnIndex()),
+                            Object::toString));
+            unknownCells.forEach(field -> recordValues.put(field.getName(), excelUnknownCellsMap));
+        } else {
+            Map<String, String> excelUnknownCellsMap = StreamSupport
+                    .stream(Spliterators.spliteratorUnknownSize(currentRow.cellIterator(), Spliterator.ORDERED), false)
+                    .filter(cell -> !mappedColumnIndices.contains(cell.getColumnIndex()))
+                    .collect(Collectors.toMap(
+                            cell -> valueOf(cell.getColumnIndex()),
+                            Object::toString));
+            unknownCells.forEach(field -> recordValues.put(field.getName(), excelUnknownCellsMap));
+        }
+    }
+
+    private void mapColumnsForRecord(
+            Row currentRow,
+            Map<String, Object> recordValues,
+            List<Integer> mappedColumnIndices,
+            List<PoijiRowSpecificException> errors,
+            Field field) {
+        try {
+            mappedColumnIndices.add(tailSetFieldValueForRecord(currentRow, recordValues, field));
+        } catch (PoijiRowSpecificException poijiRowException) {
+            errors.add(poijiRowException);
+        }
+    }
+
+    private Integer tailSetFieldValueForRecord(Row currentRow, Map<String, Object> recordValues, Field field) {
+        final FieldAnnotationDetail annotationDetail = getFieldColumn(field);
+        if (annotationDetail.getColumn() != null) {
+            constructTypeValueForRecord(currentRow, recordValues, field, annotationDetail);
+        }
+
+        if (CollectionUtils.isNotEmpty(annotationDetail.getColumns())) {
+            for (Integer column : annotationDetail.getColumns()) {
+                annotationDetail.setColumn(column);
+                constructTypeValueForRecord(currentRow, recordValues, field, annotationDetail);
+            }
+        }
+
+        return annotationDetail.getColumn();
+    }
+
+    private <T> void constructTypeValueForRecord(Row currentRow, Map<String, Object> recordValues, Field field, FieldAnnotationDetail annotationDetail) {
+        Cell cell = currentRow.getCell(annotationDetail.getColumn());
+
+        if (cell != null) {
+            if (annotationDetail.isDisabledCellFormat()) {
+                cell.setCellStyle(null);
+            }
+            String value;
+            if (options.isRawData() && isCellNumeric(cell)) {
+                value = NumberToTextConverter.toText(cell.getNumericCellValue());
+            } else {
+                value = dataFormatter.formatCellValue(cell, baseFormulaEvaluator);
+            }
+            Object data = casting.castValue(field, value, currentRow.getRowNum(), annotationDetail.getColumn(),
+                    options);
+
+            if (!annotationDetail.isMultiValueMap()) {
+                recordValues.put(field.getName(), data);
+            } else {
+                String titleColumn = indexToTitle.get(annotationDetail.getColumn());
+                titleColumn = titleColumn.replaceAll("@[0-9]+", "");
+                // For records with MultiValuedMap, we can't use the same approach
+                // Store it as a simple value for now
+                recordValues.put(field.getName(), data);
+            }
+        } else if (annotationDetail.isMandatoryCell()) {
+            throw new PoijiRowSpecificException(annotationDetail.getColumnName(), field.getName(),
+                    currentRow.getRowNum());
+        }
     }
 
     private <T> T tailSetFieldValue(Row currentRow, Class<? super T> type, T instance) {

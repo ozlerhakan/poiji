@@ -8,9 +8,11 @@ import org.apache.commons.collections4.MultiValuedMap;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.RecordComponent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public final class ReflectUtil {
 
@@ -30,6 +32,51 @@ public final class ReflectUtil {
         }
 
         return obj;
+    }
+
+    /**
+     * Creates an instance of a record class using its canonical constructor with provided values.
+     * 
+     * @param <T> the type of the record
+     * @param type the record class
+     * @param recordValues a map of field names to their values
+     * @return a new instance of the record
+     */
+    public static <T> T newRecordInstance(Class<T> type, Map<String, Object> recordValues) {
+        if (!type.isRecord()) {
+            throw new PoijiInstantiationException("Type " + type.getName() + " is not a record",
+                    new IllegalArgumentException("Expected a record type"));
+        }
+
+        try {
+            RecordComponent[] components = type.getRecordComponents();
+            Class<?>[] parameterTypes = new Class<?>[components.length];
+            Object[] args = new Object[components.length];
+
+            for (int i = 0; i < components.length; i++) {
+                RecordComponent component = components[i];
+                parameterTypes[i] = component.getType();
+                args[i] = recordValues.get(component.getName());
+            }
+
+            Constructor<T> constructor = type.getDeclaredConstructor(parameterTypes);
+            if (!constructor.canAccess(null)) {
+                constructor.setAccessible(true);
+            }
+            return constructor.newInstance(args);
+        } catch (Exception ex) {
+            throw new PoijiInstantiationException("Cannot create a new instance of record " + type.getName(), ex);
+        }
+    }
+
+    /**
+     * Checks if a class is a record.
+     * 
+     * @param type the class to check
+     * @return true if the class is a record, false otherwise
+     */
+    public static boolean isRecord(Class<?> type) {
+        return type.isRecord();
     }
 
     /**
