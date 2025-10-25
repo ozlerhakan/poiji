@@ -8,7 +8,7 @@ import org.apache.commons.collections4.MultiValuedMap;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.RecordComponent;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -36,6 +36,7 @@ public final class ReflectUtil {
 
     /**
      * Creates an instance of a record class using its canonical constructor with provided values.
+     * This method uses reflection to maintain compatibility with Java 11 while supporting records on Java 17+.
      * 
      * @param <T> the type of the record
      * @param type the record class
@@ -43,24 +44,35 @@ public final class ReflectUtil {
      * @return a new instance of the record
      */
     public static <T> T newRecordInstance(Class<T> type, Map<String, Object> recordValues) {
-        if (!type.isRecord()) {
+        if (!isRecord(type)) {
             throw new PoijiInstantiationException("Type " + type.getName() + " is not a record",
                     new IllegalArgumentException("Expected a record type"));
         }
 
         try {
-            RecordComponent[] components = type.getRecordComponents();
+            // Use reflection to call getRecordComponents() to maintain Java 11 compatibility
+            Method getRecordComponentsMethod = Class.class.getMethod("getRecordComponents");
+            Object[] components = (Object[]) getRecordComponentsMethod.invoke(type);
+            
             Class<?>[] parameterTypes = new Class<?>[components.length];
             Object[] args = new Object[components.length];
 
+            // Get methods from RecordComponent class using reflection
+            Class<?> recordComponentClass = Class.forName("java.lang.reflect.RecordComponent");
+            Method getNameMethod = recordComponentClass.getMethod("getName");
+            Method getTypeMethod = recordComponentClass.getMethod("getType");
+
             for (int i = 0; i < components.length; i++) {
-                RecordComponent component = components[i];
-                parameterTypes[i] = component.getType();
-                Object value = recordValues.get(component.getName());
+                Object component = components[i];
+                String componentName = (String) getNameMethod.invoke(component);
+                Class<?> componentType = (Class<?>) getTypeMethod.invoke(component);
+                
+                parameterTypes[i] = componentType;
+                Object value = recordValues.get(componentName);
                 
                 // If value is null, use default values for primitives
-                if (value == null && component.getType().isPrimitive()) {
-                    value = getDefaultValue(component.getType());
+                if (value == null && componentType.isPrimitive()) {
+                    value = getDefaultValue(componentType);
                 }
                 
                 args[i] = value;
@@ -101,13 +113,24 @@ public final class ReflectUtil {
     }
 
     /**
-     * Checks if a class is a record.
+     * Checks if a class is a record using reflection to maintain Java 11 compatibility.
+     * Records are only available in Java 16+, so this method will return false on earlier versions.
      * 
      * @param type the class to check
      * @return true if the class is a record, false otherwise
      */
     public static boolean isRecord(Class<?> type) {
-        return type.isRecord();
+        try {
+            // Use reflection to call isRecord() method to maintain Java 11 compatibility
+            Method isRecordMethod = Class.class.getMethod("isRecord");
+            return (Boolean) isRecordMethod.invoke(type);
+        } catch (NoSuchMethodException e) {
+            // isRecord() method doesn't exist, we're running on Java < 16
+            return false;
+        } catch (Exception e) {
+            // Some other error occurred
+            return false;
+        }
     }
 
     /**

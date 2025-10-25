@@ -207,6 +207,8 @@ PoijiOptions options = PoijiOptionsBuilder.settings()
 
 Starting with version 4.9.0, Poiji supports Java Records (Java 16+). Records provide a concise way to declare data carrier classes with immutable fields.
 
+**Compatibility Note**: The library maintains Java 11 compatibility for regular classes. Record support is automatically available when running on Java 17+ runtime, but the library will work on Java 11 for traditional POJOs.
+
 [source,java]
 ----
 public record EmployeeRecord(
@@ -253,6 +255,12 @@ Records work with all annotations including:
 * `@ExcelUnknownCells` - Capture unmapped cells
 
 Records work with both XLS and XLSX formats and support all standard Poiji options.
+
+**Requirements**:
+
+* Library compiled with Java 11 (maintains backward compatibility)
+* Record support requires Java 17+ runtime
+* Traditional POJOs work on any Java 11+ runtime
 
 === Prefer Default Value
 
