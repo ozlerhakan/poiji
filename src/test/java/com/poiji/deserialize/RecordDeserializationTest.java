@@ -110,4 +110,184 @@ public class RecordDeserializationTest {
             assertThat(calculation.toDate().toString(), is("2018-06-30"));
         }
     }
+
+    @Test
+    public void shouldMapExcelToRecordFromInputStream() {
+        // Test with InputStream
+        try (java.io.FileInputStream stream = new java.io.FileInputStream(
+                new File("src/test/resources/employees.xlsx"))) {
+            List<EmployeeRecord> employees = Poiji.fromExcel(
+                    stream,
+                    com.poiji.exception.PoijiExcelType.XLSX,
+                    EmployeeRecord.class
+            );
+
+            assertThat(employees, notNullValue());
+            assertThat(employees.size(), is(3));
+
+            EmployeeRecord firstEmployee = employees.get(0);
+            assertThat(firstEmployee.employeeId(), is(123923L));
+            assertThat(firstEmployee.name(), is("Joe"));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void shouldMapExcelToRecordFromInputStreamWithOptions() {
+        // Test with InputStream and options
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .headerStart(0)
+                .build();
+
+        try (java.io.FileInputStream stream = new java.io.FileInputStream(
+                new File("src/test/resources/employees.xlsx"))) {
+            List<EmployeeRecord> employees = Poiji.fromExcel(
+                    stream,
+                    com.poiji.exception.PoijiExcelType.XLSX,
+                    EmployeeRecord.class,
+                    options
+            );
+
+            assertThat(employees, notNullValue());
+            assertThat(employees.size(), is(3));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void shouldMapXLSFromInputStream() {
+        // Test XLS with InputStream
+        try (java.io.FileInputStream stream = new java.io.FileInputStream(
+                new File("src/test/resources/employees.xls"))) {
+            List<EmployeeRecord> employees = Poiji.fromExcel(
+                    stream,
+                    com.poiji.exception.PoijiExcelType.XLS,
+                    EmployeeRecord.class
+            );
+
+            assertThat(employees, notNullValue());
+            assertThat(employees.size(), is(3));
+
+            EmployeeRecord firstEmployee = employees.get(0);
+            assertThat(firstEmployee.employeeId(), is(123923L));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void shouldHandleRecordWithConsumer() {
+        // Test with consumer interface
+        final java.util.List<EmployeeRecord> collectedEmployees = new java.util.ArrayList<>();
+        
+        Poiji.fromExcel(
+                new File("src/test/resources/employees.xlsx"),
+                EmployeeRecord.class,
+                collectedEmployees::add
+        );
+
+        assertThat(collectedEmployees.size(), is(3));
+        assertThat(collectedEmployees.get(0).name(), is("Joe"));
+    }
+
+    @Test
+    public void shouldHandleRecordWithConsumerAndOptions() {
+        // Test with consumer interface and options
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .headerStart(0)
+                .build();
+
+        final java.util.List<EmployeeRecord> collectedEmployees = new java.util.ArrayList<>();
+        
+        Poiji.fromExcel(
+                new File("src/test/resources/employees.xlsx"),
+                EmployeeRecord.class,
+                options,
+                collectedEmployees::add
+        );
+
+        assertThat(collectedEmployees.size(), is(3));
+    }
+
+    @Test
+    public void shouldMapExcelToRecordFromSheet() {
+        // Test with Sheet API
+        try {
+            org.apache.poi.ss.usermodel.Workbook workbook = org.apache.poi.ss.usermodel.WorkbookFactory.create(
+                    new File("src/test/resources/employees.xlsx"));
+            org.apache.poi.ss.usermodel.Sheet sheet = workbook.getSheetAt(0);
+
+            List<EmployeeRecord> employees = Poiji.fromExcel(
+                    sheet,
+                    EmployeeRecord.class
+            );
+
+            assertThat(employees, notNullValue());
+            assertThat(employees.size(), is(3));
+            assertThat(employees.get(0).name(), is("Joe"));
+
+            workbook.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void shouldMapExcelToRecordFromSheetWithOptions() {
+        // Test with Sheet API and options
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .headerStart(0)
+                .build();
+
+        try {
+            org.apache.poi.ss.usermodel.Workbook workbook = org.apache.poi.ss.usermodel.WorkbookFactory.create(
+                    new File("src/test/resources/employees.xlsx"));
+            org.apache.poi.ss.usermodel.Sheet sheet = workbook.getSheetAt(0);
+
+            List<EmployeeRecord> employees = Poiji.fromExcel(
+                    sheet,
+                    EmployeeRecord.class,
+                    options
+            );
+
+            assertThat(employees, notNullValue());
+            assertThat(employees.size(), is(3));
+
+            workbook.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void shouldMapExcelToRecordFromSheetWithConsumer() {
+        // Test with Sheet API and consumer
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .headerStart(0)
+                .build();
+
+        final java.util.List<EmployeeRecord> collectedEmployees = new java.util.ArrayList<>();
+
+        try {
+            org.apache.poi.ss.usermodel.Workbook workbook = org.apache.poi.ss.usermodel.WorkbookFactory.create(
+                    new File("src/test/resources/employees.xlsx"));
+            org.apache.poi.ss.usermodel.Sheet sheet = workbook.getSheetAt(0);
+
+            Poiji.fromExcel(
+                    sheet,
+                    EmployeeRecord.class,
+                    options,
+                    collectedEmployees::add
+            );
+
+            assertThat(collectedEmployees.size(), is(3));
+            assertThat(collectedEmployees.get(0).name(), is("Joe"));
+
+            workbook.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
