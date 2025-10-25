@@ -1,6 +1,7 @@
 package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
+import com.poiji.deserialize.model.byid.CalculationRecord;
 import com.poiji.deserialize.model.byname.EmployeeRecord;
 import com.poiji.deserialize.model.byname.PersonRecord;
 import com.poiji.option.PoijiOptions;
@@ -85,5 +86,28 @@ public class RecordDeserializationTest {
 
         assertThat(employees, notNullValue());
         assertThat(employees.size(), is(3));
+    }
+
+    @Test
+    public void shouldMapExcelToRecordWithExcelCell() {
+        // Test with @ExcelCell annotation (by index)
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .sheetIndex(1)
+                .build();
+
+        List<CalculationRecord> calculations = Poiji.fromExcel(
+                new File("src/test/resources/calculations.xlsx"), 
+                CalculationRecord.class,
+                options
+        );
+
+        assertThat(calculations, notNullValue());
+        assertThat(calculations.size(), is(4));
+
+        // Verify that records with @ExcelCell work correctly
+        for (CalculationRecord calculation : calculations) {
+            assertThat(calculation.fromDate().toString(), is("2018-01-01"));
+            assertThat(calculation.toDate().toString(), is("2018-06-30"));
+        }
     }
 }
