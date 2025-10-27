@@ -181,7 +181,7 @@ public class RecordDeserializationTest {
     @Test
     public void shouldHandleRecordWithConsumer() {
         // Test with consumer interface
-        final java.util.List<EmployeeRecord> collectedEmployees = new java.util.ArrayList<>();
+        final List<EmployeeRecord> collectedEmployees = new java.util.ArrayList<>();
         
         Poiji.fromExcel(
                 new File("src/test/resources/employees.xlsx"),

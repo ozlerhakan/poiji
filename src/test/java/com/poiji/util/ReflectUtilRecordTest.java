@@ -20,8 +20,6 @@ public class ReflectUtilRecordTest {
     public static class SimplePojo {
         private String name;
         
-        public SimplePojo() {}
-        
         public String getName() {
             return name;
         }

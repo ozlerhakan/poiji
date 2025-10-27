@@ -11,6 +11,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Tests for code paths in modified classes to maintain coverage
@@ -77,7 +78,7 @@ public class ModifiedClassesCoverageTest {
             assertThat(people, notNullValue());
             assertThat(people.size(), is(5));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            fail(e.getMessage());
         }
     }
 
@@ -95,7 +96,7 @@ public class ModifiedClassesCoverageTest {
             assertThat(people, notNullValue());
             assertThat(people.size(), is(5));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            fail(e.getMessage());
         }
     }
 
@@ -117,7 +118,7 @@ public class ModifiedClassesCoverageTest {
 
             workbook.close();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            fail(e.getMessage());
         }
     }
 
@@ -144,7 +145,7 @@ public class ModifiedClassesCoverageTest {
 
             workbook.close();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            fail(e.getMessage());
         }
     }
 
@@ -173,7 +174,7 @@ public class ModifiedClassesCoverageTest {
 
             workbook.close();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            fail(e.getMessage());
         }
     }
 }
