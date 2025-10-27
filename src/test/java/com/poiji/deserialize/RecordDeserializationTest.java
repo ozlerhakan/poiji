@@ -116,7 +116,7 @@ public class RecordDeserializationTest {
     public void shouldMapExcelToRecordFromInputStream() {
         // Test with InputStream
         try (java.io.FileInputStream stream = new java.io.FileInputStream(
-                new File("src/test/resources/employees.xlsx"))) {
+                "src/test/resources/employees.xlsx")) {
             List<EmployeeRecord> employees = Poiji.fromExcel(
                     stream,
                     com.poiji.exception.PoijiExcelType.XLSX,
@@ -142,7 +142,7 @@ public class RecordDeserializationTest {
                 .build();
 
         try (java.io.FileInputStream stream = new java.io.FileInputStream(
-                new File("src/test/resources/employees.xlsx"))) {
+                "src/test/resources/employees.xlsx")) {
             List<EmployeeRecord> employees = Poiji.fromExcel(
                     stream,
                     com.poiji.exception.PoijiExcelType.XLSX,
@@ -161,7 +161,7 @@ public class RecordDeserializationTest {
     public void shouldMapXLSFromInputStream() {
         // Test XLS with InputStream
         try (java.io.FileInputStream stream = new java.io.FileInputStream(
-                new File("src/test/resources/employees.xls"))) {
+                "src/test/resources/employees.xls")) {
             List<EmployeeRecord> employees = Poiji.fromExcel(
                     stream,
                     com.poiji.exception.PoijiExcelType.XLS,

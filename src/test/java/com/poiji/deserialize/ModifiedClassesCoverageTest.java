@@ -68,7 +68,7 @@ public class ModifiedClassesCoverageTest {
     public void shouldMapExcelWithPojoUsingInputStream() {
         // Test InputStream API with POJO
         try (java.io.FileInputStream stream = new java.io.FileInputStream(
-                new File("src/test/resources/person.xlsx"))) {
+                "src/test/resources/person.xlsx")) {
             List<Person> people = Poiji.fromExcel(
                     stream,
                     com.poiji.exception.PoijiExcelType.XLSX,
@@ -86,7 +86,7 @@ public class ModifiedClassesCoverageTest {
     public void shouldMapXLSWithPojoUsingInputStream() {
         // Test XLS InputStream API with POJO
         try (java.io.FileInputStream stream = new java.io.FileInputStream(
-                new File("src/test/resources/person.xls"))) {
+                "src/test/resources/person.xls")) {
             List<Person> people = Poiji.fromExcel(
                     stream,
                     com.poiji.exception.PoijiExcelType.XLS,
