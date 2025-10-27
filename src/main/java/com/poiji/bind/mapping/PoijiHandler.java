@@ -12,6 +12,7 @@ import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.AnnotationUtil;
 import com.poiji.util.ReflectUtil;
+import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.util.StringUtil;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
@@ -233,8 +234,13 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             if (pattern.matcher(titleColumn).matches()) {
                 Object o = casting.castValue(field, content, internalRow, column, options);
                 if (isRecord && ins == null) {
-                    // For records, MultiValuedMap is not supported in the same way
-                    recordValues.put(field.getName(), o);
+                    // For records, we need to collect values into a MultiValuedMap
+                    MultiValuedMap<String, Object> fieldMap = (MultiValuedMap<String, Object>) recordValues.get(field.getName());
+                    if (fieldMap == null) {
+                        fieldMap = new org.apache.commons.collections4.multimap.ArrayListValuedHashMap<>();
+                        recordValues.put(field.getName(), fieldMap);
+                    }
+                    fieldMap.put(titleColumn, o);
                 } else {
                     ReflectUtil.putFieldMultiValueMapData(field, titleColumn, o, ins);
                 }

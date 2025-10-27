@@ -236,6 +236,7 @@
                                         <exclude>**/model/byname/EmployeeRecord.java</exclude>
                                         <exclude>**/model/byname/PersonRecord.java</exclude>
                                         <exclude>**/model/byname/OrgWithUnknownCellsRecord.java</exclude>
+                                        <exclude>**/model/AlbumRecord.java</exclude>
                                         <exclude>**/RecordDeserializationTest.java</exclude>
                                     </testExcludes>
                                 </configuration>

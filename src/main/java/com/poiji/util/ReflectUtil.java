@@ -70,9 +70,20 @@ public final class ReflectUtil {
                 parameterTypes[i] = componentType;
                 Object value = recordValues.get(componentName);
                 
-                // If value is null, use default values for primitives
-                if (value == null && componentType.isPrimitive()) {
-                    value = getDefaultValue(componentType);
+                // If value is null, use default values for primitives or create empty MultiValuedMap
+                if (value == null) {
+                    if (componentType.isPrimitive()) {
+                        value = getDefaultValue(componentType);
+                    } else if (componentType.getName().contains("MultiValuedMap")) {
+                        // Create empty MultiValuedMap for null values
+                        try {
+                            value = Class.forName("org.apache.commons.collections4.multimap.ArrayListValuedHashMap")
+                                    .getDeclaredConstructor()
+                                    .newInstance();
+                        } catch (Exception e) {
+                            // If we can't create ArrayListValuedHashMap, leave as null
+                        }
+                    }
                 }
                 
                 args[i] = value;

@@ -297,9 +297,13 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
             } else {
                 String titleColumn = indexToTitle.get(annotationDetail.getColumn());
                 titleColumn = titleColumn.replaceAll("@[0-9]+", "");
-                // For records with MultiValuedMap, we can't use the same approach
-                // Store it as a simple value for now
-                recordValues.put(field.getName(), data);
+                // For records with MultiValuedMap, we need to collect values into the map
+                MultiValuedMap<String, Object> fieldMap = (MultiValuedMap<String, Object>) recordValues.get(field.getName());
+                if (fieldMap == null) {
+                    fieldMap = new org.apache.commons.collections4.multimap.ArrayListValuedHashMap<>();
+                    recordValues.put(field.getName(), fieldMap);
+                }
+                fieldMap.put(titleColumn, data);
             }
         } else if (annotationDetail.isMandatoryCell()) {
             throw new PoijiRowSpecificException(annotationDetail.getColumnName(), field.getName(),

@@ -1,6 +1,7 @@
 package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
+import com.poiji.deserialize.model.AlbumRecord;
 import com.poiji.deserialize.model.byid.CalculationRecord;
 import com.poiji.deserialize.model.byname.EmployeeRecord;
 import com.poiji.deserialize.model.byname.OrgWithUnknownCellsRecord;
@@ -344,5 +345,59 @@ public class RecordDeserializationTest {
         OrgWithUnknownCellsRecord firstRow = organisations.get(0);
         assertThat(firstRow.unknownCells(), notNullValue());
         assertThat(firstRow.unknownCells().containsKey("Region"), is(true));
+    }
+
+    @Test
+    public void shouldMapExcelToRecordWithExcelCellsJoinedByName() {
+        // Test with @ExcelCellsJoinedByName annotation
+        List<AlbumRecord> albums = Poiji.fromExcel(
+                new File("src/test/resources/regex/album.xlsx"),
+                AlbumRecord.class,
+                PoijiOptions.PoijiOptionsBuilder.settings()
+                        .sheetName("Sheet 1")
+                        .build()
+        );
+
+        assertThat(albums, notNullValue());
+        assertThat(albums.size(), is(1));
+
+        AlbumRecord album = albums.get(0);
+        
+        // Verify artists are collected correctly
+        assertThat(album.artists(), notNullValue());
+        assertThat(album.artists().get("Artist").size(), is(3));
+        assertThat(album.artists().get("Artist").contains("Michael Jackson"), is(true));
+        assertThat(album.artists().get("Artist").contains("Lionel Richie"), is(true));
+        assertThat(album.artists().get("Artist").contains("Stevie Wonder"), is(true));
+
+        // Verify tracks are collected correctly with regex pattern
+        assertThat(album.tracks(), notNullValue());
+        assertThat(album.tracks().get("Track1").size(), is(1));
+        assertThat(album.tracks().get("Track1").contains("We are the World"), is(true));
+        assertThat(album.tracks().get("Track2").size(), is(1));
+        assertThat(album.tracks().get("Track2").contains("We are the World (instrumental)"), is(true));
+    }
+
+    @Test
+    public void shouldMapXLSToRecordWithExcelCellsJoinedByName() {
+        // Test XLS format with @ExcelCellsJoinedByName annotation
+        List<AlbumRecord> albums = Poiji.fromExcel(
+                new File("src/test/resources/regex/album.xls"),
+                AlbumRecord.class,
+                PoijiOptions.PoijiOptionsBuilder.settings()
+                        .sheetName("Sheet 1")
+                        .build()
+        );
+
+        assertThat(albums, notNullValue());
+        assertThat(albums.size(), is(1));
+
+        AlbumRecord album = albums.get(0);
+        
+        // Verify collected values work correctly in XLS format
+        assertThat(album.artists(), notNullValue());
+        assertThat(album.artists().get("Artist").size(), is(3));
+        assertThat(album.tracks(), notNullValue());
+        assertThat(album.tracks().size(), is(2)); // Track1 and Track2
     }
 }
