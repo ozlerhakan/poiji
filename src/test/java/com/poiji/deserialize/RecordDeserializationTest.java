@@ -13,6 +13,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Tests for Java Records support in Poiji
@@ -129,7 +130,7 @@ public class RecordDeserializationTest {
             assertThat(firstEmployee.employeeId(), is(123923L));
             assertThat(firstEmployee.name(), is("Joe"));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            fail(e.getMessage());
         }
     }
 
@@ -152,7 +153,7 @@ public class RecordDeserializationTest {
             assertThat(employees, notNullValue());
             assertThat(employees.size(), is(3));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            fail(e.getMessage());
         }
     }
 
@@ -173,7 +174,7 @@ public class RecordDeserializationTest {
             EmployeeRecord firstEmployee = employees.get(0);
             assertThat(firstEmployee.employeeId(), is(123923L));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            fail(e.getMessage());
         }
     }
 
@@ -230,7 +231,7 @@ public class RecordDeserializationTest {
 
             workbook.close();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            fail(e.getMessage());
         }
     }
 
@@ -257,7 +258,7 @@ public class RecordDeserializationTest {
 
             workbook.close();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            fail(e.getMessage());
         }
     }
 
@@ -287,7 +288,7 @@ public class RecordDeserializationTest {
 
             workbook.close();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            fail(e.getMessage());
         }
     }
 }
