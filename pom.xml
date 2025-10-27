@@ -238,6 +238,7 @@
                                         <exclude>**/model/byname/OrgWithUnknownCellsRecord.java</exclude>
                                         <exclude>**/model/AlbumRecord.java</exclude>
                                         <exclude>**/RecordDeserializationTest.java</exclude>
+                                        <exclude>**/util/ReflectUtilRecordEdgeCaseTest.java</exclude>
                                     </testExcludes>
                                 </configuration>
                             </execution>
