@@ -201,7 +201,7 @@ public class RecordDeserializationTest {
                 .headerStart(0)
                 .build();
 
-        final java.util.List<EmployeeRecord> collectedEmployees = new java.util.ArrayList<>();
+        final List<EmployeeRecord> collectedEmployees = new java.util.ArrayList<>();
         
         Poiji.fromExcel(
                 new File("src/test/resources/employees.xlsx"),

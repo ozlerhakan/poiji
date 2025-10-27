@@ -156,7 +156,7 @@ public class ModifiedClassesCoverageTest {
                 .headerStart(0)
                 .build();
 
-        final java.util.List<Person> collectedPeople = new java.util.ArrayList<>();
+        final List<Person> collectedPeople = new java.util.ArrayList<>();
 
         try {
             org.apache.poi.ss.usermodel.Workbook workbook = org.apache.poi.ss.usermodel.WorkbookFactory.create(
