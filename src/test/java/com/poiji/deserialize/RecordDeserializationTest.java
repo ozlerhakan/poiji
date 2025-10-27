@@ -3,6 +3,7 @@ package com.poiji.deserialize;
 import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.byid.CalculationRecord;
 import com.poiji.deserialize.model.byname.EmployeeRecord;
+import com.poiji.deserialize.model.byname.OrgWithUnknownCellsRecord;
 import com.poiji.deserialize.model.byname.PersonRecord;
 import com.poiji.option.PoijiOptions;
 import org.junit.Test;
@@ -290,5 +291,58 @@ public class RecordDeserializationTest {
         } catch (Exception e) {
             fail(e.getMessage());
         }
+    }
+
+    @Test
+    public void shouldMapExcelToRecordWithUnknownCells() {
+        // Test with @ExcelUnknownCells annotation
+        List<OrgWithUnknownCellsRecord> organisations = Poiji.fromExcel(
+                new File("src/test/resources/unknown-cells.xlsx"),
+                OrgWithUnknownCellsRecord.class,
+                PoijiOptions.PoijiOptionsBuilder.settings()
+                        .sheetName("Organisation")
+                        .build()
+        );
+
+        assertThat(organisations, notNullValue());
+        assertThat(organisations.size(), is(2));
+
+        // Test first row - verify unknownCells captures unmapped "Region" column
+        OrgWithUnknownCellsRecord firstRow = organisations.stream()
+                .filter(org -> org.id().equals("CrEaTe"))
+                .findFirst()
+                .get();
+        assertThat(firstRow.unknownCells(), notNullValue());
+        assertThat(firstRow.unknownCells().size(), is(1));
+        assertThat(firstRow.unknownCells().get("Region"), is("EMEA"));
+
+        // Test second row
+        OrgWithUnknownCellsRecord secondRow = organisations.stream()
+                .filter(org -> org.id().equals("8d9e6430-8626-4556-8004-079085d2df2d"))
+                .findFirst()
+                .get();
+        assertThat(secondRow.unknownCells(), notNullValue());
+        assertThat(secondRow.unknownCells().size(), is(1));
+        assertThat(secondRow.unknownCells().get("Region"), is("NA"));
+    }
+
+    @Test
+    public void shouldMapXLSToRecordWithUnknownCells() {
+        // Test XLS format with @ExcelUnknownCells annotation
+        List<OrgWithUnknownCellsRecord> organisations = Poiji.fromExcel(
+                new File("src/test/resources/unknown-cells.xls"),
+                OrgWithUnknownCellsRecord.class,
+                PoijiOptions.PoijiOptionsBuilder.settings()
+                        .sheetName("Organisation")
+                        .build()
+        );
+
+        assertThat(organisations, notNullValue());
+        assertThat(organisations.size(), is(2));
+
+        // Verify unknownCells are captured correctly
+        OrgWithUnknownCellsRecord firstRow = organisations.get(0);
+        assertThat(firstRow.unknownCells(), notNullValue());
+        assertThat(firstRow.unknownCells().containsKey("Region"), is(true));
     }
 }
