@@ -3,6 +3,7 @@ package com.poiji.deserialize;
 import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.AlbumRecord;
 import com.poiji.deserialize.model.byid.CalculationRecord;
+import com.poiji.deserialize.model.byid.ClassesRecord;
 import com.poiji.deserialize.model.byname.EmployeeRecord;
 import com.poiji.deserialize.model.byname.OrgWithUnknownCellsRecord;
 import com.poiji.deserialize.model.byname.PersonRecord;
@@ -399,5 +400,52 @@ public class RecordDeserializationTest {
         assertThat(album.artists().get("Artist").size(), is(3));
         assertThat(album.tracks(), notNullValue());
         assertThat(album.tracks().size(), is(2)); // Track1 and Track2
+    }
+
+    @Test
+    public void shouldMapExcelToRecordWithExcelCellRange() {
+        // Test with @ExcelCellRange annotation
+        List<ClassesRecord> classes = Poiji.fromExcel(
+                new File("src/test/resources/test_multi.xlsx"),
+                ClassesRecord.class,
+                PoijiOptions.PoijiOptionsBuilder.settings(1)
+                        .headerStart(1)
+                        .build()
+        );
+
+        assertThat(classes, notNullValue());
+        assertThat(classes.size(), is(3));
+
+        ClassesRecord firstClass = classes.get(0);
+        assertThat(firstClass.classA(), notNullValue());
+        assertThat(firstClass.classA().getAge(), is(28));
+        
+        assertThat(firstClass.classB(), notNullValue());
+        assertThat(firstClass.classB().getCity(), is("Los Angeles"));
+        
+        ClassesRecord secondClass = classes.get(1);
+        assertThat(secondClass.classA().getName(), is("Paul Ryan"));
+        assertThat(secondClass.classB().getState(), is("Virginia"));
+        assertThat(secondClass.classB().getZip(), is(22347));
+    }
+
+    @Test
+    public void shouldMapXLSToRecordWithExcelCellRange() {
+        // Test XLS format with @ExcelCellRange annotation
+        List<ClassesRecord> classes = Poiji.fromExcel(
+                new File("src/test/resources/test_multi.xls"),
+                ClassesRecord.class,
+                PoijiOptions.PoijiOptionsBuilder.settings(1)
+                        .headerStart(1)
+                        .build()
+        );
+
+        assertThat(classes, notNullValue());
+        assertThat(classes.size(), is(3));
+
+        // Verify nested fields are properly mapped
+        ClassesRecord secondClass = classes.get(1);
+        assertThat(secondClass.classA(), notNullValue());
+        assertThat(secondClass.classB(), notNullValue());
     }
 }

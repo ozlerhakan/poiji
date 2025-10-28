@@ -233,6 +233,7 @@
                                     <release>11</release>
                                     <testExcludes>
                                         <exclude>**/model/byid/CalculationRecord.java</exclude>
+                                        <exclude>**/model/byid/ClassesRecord.java</exclude>
                                         <exclude>**/model/byname/EmployeeRecord.java</exclude>
                                         <exclude>**/model/byname/PersonRecord.java</exclude>
                                         <exclude>**/model/byname/OrgWithUnknownCellsRecord.java</exclude>

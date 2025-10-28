@@ -85,11 +85,21 @@ final class PoijiHandler<T> implements SheetContentsHandler {
      **/
     private Object getInstance(Field field) {
         Object ins;
-        if (fieldInstances.containsKey(field.getName())) {
-            ins = fieldInstances.get(field.getName());
+        if (isRecord) {
+            // For records, check recordValues for nested objects
+            if (recordValues.containsKey(field.getName())) {
+                ins = recordValues.get(field.getName());
+            } else {
+                ins = ReflectUtil.newInstanceOf(field.getType());
+                recordValues.put(field.getName(), ins);
+            }
         } else {
-            ins = ReflectUtil.newInstanceOf(field.getType());
-            fieldInstances.put(field.getName(), ins);
+            if (fieldInstances.containsKey(field.getName())) {
+                ins = fieldInstances.get(field.getName());
+            } else {
+                ins = ReflectUtil.newInstanceOf(field.getType());
+                fieldInstances.put(field.getName(), ins);
+            }
         }
         return ins;
     }
