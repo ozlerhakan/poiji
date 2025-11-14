@@ -6,6 +6,7 @@ import com.poiji.option.PoijiOptions;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -52,7 +53,7 @@ public class ModifiedClassesCoverageTest {
     @Test
     public void shouldMapExcelWithPojoUsingConsumer() {
         // Test consumer interface with POJO
-        final java.util.List<Person> collectedPeople = new java.util.ArrayList<>();
+        final List<Person> collectedPeople = new ArrayList<>();
 
         Poiji.fromExcel(
                 new File("src/test/resources/person.xlsx"),
@@ -156,7 +157,7 @@ public class ModifiedClassesCoverageTest {
                 .headerStart(0)
                 .build();
 
-        final List<Person> collectedPeople = new java.util.ArrayList<>();
+        final List<Person> collectedPeople = new ArrayList<>();
 
         try {
             org.apache.poi.ss.usermodel.Workbook workbook = org.apache.poi.ss.usermodel.WorkbookFactory.create(

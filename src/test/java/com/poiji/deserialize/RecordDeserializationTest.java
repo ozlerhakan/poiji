@@ -11,6 +11,7 @@ import com.poiji.option.PoijiOptions;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -184,7 +185,7 @@ public class RecordDeserializationTest {
     @Test
     public void shouldHandleRecordWithConsumer() {
         // Test with consumer interface
-        final List<EmployeeRecord> collectedEmployees = new java.util.ArrayList<>();
+        final List<EmployeeRecord> collectedEmployees = new ArrayList<>();
         
         Poiji.fromExcel(
                 new File("src/test/resources/employees.xlsx"),
@@ -203,7 +204,7 @@ public class RecordDeserializationTest {
                 .headerStart(0)
                 .build();
 
-        final List<EmployeeRecord> collectedEmployees = new java.util.ArrayList<>();
+        final List<EmployeeRecord> collectedEmployees = new ArrayList<>();
         
         Poiji.fromExcel(
                 new File("src/test/resources/employees.xlsx"),
@@ -272,7 +273,7 @@ public class RecordDeserializationTest {
                 .headerStart(0)
                 .build();
 
-        final java.util.List<EmployeeRecord> collectedEmployees = new java.util.ArrayList<>();
+        final List<EmployeeRecord> collectedEmployees = new ArrayList<>();
 
         try {
             org.apache.poi.ss.usermodel.Workbook workbook = org.apache.poi.ss.usermodel.WorkbookFactory.create(
