@@ -1,0 +1,452 @@
+package com.poiji.deserialize;
+
+import com.poiji.bind.Poiji;
+import com.poiji.deserialize.model.AlbumRecord;
+import com.poiji.deserialize.model.byid.CalculationRecord;
+import com.poiji.deserialize.model.byid.ClassesRecord;
+import com.poiji.deserialize.model.byname.EmployeeRecord;
+import com.poiji.deserialize.model.byname.OrgWithUnknownCellsRecord;
+import com.poiji.deserialize.model.byname.PersonRecord;
+import com.poiji.option.PoijiOptions;
+import org.junit.Test;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
+
+/**
+ * Tests for Java Records support in Poiji
+ */
+public class RecordDeserializationTest {
+
+    @Test
+    public void shouldMapExcelToRecordByName() {
+        // Test with employees.xlsx
+        List<EmployeeRecord> employees = Poiji.fromExcel(
+                new File("src/test/resources/employees.xlsx"), 
+                EmployeeRecord.class
+        );
+
+        assertThat(employees, notNullValue());
+        assertThat(employees.size(), is(3));
+
+        EmployeeRecord firstEmployee = employees.get(0);
+        assertThat(firstEmployee.employeeId(), is(123923L));
+        assertThat(firstEmployee.name(), is("Joe"));
+        assertThat(firstEmployee.surname(), is("Doe"));
+        assertThat(firstEmployee.age(), is(30));
+        assertThat(firstEmployee.single(), is(true));
+        assertThat(firstEmployee.birthday(), is("4/9/1987"));
+    }
+
+    @Test
+    public void shouldMapExcelToRecordWithRowNumber() {
+        // Test with person.xlsx
+        List<PersonRecord> people = Poiji.fromExcel(
+                new File("src/test/resources/person.xlsx"), 
+                PersonRecord.class
+        );
+
+        assertThat(people, notNullValue());
+        assertThat(people.size(), is(5));
+
+        PersonRecord firstPerson = people.get(0);
+        assertThat(firstPerson.name(), is("Rafique"));
+        assertThat(firstPerson.row(), is(1)); // Row number should be captured
+    }
+
+    @Test
+    public void shouldMapXLSToRecord() {
+        // Test with XLS format
+        List<EmployeeRecord> employees = Poiji.fromExcel(
+                new File("src/test/resources/employees.xls"), 
+                EmployeeRecord.class
+        );
+
+        assertThat(employees, notNullValue());
+        assertThat(employees.size(), is(3));
+
+        EmployeeRecord firstEmployee = employees.get(0);
+        assertThat(firstEmployee.employeeId(), is(123923L));
+        assertThat(firstEmployee.name(), is("Joe"));
+    }
+
+    @Test
+    public void shouldMapExcelToRecordWithOptions() {
+        // Test with options
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .headerStart(0)
+                .build();
+
+        List<EmployeeRecord> employees = Poiji.fromExcel(
+                new File("src/test/resources/employees.xlsx"), 
+                EmployeeRecord.class,
+                options
+        );
+
+        assertThat(employees, notNullValue());
+        assertThat(employees.size(), is(3));
+    }
+
+    @Test
+    public void shouldMapExcelToRecordWithExcelCell() {
+        // Test with @ExcelCell annotation (by index)
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .sheetIndex(1)
+                .build();
+
+        List<CalculationRecord> calculations = Poiji.fromExcel(
+                new File("src/test/resources/calculations.xlsx"), 
+                CalculationRecord.class,
+                options
+        );
+
+        assertThat(calculations, notNullValue());
+        assertThat(calculations.size(), is(4));
+
+        // Verify that records with @ExcelCell work correctly
+        for (CalculationRecord calculation : calculations) {
+            assertThat(calculation.fromDate().toString(), is("2018-01-01"));
+            assertThat(calculation.toDate().toString(), is("2018-06-30"));
+        }
+    }
+
+    @Test
+    public void shouldMapExcelToRecordFromInputStream() {
+        // Test with InputStream
+        try (java.io.FileInputStream stream = new java.io.FileInputStream(
+                "src/test/resources/employees.xlsx")) {
+            List<EmployeeRecord> employees = Poiji.fromExcel(
+                    stream,
+                    com.poiji.exception.PoijiExcelType.XLSX,
+                    EmployeeRecord.class
+            );
+
+            assertThat(employees, notNullValue());
+            assertThat(employees.size(), is(3));
+
+            EmployeeRecord firstEmployee = employees.get(0);
+            assertThat(firstEmployee.employeeId(), is(123923L));
+            assertThat(firstEmployee.name(), is("Joe"));
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldMapExcelToRecordFromInputStreamWithOptions() {
+        // Test with InputStream and options
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .headerStart(0)
+                .build();
+
+        try (java.io.FileInputStream stream = new java.io.FileInputStream(
+                "src/test/resources/employees.xlsx")) {
+            List<EmployeeRecord> employees = Poiji.fromExcel(
+                    stream,
+                    com.poiji.exception.PoijiExcelType.XLSX,
+                    EmployeeRecord.class,
+                    options
+            );
+
+            assertThat(employees, notNullValue());
+            assertThat(employees.size(), is(3));
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldMapXLSFromInputStream() {
+        // Test XLS with InputStream
+        try (java.io.FileInputStream stream = new java.io.FileInputStream(
+                "src/test/resources/employees.xls")) {
+            List<EmployeeRecord> employees = Poiji.fromExcel(
+                    stream,
+                    com.poiji.exception.PoijiExcelType.XLS,
+                    EmployeeRecord.class
+            );
+
+            assertThat(employees, notNullValue());
+            assertThat(employees.size(), is(3));
+
+            EmployeeRecord firstEmployee = employees.get(0);
+            assertThat(firstEmployee.employeeId(), is(123923L));
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldHandleRecordWithConsumer() {
+        // Test with consumer interface
+        final List<EmployeeRecord> collectedEmployees = new ArrayList<>();
+        
+        Poiji.fromExcel(
+                new File("src/test/resources/employees.xlsx"),
+                EmployeeRecord.class,
+                collectedEmployees::add
+        );
+
+        assertThat(collectedEmployees.size(), is(3));
+        assertThat(collectedEmployees.get(0).name(), is("Joe"));
+    }
+
+    @Test
+    public void shouldHandleRecordWithConsumerAndOptions() {
+        // Test with consumer interface and options
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .headerStart(0)
+                .build();
+
+        final List<EmployeeRecord> collectedEmployees = new ArrayList<>();
+        
+        Poiji.fromExcel(
+                new File("src/test/resources/employees.xlsx"),
+                EmployeeRecord.class,
+                options,
+                collectedEmployees::add
+        );
+
+        assertThat(collectedEmployees.size(), is(3));
+    }
+
+    @Test
+    public void shouldMapExcelToRecordFromSheet() {
+        // Test with Sheet API
+        try {
+            org.apache.poi.ss.usermodel.Workbook workbook = org.apache.poi.ss.usermodel.WorkbookFactory.create(
+                    new File("src/test/resources/employees.xlsx"));
+            org.apache.poi.ss.usermodel.Sheet sheet = workbook.getSheetAt(0);
+
+            List<EmployeeRecord> employees = Poiji.fromExcel(
+                    sheet,
+                    EmployeeRecord.class
+            );
+
+            assertThat(employees, notNullValue());
+            assertThat(employees.size(), is(3));
+            assertThat(employees.get(0).name(), is("Joe"));
+
+            workbook.close();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldMapExcelToRecordFromSheetWithOptions() {
+        // Test with Sheet API and options
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .headerStart(0)
+                .build();
+
+        try {
+            org.apache.poi.ss.usermodel.Workbook workbook = org.apache.poi.ss.usermodel.WorkbookFactory.create(
+                    new File("src/test/resources/employees.xlsx"));
+            org.apache.poi.ss.usermodel.Sheet sheet = workbook.getSheetAt(0);
+
+            List<EmployeeRecord> employees = Poiji.fromExcel(
+                    sheet,
+                    EmployeeRecord.class,
+                    options
+            );
+
+            assertThat(employees, notNullValue());
+            assertThat(employees.size(), is(3));
+
+            workbook.close();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldMapExcelToRecordFromSheetWithConsumer() {
+        // Test with Sheet API and consumer
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .headerStart(0)
+                .build();
+
+        final List<EmployeeRecord> collectedEmployees = new ArrayList<>();
+
+        try {
+            org.apache.poi.ss.usermodel.Workbook workbook = org.apache.poi.ss.usermodel.WorkbookFactory.create(
+                    new File("src/test/resources/employees.xlsx"));
+            org.apache.poi.ss.usermodel.Sheet sheet = workbook.getSheetAt(0);
+
+            Poiji.fromExcel(
+                    sheet,
+                    EmployeeRecord.class,
+                    options,
+                    collectedEmployees::add
+            );
+
+            assertThat(collectedEmployees.size(), is(3));
+            assertThat(collectedEmployees.get(0).name(), is("Joe"));
+
+            workbook.close();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldMapExcelToRecordWithUnknownCells() {
+        // Test with @ExcelUnknownCells annotation
+        List<OrgWithUnknownCellsRecord> organisations = Poiji.fromExcel(
+                new File("src/test/resources/unknown-cells.xlsx"),
+                OrgWithUnknownCellsRecord.class,
+                PoijiOptions.PoijiOptionsBuilder.settings()
+                        .sheetName("Organisation")
+                        .build()
+        );
+
+        assertThat(organisations, notNullValue());
+        assertThat(organisations.size(), is(2));
+
+        // Test first row - verify unknownCells captures unmapped "Region" column
+        OrgWithUnknownCellsRecord firstRow = organisations.stream()
+                .filter(org -> org.id().equals("CrEaTe"))
+                .findFirst()
+                .get();
+        assertThat(firstRow.unknownCells(), notNullValue());
+        assertThat(firstRow.unknownCells().size(), is(1));
+        assertThat(firstRow.unknownCells().get("Region"), is("EMEA"));
+
+        // Test second row
+        OrgWithUnknownCellsRecord secondRow = organisations.stream()
+                .filter(org -> org.id().equals("8d9e6430-8626-4556-8004-079085d2df2d"))
+                .findFirst()
+                .get();
+        assertThat(secondRow.unknownCells(), notNullValue());
+        assertThat(secondRow.unknownCells().size(), is(1));
+        assertThat(secondRow.unknownCells().get("Region"), is("NA"));
+    }
+
+    @Test
+    public void shouldMapXLSToRecordWithUnknownCells() {
+        // Test XLS format with @ExcelUnknownCells annotation
+        List<OrgWithUnknownCellsRecord> organisations = Poiji.fromExcel(
+                new File("src/test/resources/unknown-cells.xls"),
+                OrgWithUnknownCellsRecord.class,
+                PoijiOptions.PoijiOptionsBuilder.settings()
+                        .sheetName("Organisation")
+                        .build()
+        );
+
+        assertThat(organisations, notNullValue());
+        assertThat(organisations.size(), is(2));
+
+        // Verify unknownCells are captured correctly
+        OrgWithUnknownCellsRecord firstRow = organisations.get(0);
+        assertThat(firstRow.unknownCells(), notNullValue());
+        assertThat(firstRow.unknownCells().containsKey("Region"), is(true));
+    }
+
+    @Test
+    public void shouldMapExcelToRecordWithExcelCellsJoinedByName() {
+        // Test with @ExcelCellsJoinedByName annotation
+        List<AlbumRecord> albums = Poiji.fromExcel(
+                new File("src/test/resources/regex/album.xlsx"),
+                AlbumRecord.class,
+                PoijiOptions.PoijiOptionsBuilder.settings()
+                        .sheetName("Sheet 1")
+                        .build()
+        );
+
+        assertThat(albums, notNullValue());
+        assertThat(albums.size(), is(1));
+
+        AlbumRecord album = albums.get(0);
+        
+        // Verify artists are collected correctly
+        assertThat(album.artists(), notNullValue());
+        assertThat(album.artists().get("Artist").size(), is(3));
+        assertThat(album.artists().get("Artist").contains("Michael Jackson"), is(true));
+        assertThat(album.artists().get("Artist").contains("Lionel Richie"), is(true));
+        assertThat(album.artists().get("Artist").contains("Stevie Wonder"), is(true));
+
+        // Verify tracks are collected correctly with regex pattern
+        assertThat(album.tracks(), notNullValue());
+        assertThat(album.tracks().get("Track1").size(), is(1));
+        assertThat(album.tracks().get("Track1").contains("We are the World"), is(true));
+        assertThat(album.tracks().get("Track2").size(), is(1));
+        assertThat(album.tracks().get("Track2").contains("We are the World (instrumental)"), is(true));
+    }
+
+    @Test
+    public void shouldMapXLSToRecordWithExcelCellsJoinedByName() {
+        // Test XLS format with @ExcelCellsJoinedByName annotation
+        List<AlbumRecord> albums = Poiji.fromExcel(
+                new File("src/test/resources/regex/album.xls"),
+                AlbumRecord.class,
+                PoijiOptions.PoijiOptionsBuilder.settings()
+                        .sheetName("Sheet 1")
+                        .build()
+        );
+
+        assertThat(albums, notNullValue());
+        assertThat(albums.size(), is(1));
+
+        AlbumRecord album = albums.get(0);
+        
+        // Verify collected values work correctly in XLS format
+        assertThat(album.artists(), notNullValue());
+        assertThat(album.artists().get("Artist").size(), is(3));
+        assertThat(album.tracks(), notNullValue());
+        assertThat(album.tracks().size(), is(2)); // Track1 and Track2
+    }
+
+    @Test
+    public void shouldMapExcelToRecordWithExcelCellRange() {
+        // Test with @ExcelCellRange annotation
+        List<ClassesRecord> classes = Poiji.fromExcel(
+                new File("src/test/resources/test_multi.xlsx"),
+                ClassesRecord.class,
+                PoijiOptions.PoijiOptionsBuilder.settings(1)
+                        .headerStart(1)
+                        .build()
+        );
+
+        assertThat(classes, notNullValue());
+        assertThat(classes.size(), is(3));
+
+        ClassesRecord firstClass = classes.get(0);
+        assertThat(firstClass.classA(), notNullValue());
+        assertThat(firstClass.classA().getAge(), is(28));
+        
+        assertThat(firstClass.classB(), notNullValue());
+        assertThat(firstClass.classB().getCity(), is("Los Angeles"));
+        
+        ClassesRecord secondClass = classes.get(1);
+        assertThat(secondClass.classA().getName(), is("Paul Ryan"));
+        assertThat(secondClass.classB().getState(), is("Virginia"));
+        assertThat(secondClass.classB().getZip(), is(22347));
+    }
+
+    @Test
+    public void shouldMapXLSToRecordWithExcelCellRange() {
+        // Test XLS format with @ExcelCellRange annotation
+        List<ClassesRecord> classes = Poiji.fromExcel(
+                new File("src/test/resources/test_multi.xls"),
+                ClassesRecord.class,
+                PoijiOptions.PoijiOptionsBuilder.settings(1)
+                        .headerStart(1)
+                        .build()
+        );
+
+        assertThat(classes, notNullValue());
+        assertThat(classes.size(), is(3));
+
+        // Verify nested fields are properly mapped
+        ClassesRecord secondClass = classes.get(1);
+        assertThat(secondClass.classA(), notNullValue());
+        assertThat(secondClass.classB(), notNullValue());
+    }
+}

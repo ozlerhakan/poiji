@@ -6,7 +6,7 @@
 
     <groupId>com.github.ozlerhakan</groupId>
     <artifactId>poiji</artifactId>
-    <version>4.9.0</version>
+    <version>5.0.0</version>
     <packaging>jar</packaging>
 
     <name>poiji</name>
@@ -183,6 +183,70 @@
             <properties>
                 <javadoc.none>-Xdoclint:none</javadoc.none>
             </properties>
+        </profile>
+        <profile>
+            <id>java17-tests</id>
+            <activation>
+                <jdk>[17,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.13.0</version>
+                        <executions>
+                            <execution>
+                                <id>default-testCompile</id>
+                                <phase>test-compile</phase>
+                                <goals>
+                                    <goal>testCompile</goal>
+                                </goals>
+                                <configuration>
+                                    <release>17</release>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>java11-tests</id>
+            <activation>
+                <jdk>(,17)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.13.0</version>
+                        <executions>
+                            <execution>
+                                <id>default-testCompile</id>
+                                <phase>test-compile</phase>
+                                <goals>
+                                    <goal>testCompile</goal>
+                                </goals>
+                                <configuration>
+                                    <release>11</release>
+                                    <testExcludes>
+                                        <exclude>**/model/byid/CalculationRecord.java</exclude>
+                                        <exclude>**/model/byid/ClassesRecord.java</exclude>
+                                        <exclude>**/model/byname/EmployeeRecord.java</exclude>
+                                        <exclude>**/model/byname/PersonRecord.java</exclude>
+                                        <exclude>**/model/byname/OrgWithUnknownCellsRecord.java</exclude>
+                                        <exclude>**/model/AlbumRecord.java</exclude>
+                                        <exclude>**/RecordDeserializationTest.java</exclude>
+                                        <exclude>**/util/ReflectUtilRecordEdgeCaseTest.java</exclude>
+                                    </testExcludes>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>coverage</id>

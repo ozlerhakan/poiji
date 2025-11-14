@@ -12,6 +12,7 @@ import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.AnnotationUtil;
 import com.poiji.util.ReflectUtil;
+import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.util.StringUtil;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
@@ -51,6 +52,9 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     private final Map<Integer, Field> columnToField;
     private final Map<Integer, Field> columnToSuperClassField;
     private final Set<ExcelCellName> excelCellNameAnnotations;
+    // Record support
+    private final boolean isRecord;
+    private Map<String, Object> recordValues;
 
     PoijiHandler(Class<T> type, PoijiOptions options, Consumer<? super T> consumer) {
         this.type = type;
@@ -64,6 +68,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         columnToField = new HashMap<>();
         columnToSuperClassField = new HashMap<>();
         excelCellNameAnnotations = new HashSet<>();
+        this.isRecord = ReflectUtil.isRecord(type);
     }
 
     private void setFieldValue(String content, Class<? super T> subclass, int column) {
@@ -80,11 +85,21 @@ final class PoijiHandler<T> implements SheetContentsHandler {
      **/
     private Object getInstance(Field field) {
         Object ins;
-        if (fieldInstances.containsKey(field.getName())) {
-            ins = fieldInstances.get(field.getName());
+        if (isRecord) {
+            // For records, check recordValues for nested objects
+            if (recordValues.containsKey(field.getName())) {
+                ins = recordValues.get(field.getName());
+            } else {
+                ins = ReflectUtil.newInstanceOf(field.getType());
+                recordValues.put(field.getName(), ins);
+            }
         } else {
-            ins = ReflectUtil.newInstanceOf(field.getType());
-            fieldInstances.put(field.getName(), ins);
+            if (fieldInstances.containsKey(field.getName())) {
+                ins = fieldInstances.get(field.getName());
+            } else {
+                ins = ReflectUtil.newInstanceOf(field.getType());
+                fieldInstances.put(field.getName(), ins);
+            }
         }
         return ins;
     }
@@ -97,7 +112,11 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                     ExcelRow excelRow = field.getAnnotation(ExcelRow.class);
                     if (excelRow != null) {
                         Object o = casting.castValue(field, valueOf(internalRow), internalRow, column, options);
-                        ReflectUtil.setFieldData(field, o, instance);
+                        if (isRecord) {
+                            recordValues.put(field.getName(), o);
+                        } else {
+                            ReflectUtil.setFieldData(field, o, instance);
+                        }
                         columnToField.put(-1, field);
                     }
                     ExcelCellRange range = field.getAnnotation(ExcelCellRange.class);
@@ -106,13 +125,17 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                         ins = getInstance(field);
                         for (Field f : field.getType().getDeclaredFields()) {
                             if (setValue(f, column, content, ins)) {
-                                ReflectUtil.setFieldData(field, ins, instance);
+                                if (isRecord) {
+                                    recordValues.put(field.getName(), ins);
+                                } else {
+                                    ReflectUtil.setFieldData(field, ins, instance);
+                                }
                                 columnToField.put(column, f);
                                 columnToSuperClassField.put(column, field);
                             }
                         }
                     } else {
-                        if (setValue(field, column, content, instance)) {
+                        if (setValue(field, column, content, isRecord ? null : instance)) {
                             columnToField.put(column, field);
                         }
                     }
@@ -123,12 +146,22 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                     if (!columnToField.containsKey(column)) {
                         try {
                             Map<String, String> excelUnknownCellsMap;
-                            field.setAccessible(true);
-                            if (field.get(instance) == null) {
-                                excelUnknownCellsMap = new HashMap<>();
-                                ReflectUtil.setFieldData(field, excelUnknownCellsMap, instance);
+                            if (isRecord) {
+                                // For records, we need to get or create the map from recordValues
+                                if (recordValues.containsKey(field.getName())) {
+                                    excelUnknownCellsMap = (Map<String, String>) recordValues.get(field.getName());
+                                } else {
+                                    excelUnknownCellsMap = new HashMap<>();
+                                    recordValues.put(field.getName(), excelUnknownCellsMap);
+                                }
                             } else {
-                                excelUnknownCellsMap = (Map<String, String>) field.get(instance);
+                                field.setAccessible(true);
+                                if (field.get(instance) == null) {
+                                    excelUnknownCellsMap = new HashMap<>();
+                                    ReflectUtil.setFieldData(field, excelUnknownCellsMap, instance);
+                                } else {
+                                    excelUnknownCellsMap = (Map<String, String>) field.get(instance);
+                                }
                             }
                             String index = indexToTitle.get(column);
                             if (index == null) {
@@ -146,19 +179,37 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         if (columnToField.containsKey(-1)) {
             Field field = columnToField.get(-1);
             Object o = casting.castValue(field, valueOf(internalRow), internalRow, column, options);
-            ReflectUtil.setFieldData(field, o, instance);
+            if (isRecord) {
+                recordValues.put(field.getName(), o);
+            } else {
+                ReflectUtil.setFieldData(field, o, instance);
+            }
         }
         if (columnToField.containsKey(column) && columnToSuperClassField.containsKey(column)) {
             Field field = columnToField.get(column);
             Object ins;
             ins = getInstance(columnToSuperClassField.get(column));
             if (setValue(field, column, content, ins)) {
-                ReflectUtil.setFieldData(columnToSuperClassField.get(column), ins, instance);
+                if (isRecord) {
+                    recordValues.put(columnToSuperClassField.get(column).getName(), ins);
+                } else {
+                    ReflectUtil.setFieldData(columnToSuperClassField.get(column), ins, instance);
+                }
                 return true;
             }
-            return setValue(field, column, content, instance);
+            return setValue(field, column, content, isRecord ? null : instance);
         }
         return false;
+    }
+
+    private void setFieldValue(Field field, Object value, Object ins) {
+        if (isRecord && ins == null) {
+            // For records, store value in recordValues map
+            recordValues.put(field.getName(), value);
+        } else {
+            // For regular classes, set field directly
+            ReflectUtil.setFieldData(field, value, ins);
+        }
     }
 
     private boolean setValue(Field field, int column, String content, Object ins) {
@@ -167,7 +218,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         if (index != null) {
             if (column == index.value()) {
                 Object o = casting.castValue(field, content, internalRow, column, options);
-                ReflectUtil.setFieldData(field, o, ins);
+                setFieldValue(field, o, ins);
                 return true;
             }
         }
@@ -179,7 +230,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             // Fix both columns mapped to name passing this condition below
             if (titleColumn != null && titleColumn == column) {
                 Object o = casting.castValue(field, content, internalRow, column, options);
-                ReflectUtil.setFieldData(field, o, ins);
+                setFieldValue(field, o, ins);
                 return true;
             }
         }
@@ -192,7 +243,17 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             Pattern pattern = Pattern.compile(expression);
             if (pattern.matcher(titleColumn).matches()) {
                 Object o = casting.castValue(field, content, internalRow, column, options);
-                ReflectUtil.putFieldMultiValueMapData(field, titleColumn, o, ins);
+                if (isRecord && ins == null) {
+                    // For records, we need to collect values into a MultiValuedMap
+                    MultiValuedMap<String, Object> fieldMap = (MultiValuedMap<String, Object>) recordValues.get(field.getName());
+                    if (fieldMap == null) {
+                        fieldMap = new org.apache.commons.collections4.multimap.ArrayListValuedHashMap<>();
+                        recordValues.put(field.getName(), fieldMap);
+                    }
+                    fieldMap.put(titleColumn, o);
+                } else {
+                    ReflectUtil.putFieldMultiValueMapData(field, titleColumn, o, ins);
+                }
                 return true;
             }
         }
@@ -223,8 +284,12 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     public void startRow(int rowNum) {
         if (rowNum + 1 > options.skip()) {
             internalCount += 1;
-            instance = ReflectUtil.newInstanceOf(type);
-            fieldInstances = new HashMap<>();
+            if (isRecord) {
+                recordValues = new HashMap<>();
+            } else {
+                instance = ReflectUtil.newInstanceOf(type);
+                fieldInstances = new HashMap<>();
+            }
         }
     }
 
@@ -234,6 +299,9 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             return;
 
         if (rowNum + 1 > options.skip()) {
+            if (isRecord) {
+                instance = ReflectUtil.newRecordInstance(type, recordValues);
+            }
             consumer.accept(instance);
         }
     }
