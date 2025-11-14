@@ -200,9 +200,6 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
         List<PoijiRowSpecificException> errors = new ArrayList<>();
 
         for (Field field : type.getDeclaredFields()) {
-            if (field.getModifiers() == 25) {
-                continue;
-            }
             if (field.getAnnotation(ExcelRow.class) != null) {
                 final int rowNum = currentRow.getRowNum();
                 final Object data = casting.castValue(field, valueOf(rowNum), rowNum, -1, options);
