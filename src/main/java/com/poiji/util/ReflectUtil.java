@@ -76,13 +76,9 @@ public final class ReflectUtil {
                         value = getDefaultValue(componentType);
                     } else if (componentType.getName().contains("MultiValuedMap")) {
                         // Create empty MultiValuedMap for null values
-                        try {
-                            value = Class.forName("org.apache.commons.collections4.multimap.ArrayListValuedHashMap")
-                                    .getDeclaredConstructor()
-                                    .newInstance();
-                        } catch (Exception e) {
-                            // If we can't create ArrayListValuedHashMap, leave as null
-                        }
+                        value = Class.forName("org.apache.commons.collections4.multimap.ArrayListValuedHashMap")
+                                .getDeclaredConstructor()
+                                .newInstance();
                     }
                 }
                 
@@ -90,9 +86,7 @@ public final class ReflectUtil {
             }
 
             Constructor<T> constructor = type.getDeclaredConstructor(parameterTypes);
-            if (!constructor.canAccess(null)) {
-                constructor.setAccessible(true);
-            }
+            constructor.setAccessible(true);
             return constructor.newInstance(args);
         } catch (Exception ex) {
             throw new PoijiInstantiationException("Cannot create a new instance of record " + type.getName(), ex);
@@ -138,8 +132,8 @@ public final class ReflectUtil {
         } catch (NoSuchMethodException e) {
             // isRecord() method doesn't exist, we're running on Java < 16
             return false;
-        } catch (Exception e) {
-            // Some other error occurred
+        } catch (IllegalAccessException | java.lang.reflect.InvocationTargetException e) {
+            // Should not happen for a public method, but handle gracefully
             return false;
         }
     }
