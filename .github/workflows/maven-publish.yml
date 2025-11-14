@@ -15,20 +15,24 @@ jobs:
       contents: read
       packages: write
 
+    strategy:
+      matrix:
+        java-version: [ 11, 17, 23 ]
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK 11
+      - uses: actions/checkout@v3
+      - name: Set up JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v2
         with:
-          java-version: '11'
-          distribution: 'adopt'
+          java-version: ${{ matrix.java-version }}
+          distribution: adopt
           server-id: ossrh
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
           gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
-      - name: Publish package
-        run: mvn --batch-mode deploy
+      - name: Publish package (${{ matrix.java-version }})
+        run: mvn --batch-mode -Pjava${{ matrix.java-version }} deploy
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
