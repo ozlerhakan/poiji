@@ -29,7 +29,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 </dependency>
 ----
 
-You can find the latest and earlier development versions including javadoc and source files on https://oss.sonatype.org/content/groups/public/com/github/ozlerhakan/poiji/[Sonatypes OSS repository].
+You can find the latest and earlier development versions including javadoc and source files at https://central.sonatype.com/artifact/com.github.ozlerhakan/poiji.
 
 == Usage
 
