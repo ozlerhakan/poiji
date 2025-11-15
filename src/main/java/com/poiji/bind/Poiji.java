@@ -120,6 +120,10 @@ public final class Poiji {
         } else if (XLS_EXTENSION.equals(extension)) {
             throw new InvalidExcelFileExtension("Reading metadata from (" + extension + "), is not supported");
         } else {
+            if (options.ignoreFileExtension()) {
+                // When ignoring file extension, assume XLSX for properties
+                return PoijiPropertyHelper.createPoijiPropertyFile(file, options);
+            }
             throw new InvalidExcelFileExtension("Invalid file extension (" + extension + "), expected .xlsx");
         }
     }
@@ -437,6 +441,10 @@ public final class Poiji {
         } else if (XLSX_EXTENSION.equals(extension)) {
             return UnmarshallerHelper.xssfInstance(poijiFile, options);
         } else {
+            if (options.ignoreFileExtension()) {
+                // When ignoring file extension, try XLSX first as it's more common
+                return UnmarshallerHelper.xssfInstance(poijiFile, options);
+            }
             throw new InvalidExcelFileExtension("Invalid file extension (" + extension + "), expected .xls or .xlsx");
         }
     }
