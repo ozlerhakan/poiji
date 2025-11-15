@@ -33,6 +33,7 @@ jobs:
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
       - name: Publish package (${{ matrix.java-version }})
         run: mvn --batch-mode -Pjava${{ matrix.java-version }} deploy
+        timeout-minutes: 120
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
