@@ -87,6 +87,7 @@ com.poiji.option.PoijiOptions.PoijiOptionsBuilder
     #addListDelimiter(String)
     #setLocale(java.util.Locale)
     #rawData(boolean)
+    #setIgnoreFileExtension(boolean)
 ----
 
 == Documentation
@@ -261,6 +262,12 @@ Records work with both XLS and XLSX formats and support all standard Poiji optio
 * Library compiled with Java 11 (maintains backward compatibility)
 * Record support requires Java 17+ runtime
 * Traditional POJOs work on any Java 11+ runtime
+
+=== Ignore File Extension
+
+Ignore file extension validation. When `PoijiOptions.ignoreFileExtension` set to true, Poiji will not throw `InvalidExcelFileExtension` if the file extension is not `.xls` or `.xlsx`. This is useful when working with temporary files that don't have proper extensions.
+
+Note: Files will be treated as XLSX format when the extension is ignored. XLS files without proper extensions are not supported with this option.
 
 === Prefer Default Value
 
