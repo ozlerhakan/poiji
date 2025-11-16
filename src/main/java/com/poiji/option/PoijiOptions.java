@@ -52,6 +52,7 @@ public final class PoijiOptions {
     private Formatting formatting;
     private Locale locale;
     private boolean rawData;
+    private boolean ignoreFileExtension;
 
     public PoijiNumberFormat getPoijiNumberFormat() {
         return numberFormat;
@@ -320,6 +321,15 @@ public final class PoijiOptions {
         return this;
     }
 
+    public boolean ignoreFileExtension() {
+        return ignoreFileExtension;
+    }
+
+    private PoijiOptions setIgnoreFileExtension(boolean ignoreFileExtension) {
+        this.ignoreFileExtension = ignoreFileExtension;
+        return this;
+    }
+
     public static class PoijiOptionsBuilder {
 
         private int sheetIndex;
@@ -350,6 +360,7 @@ public final class PoijiOptions {
         private String listDelimiter = "\\s*,\\s*";
         private Locale locale = Locale.US;
         private boolean rawData;
+        private boolean ignoreFileExtension;
 
         private PoijiOptionsBuilder() {
         }
@@ -481,7 +492,8 @@ public final class PoijiOptions {
                     .setListDelimiter(listDelimiter)
                     .setFormatting(formatting)
                     .setLocale(locale)
-                    .setRawData(rawData);
+                    .setRawData(rawData)
+                    .setIgnoreFileExtension(ignoreFileExtension);
 
         }
 
@@ -765,6 +777,23 @@ public final class PoijiOptions {
          */
         public PoijiOptionsBuilder rawData(boolean status) {
             this.rawData = status;
+            return this;
+        }
+
+        /**
+         * Ignore file extension validation. When set to true, Poiji will not throw
+         * InvalidExcelFileExtension if the file extension is not .xls or .xlsx.
+         * This is useful when working with temporary files that don't have proper extensions.
+         * <p>
+         * <strong>Note:</strong> Files will be treated as XLSX format when the extension is ignored.
+         * XLS files without proper extensions are not supported with this option.
+         * This option only works with {@code fromExcel} methods, not {@code fromExcelProperties}.
+         *
+         * @param ignoreFileExtension set true to skip file extension validation
+         * @return this
+         */
+        public PoijiOptionsBuilder ignoreFileExtension(boolean ignoreFileExtension) {
+            this.ignoreFileExtension = ignoreFileExtension;
             return this;
         }
     }
