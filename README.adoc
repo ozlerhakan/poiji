@@ -25,7 +25,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 <dependency>
   <groupId>com.github.ozlerhakan</groupId>
   <artifactId>poiji</artifactId>
-  <version>5.0.0</version>
+  <version>5.1.0</version>
 </dependency>
 ----
 
@@ -206,7 +206,7 @@ PoijiOptions options = PoijiOptionsBuilder.settings()
 
 === Java Records Support
 
-Starting with version 4.9.0, Poiji supports Java Records (Java 16+). Records provide a concise way to declare data carrier classes with immutable fields.
+Starting with version 5.0.0, Poiji supports Java Records (Java 16+). Records provide a concise way to declare data carrier classes with immutable fields.
 
 **Compatibility Note**: The library maintains Java 11 compatibility for regular classes. Record support is automatically available when running on Java 17+ runtime, but the library will work on Java 11 for traditional POJOs.
 
