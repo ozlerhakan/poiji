@@ -784,6 +784,10 @@ public final class PoijiOptions {
          * Ignore file extension validation. When set to true, Poiji will not throw
          * InvalidExcelFileExtension if the file extension is not .xls or .xlsx.
          * This is useful when working with temporary files that don't have proper extensions.
+         * <p>
+         * <strong>Note:</strong> Files will be treated as XLSX format when the extension is ignored.
+         * XLS files without proper extensions are not supported with this option.
+         * This option only works with {@code fromExcel} methods, not {@code fromExcelProperties}.
          *
          * @param ignoreFileExtension set true to skip file extension validation
          * @return this

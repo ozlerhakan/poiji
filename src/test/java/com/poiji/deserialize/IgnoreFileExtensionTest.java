@@ -2,7 +2,6 @@ package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.byid.Employee;
-import com.poiji.deserialize.property.model.PropertyEntity;
 import com.poiji.exception.InvalidExcelFileExtension;
 import com.poiji.option.PoijiOptions;
 import org.junit.Test;
@@ -62,29 +61,5 @@ public class IgnoreFileExtensionTest {
 
         assertThat(employees, notNullValue());
         assertThat(employees.size(), is(3));
-    }
-
-    @Test(expected = InvalidExcelFileExtension.class)
-    public void shouldThrowExceptionWhenReadingPropertiesFromFileWithNoExtension() {
-        Poiji.fromExcelProperties(
-                new File("src/test/resources/core_properties_no_extension"),
-                PropertyEntity.class);
-    }
-
-    @Test
-    public void shouldReadPropertiesFromFileWithNoExtensionWhenIgnoreFileExtensionIsEnabled() {
-        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder
-                .settings()
-                .ignoreFileExtension(true)
-                .build();
-
-        PropertyEntity properties = Poiji.fromExcelProperties(
-                new File("src/test/resources/core_properties_no_extension"),
-                PropertyEntity.class,
-                options);
-
-        assertThat(properties, notNullValue());
-        assertThat(properties.getTitle(), is("TestTitle"));
-        assertThat(properties.getCategory(), is("TestCategory"));
     }
 }
