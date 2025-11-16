@@ -50,18 +50,8 @@ public class IgnoreFileExtensionTest {
 
     @Test
     public void shouldReadFileWithInvalidExtensionWhenIgnoreFileExtensionIsEnabled() {
-        // First, create a test file with an invalid extension
-        File sourceFile = new File("src/test/resources/employees.xlsx");
+        // Use the test file with an invalid extension
         File targetFile = new File("src/test/resources/employees_invalid.dat");
-        
-        // Copy file if it doesn't exist
-        if (!targetFile.exists()) {
-            try {
-                java.nio.file.Files.copy(sourceFile.toPath(), targetFile.toPath());
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to create test file", e);
-            }
-        }
 
         PoijiOptions options = PoijiOptions.PoijiOptionsBuilder
                 .settings()
