@@ -237,24 +237,28 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
         ExcelCellsJoinedByName excelCellsJoinedByName = field.getAnnotation(ExcelCellsJoinedByName.class);
         if (excelCellsJoinedByName != null) {
-            String titleColumn = indexToTitle.get(column).replaceAll("@[0-9]+", "");
+            String titleColumn = indexToTitle.get(column);
 
-            String expression = excelCellsJoinedByName.expression();
-            Pattern pattern = Pattern.compile(expression);
-            if (pattern.matcher(titleColumn).matches()) {
-                Object o = casting.castValue(field, content, internalRow, column, options);
-                if (isRecord && ins == null) {
-                    // For records, we need to collect values into a MultiValuedMap
-                    MultiValuedMap<String, Object> fieldMap = (MultiValuedMap<String, Object>) recordValues.get(field.getName());
-                    if (fieldMap == null) {
-                        fieldMap = new org.apache.commons.collections4.multimap.ArrayListValuedHashMap<>();
-                        recordValues.put(field.getName(), fieldMap);
+            if(titleColumn!=null) {
+                titleColumn = titleColumn.replaceAll("@[0-9]+", "");
+
+                String expression = excelCellsJoinedByName.expression();
+                Pattern pattern = Pattern.compile(expression);
+                if (pattern.matcher(titleColumn).matches()) {
+                    Object o = casting.castValue(field, content, internalRow, column, options);
+                    if (isRecord && ins == null) {
+                        // For records, we need to collect values into a MultiValuedMap
+                        MultiValuedMap<String, Object> fieldMap = (MultiValuedMap<String, Object>) recordValues.get(field.getName());
+                        if (fieldMap == null) {
+                            fieldMap = new org.apache.commons.collections4.multimap.ArrayListValuedHashMap<>();
+                            recordValues.put(field.getName(), fieldMap);
+                        }
+                        fieldMap.put(titleColumn, o);
+                    } else {
+                        ReflectUtil.putFieldMultiValueMapData(field, titleColumn, o, ins);
                     }
-                    fieldMap.put(titleColumn, o);
-                } else {
-                    ReflectUtil.putFieldMultiValueMapData(field, titleColumn, o, ins);
+                    return true;
                 }
-                return true;
             }
         }
 
