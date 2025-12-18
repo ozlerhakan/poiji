@@ -87,12 +87,12 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
         int skip = options.skip();
         int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
         List<PoijiMultiRowException> errors = new ArrayList<>();
-
+        boolean processEmptyCell = options.isProcessEmptyCell();
         loadColumnTitles(sheet, maxPhysicalNumberOfRows);
         AnnotationUtil.validateMandatoryNameColumns(options, formatting, type, titleToIndex, indexToTitle);
 
         for (Row currentRow : sheet) {
-            if (!skip(currentRow, skip) && !isRowEmpty(currentRow)) {
+            if (!skip(currentRow, skip) && (processEmptyCell || !isRowEmpty(currentRow))) {
                 internalCount += 1;
 
                 if (limit != 0 && internalCount > limit)

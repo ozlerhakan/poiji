@@ -53,6 +53,7 @@ public final class PoijiOptions {
     private Locale locale;
     private boolean rawData;
     private boolean ignoreFileExtension;
+    private boolean processEmptyCell;
 
     public PoijiNumberFormat getPoijiNumberFormat() {
         return numberFormat;
@@ -327,6 +328,15 @@ public final class PoijiOptions {
 
     private PoijiOptions setIgnoreFileExtension(boolean ignoreFileExtension) {
         this.ignoreFileExtension = ignoreFileExtension;
+        return this;
+    }
+
+    public boolean isProcessEmptyCell() {
+        return processEmptyCell;
+    }
+
+    public PoijiOptions setProcessEmptyCell(boolean processEmptyCell) {
+        this.processEmptyCell = processEmptyCell;
         return this;
     }
 
