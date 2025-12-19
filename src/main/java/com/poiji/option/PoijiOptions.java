@@ -335,7 +335,7 @@ public final class PoijiOptions {
         return processEmptyCell;
     }
 
-    public PoijiOptions setProcessEmptyCell(boolean processEmptyCell) {
+    private PoijiOptions setProcessEmptyCell(boolean processEmptyCell) {
         this.processEmptyCell = processEmptyCell;
         return this;
     }
@@ -371,6 +371,7 @@ public final class PoijiOptions {
         private Locale locale = Locale.US;
         private boolean rawData;
         private boolean ignoreFileExtension;
+        private boolean processEmptyCell;
 
         private PoijiOptionsBuilder() {
         }
@@ -503,7 +504,8 @@ public final class PoijiOptions {
                     .setFormatting(formatting)
                     .setLocale(locale)
                     .setRawData(rawData)
-                    .setIgnoreFileExtension(ignoreFileExtension);
+                    .setIgnoreFileExtension(ignoreFileExtension)
+                    .setProcessEmptyCell(processEmptyCell);
 
         }
 
@@ -804,6 +806,19 @@ public final class PoijiOptions {
          */
         public PoijiOptionsBuilder ignoreFileExtension(boolean ignoreFileExtension) {
             this.ignoreFileExtension = ignoreFileExtension;
+            return this;
+        }
+
+        /**
+         * Process empty cells/rows during deserialization.
+         * When set to true, rows with no data will be processed and deserialized.
+         * Default is false.
+         *
+         * @param processEmptyCell set true to process empty cells
+         * @return this
+         */
+        public PoijiOptionsBuilder processEmptyCell(boolean processEmptyCell) {
+            this.processEmptyCell = processEmptyCell;
             return this;
         }
     }

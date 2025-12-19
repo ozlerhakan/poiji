@@ -55,6 +55,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     // Record support
     private final boolean isRecord;
     private Map<String, Object> recordValues;
+    private boolean rowHasCells;
 
     PoijiHandler(Class<T> type, PoijiOptions options, Consumer<? super T> consumer) {
         this.type = type;
@@ -284,6 +285,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     public void startRow(int rowNum) {
         if (rowNum + 1 > options.skip()) {
             internalCount += 1;
+            rowHasCells = false;
             if (isRecord) {
                 recordValues = new HashMap<>();
             } else {
@@ -295,15 +297,17 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     @Override
     public void endRow(int rowNum) {
-        if (internalRow != rowNum)
+        if (rowNum + 1 <= options.skip())
             return;
 
-        if (rowNum + 1 > options.skip()) {
-            if (isRecord) {
-                instance = ReflectUtil.newRecordInstance(type, recordValues);
-            }
-            consumer.accept(instance);
+        boolean processEmptyCell = options.isProcessEmptyCell();
+        if (!rowHasCells && !processEmptyCell)
+            return;
+
+        if (isRecord) {
+            instance = ReflectUtil.newRecordInstance(type, recordValues);
         }
+        consumer.accept(instance);
     }
 
     @Override
@@ -329,6 +333,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             return;
         }
         internalRow = row;
+        rowHasCells = true;
         setFieldValue(formattedValue, type, column);
     }
 
