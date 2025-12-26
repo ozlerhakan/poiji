@@ -156,6 +156,49 @@ public class ProcessEmptyCellTest {
         assertThat(person1.getMiddleName(), is(nullValue()));
     }
 
+    @Test
+    public void shouldProcessEmptyCellsAsNullWhenPreferNullOverDefaultIsEnabled() {
+        // When both processEmptyCell and preferNullOverDefault are enabled,
+        // empty cells should be processed and set to null instead of empty string
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder
+                .settings()
+                .processEmptyCell(true)
+                .preferNullOverDefault(true)
+                .build();
+
+        List<PersonWithGaps> persons = deserialize(options);
+
+        assertThat(persons, notNullValue());
+        assertThat(persons.size(), is(4));
+
+        // Row 1: 1, John, (empty), Doe, john@example.com, 555-0100, (empty)
+        PersonWithGaps person1 = persons.get(0);
+        assertThat(person1.getId(), is("1"));
+        assertThat(person1.getFirstName(), is("John"));
+        assertThat(person1.getMiddleName(), is(nullValue())); // Empty cell should be null with preferNullOverDefault
+        assertThat(person1.getLastName(), is("Doe"));
+        assertThat(person1.getEmail(), is("john@example.com"));
+        assertThat(person1.getPhones(), notNullValue());
+        assertThat(person1.getPhones().get("Phone1").size(), is(1));
+        assertThat(person1.getPhones().get("Phone1").iterator().next(), is("555-0100"));
+        // Phone2 should have null value when both options are enabled
+        assertThat(person1.getPhones().containsKey("Phone2"), is(true));
+        Collection<String> phone2Values = person1.getPhones().get("Phone2");
+        assertThat(phone2Values.size(), is(1));
+        assertThat(phone2Values.iterator().next(), is(nullValue())); // null instead of empty string
+
+        // Row 3: 3, Bob, (empty), (empty), bob@example.com, (empty), 555-0301
+        PersonWithGaps person3 = persons.get(2);
+        assertThat(person3.getId(), is("3"));
+        assertThat(person3.getFirstName(), is("Bob"));
+        assertThat(person3.getMiddleName(), is(nullValue())); // null with preferNullOverDefault
+        assertThat(person3.getLastName(), is(nullValue())); // null with preferNullOverDefault
+        assertThat(person3.getEmail(), is("bob@example.com"));
+        // Phone1 should be null
+        assertThat(person3.getPhones().containsKey("Phone1"), is(true));
+        assertThat(person3.getPhones().get("Phone1").iterator().next(), is(nullValue()));
+    }
+
     private List<PersonWithGaps> deserialize(PoijiOptions options) {
         if (fromStream) {
             try (InputStream stream = new FileInputStream(new File(path))) {
