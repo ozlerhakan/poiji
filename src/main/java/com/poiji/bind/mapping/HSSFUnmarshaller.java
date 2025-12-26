@@ -281,23 +281,37 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
             Object data = casting.castValue(field, value, currentRow.getRowNum(), annotationDetail.getColumn(),
                     options);
 
-            if (!annotationDetail.isMultiValueMap()) {
-                recordValues.put(field.getName(), data);
-            } else {
-                String titleColumn = indexToTitle.get(annotationDetail.getColumn());
-                titleColumn = titleColumn.replaceAll("@[0-9]+", "");
-                // For records with MultiValuedMap, we need to collect values into the map
-                MultiValuedMap<String, Object> fieldMap = (MultiValuedMap<String, Object>) recordValues.get(field.getName());
-                if (fieldMap == null) {
-                    fieldMap = new org.apache.commons.collections4.multimap.ArrayListValuedHashMap<>();
-                    recordValues.put(field.getName(), fieldMap);
-                }
-                fieldMap.put(titleColumn, data);
-            }
+            constructTypeForRecord(recordValues, field, annotationDetail, data);
+        } else if (options.isProcessEmptyCell()) {
+            // Process empty cells by setting them to empty string
+            Object data = casting.castValue(field, "", currentRow.getRowNum(), annotationDetail.getColumn(),
+                    options);
+
+            constructTypeForRecord(recordValues, field, annotationDetail, data);
         } else if (annotationDetail.isMandatoryCell()) {
             throw new PoijiRowSpecificException(annotationDetail.getColumnName(), field.getName(),
                     currentRow.getRowNum());
         }
+    }
+
+    private void constructTypeForRecord(Map<String, Object> recordValues, Field field, FieldAnnotationDetail annotationDetail, Object data) {
+        if (!annotationDetail.isMultiValueMap()) {
+            recordValues.put(field.getName(), data);
+        } else {
+            String titleColumn = indexToTitle.get(annotationDetail.getColumn());
+            titleColumn = titleColumn.replaceAll("@[0-9]+", "");
+            // For records with MultiValuedMap, we need to collect values into the map
+            fillMultiValueMap(recordValues, field, data, titleColumn);
+        }
+    }
+
+    static void fillMultiValueMap(Map<String, Object> recordValues, Field field, Object data, String titleColumn) {
+        MultiValuedMap<String, Object> fieldMap = (MultiValuedMap<String, Object>) recordValues.get(field.getName());
+        if (fieldMap == null) {
+            fieldMap = new org.apache.commons.collections4.multimap.ArrayListValuedHashMap<>();
+            recordValues.put(field.getName(), fieldMap);
+        }
+        fieldMap.put(titleColumn, data);
     }
 
     private <T> T tailSetFieldValue(Row currentRow, Class<? super T> type, T instance) {
@@ -459,6 +473,18 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
                 value = dataFormatter.formatCellValue(cell, baseFormulaEvaluator);
             }
             Object data = casting.castValue(field, value, currentRow.getRowNum(), annotationDetail.getColumn(),
+                    options);
+
+            if (!annotationDetail.isMultiValueMap()) {
+                setFieldData(instance, field, data);
+            } else {
+                String titleColumn = indexToTitle.get(annotationDetail.getColumn());
+                titleColumn = titleColumn.replaceAll("@[0-9]+", "");
+                putFieldMultiValueMapData(instance, field, titleColumn, data);
+            }
+        } else if (options.isProcessEmptyCell()) {
+            // Process empty cells by setting them to empty string
+            Object data = casting.castValue(field, "", currentRow.getRowNum(), annotationDetail.getColumn(),
                     options);
 
             if (!annotationDetail.isMultiValueMap()) {

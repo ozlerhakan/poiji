@@ -240,24 +240,22 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
         ExcelCellsJoinedByName excelCellsJoinedByName = field.getAnnotation(ExcelCellsJoinedByName.class);
         if (excelCellsJoinedByName != null) {
-            String titleColumn = indexToTitle.get(column).replaceAll("@[0-9]+", "");
+            String titleColumnRaw = indexToTitle.get(column);
+            if (titleColumnRaw != null) {
+                String titleColumn = titleColumnRaw.replaceAll("@[0-9]+", "");
 
-            String expression = excelCellsJoinedByName.expression();
-            Pattern pattern = Pattern.compile(expression);
-            if (pattern.matcher(titleColumn).matches()) {
-                Object o = casting.castValue(field, content, internalRow, column, options);
-                if (isRecord && ins == null) {
-                    // For records, we need to collect values into a MultiValuedMap
-                    MultiValuedMap<String, Object> fieldMap = (MultiValuedMap<String, Object>) recordValues.get(field.getName());
-                    if (fieldMap == null) {
-                        fieldMap = new org.apache.commons.collections4.multimap.ArrayListValuedHashMap<>();
-                        recordValues.put(field.getName(), fieldMap);
+                String expression = excelCellsJoinedByName.expression();
+                Pattern pattern = Pattern.compile(expression);
+                if (pattern.matcher(titleColumn).matches()) {
+                    Object o = casting.castValue(field, content, internalRow, column, options);
+                    if (isRecord && ins == null) {
+                        // For records, we need to collect values into a MultiValuedMap
+                        HSSFUnmarshaller.fillMultiValueMap(recordValues, field, o, titleColumn);
+                    } else {
+                        ReflectUtil.putFieldMultiValueMapData(field, titleColumn, o, ins);
                     }
-                    fieldMap.put(titleColumn, o);
-                } else {
-                    ReflectUtil.putFieldMultiValueMapData(field, titleColumn, o, ins);
+                    return true;
                 }
-                return true;
             }
         }
 
@@ -308,8 +306,14 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         if (maxColumnIndex < 0 && !processEmptyCell)
             return;
 
-        if (processEmptyCell && maxColumnIndex >= 0) {
-            for (int col = 0; col <= maxColumnIndex; col++) {
+        if (processEmptyCell) {
+            // Find the maximum column index from headers to ensure we process all defined columns
+            int maxHeaderColumn = indexToTitle.keySet().stream()
+                    .max(Integer::compareTo)
+                    .orElse(maxColumnIndex);
+            int endColumn = Math.max(maxColumnIndex, maxHeaderColumn);
+            
+            for (int col = 0; col <= endColumn; col++) {
                 if (!processedColumns.contains(col)) {
                     setFieldValue("", type, col);
                 }
