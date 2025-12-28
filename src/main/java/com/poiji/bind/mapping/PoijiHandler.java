@@ -55,6 +55,8 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     // Record support
     private final boolean isRecord;
     private Map<String, Object> recordValues;
+    private final Set<Integer> processedColumns;
+    private int maxColumnIndex;
 
     PoijiHandler(Class<T> type, PoijiOptions options, Consumer<? super T> consumer) {
         this.type = type;
@@ -68,6 +70,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         columnToField = new HashMap<>();
         columnToSuperClassField = new HashMap<>();
         excelCellNameAnnotations = new HashSet<>();
+        processedColumns = new HashSet<>();
         this.isRecord = ReflectUtil.isRecord(type);
     }
 
@@ -248,12 +251,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                     Object o = casting.castValue(field, content, internalRow, column, options);
                     if (isRecord && ins == null) {
                         // For records, we need to collect values into a MultiValuedMap
-                        MultiValuedMap<String, Object> fieldMap = (MultiValuedMap<String, Object>) recordValues.get(field.getName());
-                        if (fieldMap == null) {
-                            fieldMap = new org.apache.commons.collections4.multimap.ArrayListValuedHashMap<>();
-                            recordValues.put(field.getName(), fieldMap);
-                        }
-                        fieldMap.put(titleColumn, o);
+                        HSSFUnmarshaller.fillMultiValueMap(recordValues, field, o, titleColumn);
                     } else {
                         ReflectUtil.putFieldMultiValueMapData(field, titleColumn, o, ins);
                     }
@@ -288,6 +286,8 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     public void startRow(int rowNum) {
         if (rowNum + 1 > options.skip()) {
             internalCount += 1;
+            maxColumnIndex = -1;
+            processedColumns.clear();
             if (isRecord) {
                 recordValues = new HashMap<>();
             } else {
@@ -299,15 +299,32 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
     @Override
     public void endRow(int rowNum) {
-        if (internalRow != rowNum)
+        if (rowNum + 1 <= options.skip())
             return;
 
-        if (rowNum + 1 > options.skip()) {
-            if (isRecord) {
-                instance = ReflectUtil.newRecordInstance(type, recordValues);
+        boolean processEmptyCell = options.isProcessEmptyCell();
+
+        if (maxColumnIndex < 0 && !processEmptyCell)
+            return;
+
+        if (processEmptyCell) {
+            // Find the maximum column index from headers to ensure we process all defined columns
+            int maxHeaderColumn = indexToTitle.keySet().stream()
+                    .max(Integer::compareTo)
+                    .orElse(maxColumnIndex);
+            int endColumn = Math.max(maxColumnIndex, maxHeaderColumn);
+
+            for (int col = 0; col <= endColumn; col++) {
+                if (!processedColumns.contains(col)) {
+                    setFieldValue("", type, col);
+                }
             }
-            consumer.accept(instance);
         }
+
+        if (isRecord) {
+            instance = ReflectUtil.newRecordInstance(type, recordValues);
+        }
+        consumer.accept(instance);
     }
 
     @Override
@@ -333,6 +350,8 @@ final class PoijiHandler<T> implements SheetContentsHandler {
             return;
         }
         internalRow = row;
+        maxColumnIndex = Math.max(maxColumnIndex, column);
+        processedColumns.add(column);
         setFieldValue(formattedValue, type, column);
     }
 
