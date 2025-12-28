@@ -240,9 +240,10 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
         ExcelCellsJoinedByName excelCellsJoinedByName = field.getAnnotation(ExcelCellsJoinedByName.class);
         if (excelCellsJoinedByName != null) {
-            String titleColumnRaw = indexToTitle.get(column);
-            if (titleColumnRaw != null) {
-                String titleColumn = titleColumnRaw.replaceAll("@[0-9]+", "");
+            String titleColumn = indexToTitle.get(column);
+
+            if(titleColumn!=null) {
+                titleColumn = titleColumn.replaceAll("@[0-9]+", "");
 
                 String expression = excelCellsJoinedByName.expression();
                 Pattern pattern = Pattern.compile(expression);
@@ -312,7 +313,7 @@ final class PoijiHandler<T> implements SheetContentsHandler {
                     .max(Integer::compareTo)
                     .orElse(maxColumnIndex);
             int endColumn = Math.max(maxColumnIndex, maxHeaderColumn);
-            
+
             for (int col = 0; col <= endColumn; col++) {
                 if (!processedColumns.contains(col)) {
                     setFieldValue("", type, col);

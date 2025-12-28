@@ -1,12 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" ?>
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.ozlerhakan</groupId>
     <artifactId>poiji</artifactId>
-    <version>5.1.0</version>
+    <version>5.2.0</version>
     <packaging>jar</packaging>
 
     <name>poiji</name>
@@ -33,7 +35,8 @@
 
     <scm>
         <connection>scm:git:git://github.com/ozlerhakan/poiji.git</connection>
-        <developerConnection>scm:git:ssh://github.com:ozlerhakan/poiji.git</developerConnection>
+        <developerConnection
+        >scm:git:ssh://github.com:ozlerhakan/poiji.git</developerConnection>
         <url>http://github.com/ozlerhakan/poiji/tree/master</url>
     </scm>
 
@@ -222,14 +225,22 @@
                                 <configuration>
                                     <release>11</release>
                                     <testExcludes>
-                                        <exclude>**/model/byid/CalculationRecord.java</exclude>
-                                        <exclude>**/model/byid/ClassesRecord.java</exclude>
-                                        <exclude>**/model/byname/EmployeeRecord.java</exclude>
-                                        <exclude>**/model/byname/PersonRecord.java</exclude>
-                                        <exclude>**/model/byname/OrgWithUnknownCellsRecord.java</exclude>
-                                        <exclude>**/model/AlbumRecord.java</exclude>
-                                        <exclude>**/RecordDeserializationTest.java</exclude>
-                                        <exclude>**/util/ReflectUtilRecordEdgeCaseTest.java</exclude>
+                                        <exclude
+                                        >**/model/byid/CalculationRecord.java</exclude>
+                                        <exclude
+                                        >**/model/byid/ClassesRecord.java</exclude>
+                                        <exclude
+                                        >**/model/byname/EmployeeRecord.java</exclude>
+                                        <exclude
+                                        >**/model/byname/PersonRecord.java</exclude>
+                                        <exclude
+                                        >**/model/byname/OrgWithUnknownCellsRecord.java</exclude>
+                                        <exclude
+                                        >**/model/AlbumRecord.java</exclude>
+                                        <exclude
+                                        >**/RecordDeserializationTest.java</exclude>
+                                        <exclude
+                                        >**/util/ReflectUtilRecordEdgeCaseTest.java</exclude>
                                     </testExcludes>
                                 </configuration>
                             </execution>
