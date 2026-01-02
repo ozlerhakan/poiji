@@ -87,12 +87,11 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
         int skip = options.skip();
         int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
         List<PoijiMultiRowException> errors = new ArrayList<>();
-        boolean processEmptyCell = options.isProcessEmptyCell();
         loadColumnTitles(sheet, maxPhysicalNumberOfRows);
         AnnotationUtil.validateMandatoryNameColumns(options, formatting, type, titleToIndex, indexToTitle);
 
         for (Row currentRow : sheet) {
-            if (!skip(currentRow, skip) && (processEmptyCell || !isRowEmpty(currentRow))) {
+            if (!skip(currentRow, skip) && !isRowEmpty(currentRow)) {
                 internalCount += 1;
 
                 if (limit != 0 && internalCount > limit)
@@ -428,7 +427,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
 
             List<Integer> columns = indexToTitle.entrySet().stream()
                     .filter(entry -> pattern.matcher(
-                            entry.getValue().replaceAll("@[0-9]+", ""))
+                                    entry.getValue().replaceAll("@[0-9]+", ""))
                             .matches())
                     .map(Map.Entry::getKey)
                     .collect(Collectors.toList());
@@ -459,7 +458,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
     }
 
     private <T> void constructTypeValue(Row currentRow, T instance, Field field,
-            FieldAnnotationDetail annotationDetail) {
+                                        FieldAnnotationDetail annotationDetail) {
         Cell cell = currentRow.getCell(annotationDetail.getColumn());
 
         if (cell != null) {
@@ -529,7 +528,7 @@ abstract class HSSFUnmarshaller extends PoijiWorkBook implements Unmarshaller {
         return subclass == null
                 ? instance
                 : tailSetFieldValue(currentRow, subclass,
-                        setFieldValuesFromRowIntoInstance(currentRow, subclass.getSuperclass(), instance));
+                setFieldValuesFromRowIntoInstance(currentRow, subclass.getSuperclass(), instance));
     }
 
     boolean skip(final Row currentRow, int skip) {

@@ -234,6 +234,8 @@
                                         <exclude
                                         >**/model/byname/PersonRecord.java</exclude>
                                         <exclude
+                                        >**/model/byid/PersonWithGapsRecord.java</exclude>
+                                        <exclude
                                         >**/model/byname/OrgWithUnknownCellsRecord.java</exclude>
                                         <exclude
                                         >**/model/AlbumRecord.java</exclude>
@@ -241,6 +243,7 @@
                                         >**/RecordDeserializationTest.java</exclude>
                                         <exclude
                                         >**/util/ReflectUtilRecordEdgeCaseTest.java</exclude>
+                                        <exclude>**/ProcessEmptyCellRecordsTest.java</exclude>
                                     </testExcludes>
                                 </configuration>
                             </execution>

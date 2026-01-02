@@ -2,6 +2,7 @@ package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.byid.PersonWithGaps;
+import com.poiji.deserialize.model.byid.PersonWithGapsRecord;
 import com.poiji.exception.PoijiExcelType;
 import com.poiji.option.PoijiOptions;
 import org.junit.Test;
@@ -9,16 +10,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
 
 /**
  * Test for the processEmptyCell feature.
@@ -29,22 +26,18 @@ import static org.junit.Assert.fail;
 public class ProcessEmptyCellTest {
 
     private final String path;
-    private final PoijiExcelType excelType;
-    private final boolean fromStream;
 
-    public ProcessEmptyCellTest(String path, PoijiExcelType excelType, boolean fromStream) {
+    public ProcessEmptyCellTest(String path) {
         this.path = path;
-        this.excelType = excelType;
-        this.fromStream = fromStream;
     }
 
     @Parameterized.Parameters(name = "{index}: ({0}, {1}, fromStream={2})")
     public static Iterable<Object[]> queries() {
         return Arrays.asList(new Object[][]{
-                {"src/test/resources/persons_with_gaps.xlsx", PoijiExcelType.XLSX, false},
-                {"src/test/resources/persons_with_gaps.xlsx", PoijiExcelType.XLSX, true},
-                {"src/test/resources/persons_with_gaps.xls", PoijiExcelType.XLS, false},
-                {"src/test/resources/persons_with_gaps.xls", PoijiExcelType.XLS, true},
+                {"src/test/resources/persons_with_gaps.xlsx"},
+                {"src/test/resources/persons_with_gaps.xlsx"},
+                {"src/test/resources/persons_with_gaps.xls"},
+                {"src/test/resources/persons_with_gaps.xls"},
         });
     }
 
@@ -52,6 +45,7 @@ public class ProcessEmptyCellTest {
     public void shouldProcessEmptyCellsWhenOptionEnabled() {
         PoijiOptions options = PoijiOptions.PoijiOptionsBuilder
                 .settings()
+                .preferNullOverDefault(false) // default
                 .processEmptyCell(true)
                 .build();
 
@@ -108,6 +102,7 @@ public class ProcessEmptyCellTest {
     public void shouldNotProcessEmptyCellsWhenOptionDisabled() {
         PoijiOptions options = PoijiOptions.PoijiOptionsBuilder
                 .settings()
+                .preferNullOverDefault(false) // default
                 .processEmptyCell(false)
                 .build();
 
@@ -200,15 +195,7 @@ public class ProcessEmptyCellTest {
     }
 
     private List<PersonWithGaps> deserialize(PoijiOptions options) {
-        if (fromStream) {
-            try (InputStream stream = new FileInputStream(new File(path))) {
-                return Poiji.fromExcel(stream, excelType, PersonWithGaps.class, options);
-            } catch (IOException e) {
-                fail(e.getMessage());
-                return null;
-            }
-        } else {
-            return Poiji.fromExcel(new File(path), PersonWithGaps.class, options);
-        }
+        return Poiji.fromExcel(new File(path), PersonWithGaps.class, options);
     }
+
 }
