@@ -74,4 +74,20 @@ public class PoijiOptionsTest {
         assertThat(options.getLocale(), equalTo(userLocale));
         assertThat(LocaleUtil.getUserLocale(), equalTo(userLocale));
     }
+
+    @Test
+    public void shouldDisableProcessEmptyCellByDefault() {
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().build();
+
+        assertThat(options.isProcessEmptyCell(), equalTo(false));
+    }
+
+    @Test
+    public void shouldEnableProcessEmptyCellWhenSpecified() {
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings()
+                .processEmptyCell(true)
+                .build();
+
+        assertThat(options.isProcessEmptyCell(), equalTo(true));
+    }
 }
