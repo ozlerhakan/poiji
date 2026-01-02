@@ -2,8 +2,6 @@ package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.byid.PersonWithGaps;
-import com.poiji.deserialize.model.byid.PersonWithGapsRecord;
-import com.poiji.exception.PoijiExcelType;
 import com.poiji.option.PoijiOptions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
