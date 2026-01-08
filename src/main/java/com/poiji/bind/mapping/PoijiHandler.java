@@ -304,7 +304,8 @@ final class PoijiHandler<T> implements SheetContentsHandler {
 
         boolean processEmptyCell = options.isProcessEmptyCell();
 
-        if (maxColumnIndex < 0 && !processEmptyCell)
+        // Skip truly empty rows (no cells encountered), regardless of processEmptyCell flag
+        if (maxColumnIndex < 0)
             return;
 
         if (processEmptyCell) {

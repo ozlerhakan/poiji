@@ -192,6 +192,39 @@ public class ProcessEmptyCellTest {
         assertThat(person3.getPhones().get("Phone1").iterator().next(), is(nullValue()));
     }
 
+    @Test
+    public void shouldSkipTrulyEmptyRowsEvenWhenProcessEmptyCellIsEnabled() {
+        // Scenario: A row had cells with data, then the cells were deleted in Excel and file saved.
+        // When cells are deleted and saved, they are removed from the XLSX XML entirely.
+        // The row should be skipped even if processEmptyCell=true, because no cells exist for it.
+        //
+        // This tests the fix: if maxColumnIndex < 0 (no cells were encountered),
+        // the row is truly empty and should be skipped regardless of processEmptyCell flag.
+        PoijiOptions options = PoijiOptions.PoijiOptionsBuilder
+                .settings()
+                .processEmptyCell(true)
+                .build();
+
+        List<PersonWithGaps> persons = deserialize(options);
+
+        // With the fix in place, the test file should have 4 data rows + 1 completely empty row,
+        // but we should only get 4 rows because the empty row is skipped
+        assertThat(persons, notNullValue());
+        assertThat("Should only have 4 rows (empty row should be skipped)", 
+                persons.size(), is(4));
+        
+        // Verify all returned rows have content
+        for (PersonWithGaps person : persons) {
+            boolean hasContent = (person.getId() != null && !person.getId().isEmpty())
+                    || (person.getFirstName() != null && !person.getFirstName().isEmpty())
+                    || (person.getLastName() != null && !person.getLastName().isEmpty())
+                    || (person.getEmail() != null && !person.getEmail().isEmpty())
+                    || (person.getPhones() != null && !person.getPhones().isEmpty());
+            assertThat("Every returned row should have at least one cell with actual content",
+                    hasContent, is(true));
+        }
+    }
+
     private List<PersonWithGaps> deserialize(PoijiOptions options) {
         return Poiji.fromExcel(new File(path), PersonWithGaps.class, options);
     }
