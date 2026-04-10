@@ -8,7 +8,7 @@
 
     <groupId>com.github.ozlerhakan</groupId>
     <artifactId>poiji</artifactId>
-    <version>5.2.0</version>
+    <version>5.5.1</version>
     <packaging>jar</packaging>
 
     <name>poiji</name>
@@ -48,7 +48,7 @@
     </issueManagement>
 
     <properties>
-        <apache.poi.version>5.4.1</apache.poi.version>
+        <apache.poi.version>5.5.1</apache.poi.version>
         <junit.version>4.13.2</junit.version>
         <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
