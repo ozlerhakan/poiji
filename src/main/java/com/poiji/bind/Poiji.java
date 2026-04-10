@@ -13,11 +13,15 @@ import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
 import com.poiji.util.Files;
 import org.apache.poi.ss.usermodel.Sheet;
 
+import com.poiji.util.PoijiExecutors;
+
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 import static com.poiji.util.PoijiConstants.XLSX_EXTENSION;
@@ -425,6 +429,38 @@ public final class Poiji {
         Objects.requireNonNull(sheet);
         final Unmarshaller unmarshaller = UnmarshallerHelper.sheetInstance(sheet, options);
         unmarshaller.unmarshal(type, consumer);
+    }
+
+    /**
+     * converts excel rows into a list of objects asynchronously.
+     * On Java 21+, uses virtual threads; on Java 11/17, uses a cached thread pool.
+     *
+     * @param file    excel file ending with .xls or .xlsx.
+     * @param type    type of the root object.
+     * @param <T>     type of the root object.
+     * @param options specifies to change the default behaviour of the poiji.
+     * @return a CompletableFuture that completes with the list of deserialized objects
+     */
+    public static <T> CompletableFuture<List<T>> fromExcelAsync(final File file,
+            final Class<T> type,
+            final PoijiOptions options) {
+        ExecutorService executor = PoijiExecutors.newExecutor();
+        return CompletableFuture
+                .supplyAsync(() -> fromExcel(file, type, options), executor)
+                .whenComplete((result, ex) -> executor.shutdown());
+    }
+
+    /**
+     * converts excel rows into a list of objects asynchronously.
+     * On Java 21+, uses virtual threads; on Java 11/17, uses a cached thread pool.
+     *
+     * @param file excel file ending with .xls or .xlsx.
+     * @param type type of the root object.
+     * @param <T>  type of the root object.
+     * @return a CompletableFuture that completes with the list of deserialized objects
+     */
+    public static <T> CompletableFuture<List<T>> fromExcelAsync(final File file, final Class<T> type) {
+        return fromExcelAsync(file, type, PoijiOptionsBuilder.settings().build());
     }
 
     private static Unmarshaller deserializer(final File file, final PoijiOptions options) {
