@@ -16,6 +16,7 @@ jobs:
       packages: write
 
     strategy:
+      max-parallel: 1
       matrix:
         java-version: [ 11, 17, 23 ]
 
