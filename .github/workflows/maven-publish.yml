@@ -4,8 +4,9 @@
 name: Poiji Artifact Phase
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - *
 
 jobs:
   build:
