@@ -6,7 +6,7 @@ name: Poiji Artifact Phase
 on:
   push:
     tags:
-      - *
+      - "*"
 
 jobs:
   build:
@@ -18,7 +18,7 @@ jobs:
 
     strategy:
       matrix:
-        java-version: [ 21 ]
+        java-version: [ 11 ]
 
     steps:
       - uses: actions/checkout@v3
