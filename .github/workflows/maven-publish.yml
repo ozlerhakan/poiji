@@ -4,8 +4,9 @@
 name: Poiji Artifact Phase
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - "*"
 
 jobs:
   build:
@@ -16,9 +17,8 @@ jobs:
       packages: write
 
     strategy:
-      max-parallel: 1
       matrix:
-        java-version: [ 11, 17, 23 ]
+        java-version: [ 21 ]
 
     steps:
       - uses: actions/checkout@v3

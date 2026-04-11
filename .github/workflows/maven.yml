@@ -1,10 +1,10 @@
 name: Poiji Build and Test
-on: [push, pull_request]
+on: push
 jobs:
   test:
     strategy:
       matrix:
-        java: [ 11, 17, 23 ]
+        java: [ 11, 17, 21, 23 ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
