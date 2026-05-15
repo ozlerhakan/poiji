@@ -7,7 +7,7 @@ import com.poiji.annotation.ExcelRow;
 /**
  * Created by ar on 9/03/2018.
  */
-public class PersonByNameWithMissingColumn {
+public class PersonByNameWithMissingColumn extends Living {
 
     @ExcelCellName("Name")
     protected String name;

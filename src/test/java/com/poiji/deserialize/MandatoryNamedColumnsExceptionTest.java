@@ -40,7 +40,7 @@ public class MandatoryNamedColumnsExceptionTest {
                     .build());
         } catch (HeaderMissingException e) {
             assertEquals(Set.of(6), e.getMissingExcelCellHeaders());
-            assertEquals(Set.of("This column will be missing"), e.getMissingExcelCellNameHeaders());
+            assertEquals(Set.of("This column will be missing","Absent column"), e.getMissingExcelCellNameHeaders());
             return;
         }
         fail("Expected exception: " + HeaderMissingException.class.getName());
