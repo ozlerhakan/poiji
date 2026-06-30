@@ -61,35 +61,31 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
 
         Optional<String> maybeSheetName = this.getSheetName(type, options);
 
-        if (!maybeSheetName.isPresent()) {
-            int requestedIndex = options.sheetIndex();
-            int nonHiddenSheetIndex = 0;
-            while (iter.hasNext()) {
-                try (InputStream stream = iter.next()) {
-                    WorkBookSheet wbs = sheets.get(sheetCounter);
-                    if (wbs.getState().equals("visible")) {
-                        if (nonHiddenSheetIndex == requestedIndex) {
+        int nonHiddenSheetIndex = 0;
+        while (iter.hasNext()) {
+            try (InputStream stream = iter.next()) {
+                WorkBookSheet wbs = sheets.get(sheetCounter);
+                if (wbs.getState().equals("visible")) {
+                    //if searching by name
+                    if (maybeSheetName.isPresent()) {
+                        if(iter.getSheetName().equalsIgnoreCase(maybeSheetName.get())){
+                            processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
+                            return;
+                        }
+                    }
+                    //if searching by index
+                    else{
+                        if(nonHiddenSheetIndex == options.sheetIndex()){
                             processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
                             return;
                         }
                         nonHiddenSheetIndex++;
                     }
                 }
-                sheetCounter++;
             }
-        } else {
-            String sheetName = maybeSheetName.get();
-            while (iter.hasNext()) {
-                try (InputStream stream = iter.next()) {
-                    WorkBookSheet wbs = sheets.get(sheetCounter);
-                    if (wbs.getState().equals("visible") && iter.getSheetName().equalsIgnoreCase(sheetName)) {
-                        processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
-                        return;
-                    }
-                }
-                sheetCounter++;
-            }
+            sheetCounter++;
         }
+
     }
 
     private <T> void processSheet(StylesTable styles,
