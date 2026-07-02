@@ -49,20 +49,16 @@ public final class HSSFPropertyStream implements PropertyUnmarshaller {
 
     @Override
     public <T> T returnFromEncryptedFile(Class<T> type) {
-        try (POIFSFileSystem fs = new POIFSFileSystem(inputStream)) {
-            InputStream stream = DocumentFactoryHelper.getDecryptedStream(fs, options.getPassword());
-            try (OPCPackage open = OPCPackage.open(stream)) {
-                PropertyHandler propertyHandler = new PropertyHandler();
-                XSSFWorkbook xssfWorkbook = new XSSFWorkbook(open);
-                T ret = propertyHandler.unmarshal(type, xssfWorkbook.getProperties());
-                xssfWorkbook.close();
-                return ret;
-            } catch (IOException | OpenXML4JException e) {
-                IOUtils.closeQuietly(fs);
-                throw new PoijiException("Problem occurred while reading data", e);
-            }
+        try (POIFSFileSystem fs = new POIFSFileSystem(inputStream);
+             InputStream stream = DocumentFactoryHelper.getDecryptedStream(fs, options.getPassword());
+             OPCPackage open = OPCPackage.open(stream)) {
 
-        } catch (IOException e) {
+            PropertyHandler propertyHandler = new PropertyHandler();
+            XSSFWorkbook xssfWorkbook = new XSSFWorkbook(open);
+            T ret = propertyHandler.unmarshal(type, xssfWorkbook.getProperties());
+            xssfWorkbook.close();
+            return ret;
+        } catch (IOException | OpenXML4JException e) {
             throw new PoijiException("Problem occurred while reading data", e);
         }
     }
