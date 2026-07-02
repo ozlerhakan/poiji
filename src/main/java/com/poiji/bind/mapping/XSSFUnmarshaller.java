@@ -29,6 +29,8 @@ import java.util.function.Consumer;
  * Created by hakan on 22/10/2017
  */
 abstract class XSSFUnmarshaller implements Unmarshaller {
+    //constant variable for removing duplicate string
+    private static final String PRBLEM_OCCURED_MESSAGE = "Problem occurred while reading date";
 
     protected final PoijiOptions options;
 
@@ -111,7 +113,7 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
             reader.parse(sheetSource);
         } catch (SAXException | IOException e) {
             IOUtils.closeQuietly(sheetInputStream);
-            throw new PoijiException("Problem occurred while reading data", e);
+            throw new PoijiException(PRBLEM_OCCURED_MESSAGE, e);
         }
     }
 
@@ -123,7 +125,7 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
 
         } catch (ParserConfigurationException | SAXException | IOException | OpenXML4JException e) {
             IOUtils.closeQuietly(fs);
-            throw new PoijiException("Problem occurred while reading data", e);
+            throw new PoijiException(PRBLEM_OCCURED_MESSAGE, e);
         }
     }
 
