@@ -218,12 +218,10 @@ final class PoijiHandler<T> implements SheetContentsHandler {
     private boolean setValue(Field field, int column, String content, Object ins) {
         ExcelCell index = field.getAnnotation(ExcelCell.class);
 
-        if (index != null) {
-            if (column == index.value()) {
-                Object o = casting.castValue(field, content, internalRow, column, options);
-                setFieldValue(field, o, ins);
-                return true;
-            }
+        if (index != null && column == index.value()) {
+            Object o = casting.castValue(field, content, internalRow, column, options);
+            setFieldValue(field, o, ins);
+            return true;
         }
 
         ExcelCellName excelCellName = field.getAnnotation(ExcelCellName.class);
