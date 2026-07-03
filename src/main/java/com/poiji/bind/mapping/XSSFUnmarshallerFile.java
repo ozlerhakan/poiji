@@ -62,6 +62,10 @@ final class XSSFUnmarshallerFile extends XSSFUnmarshaller {
     private void executeWithExceptionHandling(UnmarshalingAction action){
         try{
             action.run();
+        } catch (RuntimeException e) {
+            throw e;
+        }  catch (ParserConfigurationException | SAXException | IOException | OpenXML4JException e){
+            throw new PoijiException("problem occurred reading data", e);
         } catch (Exception e) {
             throw new PoijiException("problem occurred reading data", e);
         }
