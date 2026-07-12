@@ -1,6 +1,9 @@
 package com.poiji.deserialize.model.byid;
 
 import com.poiji.annotation.ExcelCellName;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class PersonBTest {
 
@@ -18,6 +21,17 @@ public class PersonBTest {
 
     @ExcelCellName("Zip CodeB")
     private Integer zip;
+
+    @Test
+    public  void testGettersAndSetters(){
+        PersonBTest person = new PersonBTest();
+        person.setName("Test Name");
+        assertEquals("Test Name", person.getName());
+        assertEquals(null, person.getAge());
+        assertEquals(null, person.getCity());
+        assertEquals(null, person.getState());
+        assertEquals(null, person.getZip());
+    }
 
     public String getName() {
         return name;

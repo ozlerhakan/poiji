@@ -67,7 +67,7 @@ public final class Poiji {
      * @see Poiji#fromExcelProperties(File, Class, PoijiOptions)
      */
     public static <T> T fromExcelProperties(final File file, final Class<T> type) {
-        return fromExcelProperties(file, type, PoijiOptionsBuilder.settings().build());
+        return fromExcelProperties(file, type, defaultOptions());
     }
 
     /**
@@ -91,7 +91,7 @@ public final class Poiji {
     public static <T> T fromExcelProperties(final InputStream inputStream,
             PoijiExcelType excelType,
             final Class<T> type) {
-        return fromExcelProperties(inputStream, excelType, type, PoijiOptionsBuilder.settings().build());
+        return fromExcelProperties(inputStream, excelType, type, defaultOptions());
     }
 
     /**
@@ -182,9 +182,7 @@ public final class Poiji {
      * @see Poiji#fromExcel(File, Class, PoijiOptions)
      */
     public static <T> List<T> fromExcel(final File file, final Class<T> type) {
-        final ArrayList<T> list = new ArrayList<>();
-        fromExcel(file, type, list::add);
-        return list;
+        return fromExcel(file, type, defaultOptions());
     }
 
     /**
@@ -205,7 +203,7 @@ public final class Poiji {
      * @see Poiji#fromExcel(File, Class, PoijiOptions)
      */
     public static <T> void fromExcel(final File file, final Class<T> type, final Consumer<? super T> consumer) {
-        final Unmarshaller unmarshaller = deserializer(file, PoijiOptionsBuilder.settings().build());
+        final Unmarshaller unmarshaller = deserializer(file, defaultOptions());
         unmarshaller.unmarshal(type, consumer);
     }
 
@@ -229,9 +227,7 @@ public final class Poiji {
     public static <T> List<T> fromExcel(final InputStream inputStream,
             PoijiExcelType excelType,
             final Class<T> type) {
-        final ArrayList<T> list = new ArrayList<>();
-        fromExcel(inputStream, excelType, type, list::add);
-        return list;
+        return fromExcel(inputStream, excelType, type, defaultOptions());
     }
 
     /**
@@ -257,7 +253,7 @@ public final class Poiji {
             final Consumer<? super T> consumer) {
         Objects.requireNonNull(excelType);
 
-        final Unmarshaller unmarshaller = deserializer(inputStream, excelType, PoijiOptionsBuilder.settings().build());
+        final Unmarshaller unmarshaller = deserializer(inputStream, excelType, defaultOptions());
         unmarshaller.unmarshal(type, consumer);
     }
 
@@ -404,7 +400,7 @@ public final class Poiji {
             final Class<T> type) {
         Objects.requireNonNull(sheet);
         final ArrayList<T> list = new ArrayList<>();
-        fromExcel(sheet, type, PoijiOptionsBuilder.settings().build(), list::add);
+        fromExcel(sheet, type, defaultOptions(), list::add);
         return list;
     }
 
@@ -460,7 +456,7 @@ public final class Poiji {
      * @return a CompletableFuture that completes with the list of deserialized objects
      */
     public static <T> CompletableFuture<List<T>> fromExcelAsync(final File file, final Class<T> type) {
-        return fromExcelAsync(file, type, PoijiOptionsBuilder.settings().build());
+        return fromExcelAsync(file, type, defaultOptions());
     }
 
     private static Unmarshaller deserializer(final File file, final PoijiOptions options) {
@@ -479,6 +475,10 @@ public final class Poiji {
             }
             throw new InvalidExcelFileExtension("Invalid file extension (" + extension + "), expected .xls or .xlsx");
         }
+    }
+
+    private static PoijiOptions defaultOptions(){
+        return PoijiOptionsBuilder.settings().build();
     }
 
     private static Unmarshaller deserializer(final InputStream inputStream, PoijiExcelType excelType,

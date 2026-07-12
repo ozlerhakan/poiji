@@ -5,6 +5,9 @@ import com.poiji.util.ReflectUtil;
 import org.apache.poi.ooxml.POIXMLProperties;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static com.poiji.util.DefaultExcelPropertiesHelper.CATEGORY;
@@ -53,46 +56,31 @@ public final class PropertyHandler {
         return propertyName;
     }
 
-    private void setPropertyValueOnTarget(String propertyName, POIXMLProperties poixmlProperties, Field targetField, Object targetObject) {
-        switch (propertyName) {
-            case CATEGORY:
-                ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getCategory(), targetObject);
-                break;
-            case CONTENT_STATUS:
-                ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getContentStatus(), targetObject);
-                break;
-            case CREATED:
-                ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getCreated(), targetObject);
-                break;
-            case CREATOR:
-                ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getCreator(), targetObject);
-                break;
-            case DESCRIPTION:
-                ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getDescription(), targetObject);
-                break;
-            case KEYWORDS:
-                ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getKeywords(), targetObject);
-                break;
-            case LAST_PRINTED:
-                ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getLastPrinted(), targetObject);
-                break;
-            case MODIFIED:
-                ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getModified(), targetObject);
-                break;
-            case SUBJECT:
-                ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getSubject(), targetObject);
-                break;
-            case TITLE:
-                ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getTitle(), targetObject);
-                break;
-            case REVISION:
-                ReflectUtil.setFieldData(targetField, poixmlProperties.getCoreProperties().getRevision(), targetObject);
-                break;
-            default:
-                if (poixmlProperties.getCustomProperties().getProperty(propertyName) != null) {
-                    ReflectUtil.setFieldData(targetField, poixmlProperties.getCustomProperties().getProperty(propertyName).getLpwstr(), targetObject);
-                }
-                break;
+    private static final Map<String, Function<POIXMLProperties.CoreProperties, Object>> CORE_PROPERTY_EXTRACTORS = new HashMap<>();
+
+    static {
+        CORE_PROPERTY_EXTRACTORS.put(CATEGORY, POIXMLProperties.CoreProperties::getCategory);
+        CORE_PROPERTY_EXTRACTORS.put(CONTENT_STATUS, POIXMLProperties.CoreProperties::getContentStatus);
+        CORE_PROPERTY_EXTRACTORS.put(CREATED, POIXMLProperties.CoreProperties::getCreated);
+        CORE_PROPERTY_EXTRACTORS.put(CREATOR, POIXMLProperties.CoreProperties::getCreator);
+        CORE_PROPERTY_EXTRACTORS.put(DESCRIPTION, POIXMLProperties.CoreProperties::getDescription);
+        CORE_PROPERTY_EXTRACTORS.put(KEYWORDS, POIXMLProperties.CoreProperties::getKeywords);
+        CORE_PROPERTY_EXTRACTORS.put(LAST_PRINTED, POIXMLProperties.CoreProperties::getLastPrinted);
+        CORE_PROPERTY_EXTRACTORS.put(MODIFIED, POIXMLProperties.CoreProperties::getModified);
+        CORE_PROPERTY_EXTRACTORS.put(SUBJECT, POIXMLProperties.CoreProperties::getSubject);
+        CORE_PROPERTY_EXTRACTORS.put(TITLE, POIXMLProperties.CoreProperties::getTitle);
+        CORE_PROPERTY_EXTRACTORS.put(REVISION, POIXMLProperties.CoreProperties::getVersion);
+    }
+
+    private void setPropertyValueOnTarget(String propertyName, POIXMLProperties poixmlProperties, Field targetField, Object targetObject){
+        Function<POIXMLProperties.CoreProperties, Object> extractor = CORE_PROPERTY_EXTRACTORS.get(propertyName);
+
+        if (extractor != null){
+            Object value = extractor.apply(poixmlProperties.getCoreProperties());
+            ReflectUtil.setFieldData(targetField, value, targetObject);
+        }
+        else if(poixmlProperties.getCustomProperties().getProperty(propertyName) != null){
+            ReflectUtil.setFieldData(targetField, poixmlProperties.getCustomProperties().getProperty(propertyName).getLpwstr(), targetObject);
         }
     }
 }

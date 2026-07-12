@@ -37,26 +37,40 @@ final class XSSFUnmarshallerFile extends XSSFUnmarshaller {
 
     @Override
     public <T> void returnFromExcelFile(Class<T> type, Consumer<? super T> consumer) {
-
-        try (OPCPackage open = OPCPackage.open(poijiFile.file(), PackageAccess.READ)) {
-
-            unmarshal0(type, consumer, open);
-
-        } catch (ParserConfigurationException | SAXException | IOException | OpenXML4JException e) {
-            throw new PoijiException("Problem occurred while reading data", e);
-        }
+        executeWithExceptionHandling(() -> {
+            try (OPCPackage open = OPCPackage.open(poijiFile.file(), PackageAccess.READ)){
+                unmarshal0(type, consumer, open);
+            }
+        });
     }
 
     @Override
     public <T> void returnFromEncryptedFile(Class<T> type, Consumer<? super T> consumer) {
+        executeWithExceptionHandling(() -> {
+            try (POIFSFileSystem fs = new POIFSFileSystem(poijiFile.file(), true)){
+                listOfEncryptedItems(type, consumer, fs);
+            }
+        });
 
-        try (POIFSFileSystem fs = new POIFSFileSystem(poijiFile.file(), true)) {
+    }
 
-            listOfEncryptedItems(type, consumer, fs);
+    @FunctionalInterface
+    private interface UnmarshalingAction{
+        void run() throws Exception;
+    }
 
-        } catch (IOException e) {
-            throw new PoijiException("Problem occurred while reading data", e);
+    private void executeWithExceptionHandling(UnmarshalingAction action){
+        try{
+            action.run();
+        } catch (RuntimeException e) {
+            throw e;
+        }  catch (ParserConfigurationException | SAXException | IOException | OpenXML4JException e){
+            throw new PoijiException("problem occurred reading data", e);
+        } catch (Exception e) {
+            throw new PoijiException("problem occurred reading data", e);
         }
     }
+
+
 
 }
