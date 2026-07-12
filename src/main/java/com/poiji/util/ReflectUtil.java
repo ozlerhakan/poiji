@@ -141,23 +141,25 @@ public final class ReflectUtil {
     /**
      * Finds a particular annotation on a class and checks subtypes marked with
      * ExcelCellRange recursively.
-     * <p>
-     * Recursively does not refer to super classes.
      */
     static <T, A extends Annotation> Collection<A> findRecursivePoijiAnnotations(Class<T> typeToInspect,
             Class<A> annotationType) {
         List<A> annotations = new ArrayList<>();
+        Class<?> currentClass = typeToInspect;
 
-        for (Field field : typeToInspect.getDeclaredFields()) {
-            Annotation excelCellRange = field.getAnnotation(ExcelCellRange.class);
-            if (excelCellRange != null) {
-                annotations.addAll(findRecursivePoijiAnnotations(field.getType(), annotationType));
-            } else {
-                A fieldAnnotation = field.getAnnotation(annotationType);
-                if (fieldAnnotation != null) {
-                    annotations.add(fieldAnnotation);
+        while (currentClass != null && currentClass != Object.class) {
+            for (Field field : currentClass.getDeclaredFields()) {
+                Annotation excelCellRange = field.getAnnotation(ExcelCellRange.class);
+                if (excelCellRange != null) {
+                    annotations.addAll(findRecursivePoijiAnnotations(field.getType(), annotationType));
+                } else {
+                    A fieldAnnotation = field.getAnnotation(annotationType);
+                    if (fieldAnnotation != null) {
+                        annotations.add(fieldAnnotation);
+                    }
                 }
             }
+            currentClass = currentClass.getSuperclass();
         }
 
         return annotations;
